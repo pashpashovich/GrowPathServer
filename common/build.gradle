@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'org.openapi.generator' version '7.5.0'
 }
 
 dependencyManagement {
@@ -29,66 +28,3 @@ dependencies {
     api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
-def apiSpecDir = "${projectDir}/src/main/resources/api"
-def generatedSourcesDir = "${buildDir}/generated/sources/openapi"
-def generatedPackage = 'by.bsuir.growpathserver.common.dto'
-
-sourceSets {
-    main {
-        java {
-            srcDirs += "${generatedSourcesDir}/src/main/java"
-        }
-    }
-}
-
-openApiGenerate {
-    generatorName = "java"
-    inputSpec = "${apiSpecDir}/auth-api.yaml"
-    outputDir = "${generatedSourcesDir}"
-    apiPackage = "${generatedPackage}.api"
-    modelPackage = "${generatedPackage}.model"
-    invokerPackage = "${generatedPackage}.invoker"
-    
-    configOptions = [
-        dateLibrary: "java8",
-        java8: "true",
-        library: "native",
-        useJakartaEe: "true",
-        serializationLibrary: "jackson",
-        openApiNullable: "true",
-        useBeanValidation: "true",
-        hideGenerationTimestamp: "true"
-    ]
-    
-    typeMappings = [
-        'OffsetDateTime': 'java.time.OffsetDateTime',
-        'DateTime': 'java.time.OffsetDateTime'
-    ]
-    
-    importMappings = [
-        'OffsetDateTime': 'java.time.OffsetDateTime',
-        'DateTime': 'java.time.OffsetDateTime'
-    ]
-    
-    globalProperties = [
-        models: "",
-        apis: "",
-        supportingFiles: ""
-    ]
-    
-    skipValidateSpec = false
-}
-
-compileJava.dependsOn tasks.named('openApiGenerate')
-
-tasks.named('compileJava') {
-    options.annotationProcessorPath = configurations.annotationProcessor
-    options.compilerArgs = [
-            '-Amapstruct.suppressGeneratorTimestamp=true',
-            '-Amapstruct.suppressGeneratorVersionInfoComment=true'
-    ]
-}
-
-clean {
-    delete "${generatedSourcesDir}"
-}

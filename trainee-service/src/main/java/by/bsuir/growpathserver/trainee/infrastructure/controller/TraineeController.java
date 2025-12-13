@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.controller;
+package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
 import java.util.HashMap;
 import java.util.Map;

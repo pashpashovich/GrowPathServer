@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.config;
+package by.bsuir.growpathserver.trainee.infrastructure.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
