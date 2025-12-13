@@ -1,0 +1,67 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "User unique identifier"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address"
+    },
+    "name": {
+      "type": "string",
+      "description": "User full name"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ],
+      "description": "User role"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "blocked",
+        "pending"
+      ],
+      "description": "User status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User creation timestamp"
+    },
+    "lastLogin": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "Last login timestamp"
+    },
+    "invitedBy": {
+      "type": "string",
+      "nullable": true,
+      "description": "ID of user who invited this user"
+    },
+    "invitationSentAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "Invitation sent timestamp"
+    }
+  },
+  "required": [
+    "id",
+    "email",
+    "name",
+    "role",
+    "status",
+    "createdAt"
+  ]
+}

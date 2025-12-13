@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "error": {
+      "type": "string",
+      "description": "Error type",
+      "example": "Unauthorized"
+    },
+    "message": {
+      "type": "string",
+      "description": "Error message",
+      "example": "Authentication failed"
+    }
+  }
+}
+

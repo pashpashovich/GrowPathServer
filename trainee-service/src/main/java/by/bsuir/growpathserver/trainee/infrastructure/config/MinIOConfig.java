@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.config;
+package by.bsuir.growpathserver.trainee.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

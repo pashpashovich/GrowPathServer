@@ -1,6 +1,5 @@
 package by.bsuir.growpathserver.apigateway.service;
 
-import by.bsuir.growpathserver.common.dto.model.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import by.bsuir.growpathserver.apigateway.dto.model.auth.TokenResponse;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -30,7 +31,8 @@ public class AuthService {
             int realmsIndex = issuerUri.indexOf("/realms/");
             this.keycloakUrl = issuerUri.substring(0, realmsIndex);
             this.realm = issuerUri.substring(realmsIndex + "/realms/".length());
-        } else {
+        }
+        else {
             this.keycloakUrl = "http://localhost:8090";
             this.realm = "growpath";
         }
@@ -39,8 +41,8 @@ public class AuthService {
     }
 
     public Mono<TokenResponse> login(String username, String password) {
-        String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token", 
-                keycloakUrl, realm);
+        String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
+                                        keycloakUrl, realm);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "password");
@@ -59,8 +61,8 @@ public class AuthService {
     }
 
     public Mono<TokenResponse> refreshToken(String refreshToken) {
-        String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token", 
-                keycloakUrl, realm);
+        String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token",
+                                        keycloakUrl, realm);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "refresh_token");
@@ -78,8 +80,8 @@ public class AuthService {
     }
 
     public Mono<Void> logout(String refreshToken) {
-        String logoutUrl = String.format("%s/realms/%s/protocol/openid-connect/logout", 
-                keycloakUrl, realm);
+        String logoutUrl = String.format("%s/realms/%s/protocol/openid-connect/logout",
+                                         keycloakUrl, realm);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_id", clientId);
@@ -96,7 +98,8 @@ public class AuthService {
     }
 
     public String getAuthorizationUrl(String redirectUri) {
-        return String.format("%s/realms/%s/protocol/openid-connect/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid profile email roles",
+        return String.format(
+                "%s/realms/%s/protocol/openid-connect/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid profile email roles",
                 keycloakUrl, realm, clientId, redirectUri);
     }
 }
