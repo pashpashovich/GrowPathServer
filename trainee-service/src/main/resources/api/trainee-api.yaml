@@ -8,7 +8,7 @@ info:
     email: support@growpath.com
 
 servers:
-  - url: http://localhost:8080/api
+  - url: http://localhost:8080/api/v1
     description: Local development server
 
 paths:

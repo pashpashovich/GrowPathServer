@@ -14,17 +14,22 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
+        final String securitySchemeName = "bearerAuth";
+        
         return new OpenAPI()
                 .info(new Info()
-                              .title("GrowPath Server API")
+                              .title("GrowPath Trainee Service API")
                               .version("1.0.0")
-                              .description("API для управления пользователями и стажерами"))
+                              .description("API для управления задачами. " +
+                                      "⚠️ Для авторизации: 1) Получите токен через POST /api/v1/auth/login в API Gateway (http://localhost:8080), " +
+                                      "2) Нажмите кнопку 'Authorize' выше, 3) Введите токен в формате: Bearer <token> или просто <token>"))
                 .components(new Components()
-                                    .addSecuritySchemes("bearer-jwt", new SecurityScheme()
+                                    .addSecuritySchemes(securitySchemeName, new SecurityScheme()
+                                            .name(securitySchemeName)
                                             .type(SecurityScheme.Type.HTTP)
                                             .scheme("bearer")
                                             .bearerFormat("JWT")
-                                            .description("JWT токен из Keycloak")))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"));
+                                            .description("JWT токен из Keycloak. Получите через POST /api/v1/auth/login в API Gateway")))
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
     }
 }

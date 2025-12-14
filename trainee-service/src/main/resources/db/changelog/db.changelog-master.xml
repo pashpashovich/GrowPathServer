@@ -6,5 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
   <include file="db/changelog/changes/001-create-users-table.xml"/>
+  <include file="db/changelog/changes/002-create-tasks-table.xml"/>
+  <include file="db/changelog/changes/003-insert-mock-tasks.xml"/>
 
 </databaseChangeLog>

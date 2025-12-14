@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="003-insert-mock-tasks" author="growpath">
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440001"/>
+      <column name="title" value="Изучить основы Spring Boot"/>
+      <column name="description" value="Изучить основные концепции Spring Boot, включая dependency injection, autoconfiguration и starter dependencies"/>
+      <column name="status" value="PENDING"/>
+      <column name="priority" value="HIGH"/>
+      <column name="assignee_id" value="user-001"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="stage_id" value="stage-001"/>
+      <column name="due_date" value="2024-12-31 23:59:59"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-01 10:00:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440002"/>
+      <column name="title" value="Реализовать REST API для управления задачами"/>
+      <column name="description" value="Создать REST API с CRUD операциями для управления задачами, включая создание, обновление, удаление и получение списка задач"/>
+      <column name="status" value="IN_PROGRESS"/>
+      <column name="priority" value="HIGH"/>
+      <column name="assignee_id" value="user-002"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="stage_id" value="stage-002"/>
+      <column name="due_date" value="2025-01-15 18:00:00"/>
+      <column name="taken_at" value="2024-12-05 09:30:00"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-05 09:30:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440003"/>
+      <column name="title" value="Написать unit-тесты для сервисного слоя"/>
+      <column name="description" value="Создать unit-тесты для всех методов сервисного слоя, используя JUnit и Mockito"/>
+      <column name="status" value="SUBMITTED"/>
+      <column name="priority" value="MEDIUM"/>
+      <column name="assignee_id" value="user-001"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="stage_id" value="stage-003"/>
+      <column name="due_date" value="2024-12-20 17:00:00"/>
+      <column name="taken_at" value="2024-12-10 14:00:00"/>
+      <column name="submitted_at" value="2024-12-18 16:45:00"/>
+      <column name="submission_comment" value="Все тесты написаны и проходят успешно"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-18 16:45:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440004"/>
+      <column name="title" value="Изучить Docker и контейнеризацию"/>
+      <column name="description" value="Изучить основы Docker, создать Dockerfile для приложения и настроить docker-compose"/>
+      <column name="status" value="COMPLETED"/>
+      <column name="priority" value="MEDIUM"/>
+      <column name="assignee_id" value="user-003"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="stage_id" value="stage-001"/>
+      <column name="due_date" value="2024-12-10 20:00:00"/>
+      <column name="taken_at" value="2024-11-25 11:00:00"/>
+      <column name="submitted_at" value="2024-12-08 15:30:00"/>
+      <column name="completed_at" value="2024-12-09 10:00:00"/>
+      <column name="rating" value="4.5"/>
+      <column name="review_comment" value="Отличная работа! Dockerfile составлен правильно, но можно добавить multi-stage build для оптимизации"/>
+      <column name="submission_comment" value="Dockerfile создан, приложение успешно контейнеризировано"/>
+      <column name="created_at" value="2024-11-20 10:00:00"/>
+      <column name="updated_at" value="2024-12-09 10:00:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440005"/>
+      <column name="title" value="Настроить CI/CD pipeline"/>
+      <column name="description" value="Настроить непрерывную интеграцию и развертывание с использованием GitHub Actions или GitLab CI"/>
+      <column name="status" value="PENDING"/>
+      <column name="priority" value="LOW"/>
+      <column name="assignee_id" value="user-002"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="stage_id" value="stage-004"/>
+      <column name="due_date" value="2025-01-30 23:59:59"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-01 10:00:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440006"/>
+      <column name="title" value="Реализовать аутентификацию через Keycloak"/>
+      <column name="description" value="Интегрировать Keycloak для аутентификации и авторизации пользователей в приложении"/>
+      <column name="status" value="IN_PROGRESS"/>
+      <column name="priority" value="HIGH"/>
+      <column name="assignee_id" value="user-001"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="stage_id" value="stage-002"/>
+      <column name="due_date" value="2024-12-25 18:00:00"/>
+      <column name="taken_at" value="2024-12-12 08:00:00"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-12 08:00:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440007"/>
+      <column name="title" value="Оптимизировать запросы к базе данных"/>
+      <column name="description" value="Проанализировать и оптимизировать медленные SQL запросы, добавить необходимые индексы"/>
+      <column name="status" value="REJECTED"/>
+      <column name="priority" value="MEDIUM"/>
+      <column name="assignee_id" value="user-003"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="stage_id" value="stage-003"/>
+      <column name="due_date" value="2024-12-15 17:00:00"/>
+      <column name="taken_at" value="2024-12-05 10:00:00"/>
+      <column name="submitted_at" value="2024-12-14 16:00:00"/>
+      <column name="submission_comment" value="Оптимизация выполнена, но требуется доработка"/>
+      <column name="review_comment" value="Не все запросы оптимизированы. Нужно переделать с учетом рекомендаций"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-14 16:00:00"/>
+    </insert>
+
+    <insert tableName="tasks">
+      <column name="id" value="550e8400-e29b-41d4-a716-446655440008"/>
+      <column name="title" value="Создать документацию API"/>
+      <column name="description" value="Написать документацию для всех REST API endpoints с примерами запросов и ответов"/>
+      <column name="status" value="PENDING"/>
+      <column name="priority" value="LOW"/>
+      <column name="assignee_id" value="user-002"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="stage_id" value="stage-005"/>
+      <column name="due_date" value="2025-02-10 20:00:00"/>
+      <column name="created_at" value="2024-12-01 10:00:00"/>
+      <column name="updated_at" value="2024-12-01 10:00:00"/>
+    </insert>
+  </changeSet>
+
+</databaseChangeLog>

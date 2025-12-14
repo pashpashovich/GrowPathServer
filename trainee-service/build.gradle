@@ -86,9 +86,9 @@ tasks.register("openApiGenerateUsers", JavaExec) {
         '--api-package', "${generatedPackage}.api",
         '--model-package', "${generatedPackage}.model",
         '--invoker-package', "${generatedPackage}.invoker",
-        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=true,useBeanValidation=true,hideGenerationTimestamp=true,interfaceOnly=true,useSpringBoot3=true,library=spring-boot',
-        '--type-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
-        '--import-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
+        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=false,useBeanValidation=true,hideGenerationTimestamp=true,interfaceOnly=true,useSpringBoot3=true,library=spring-boot,withXml=false',
+        '--type-mappings', 'OffsetDateTime=java.time.LocalDateTime,DateTime=java.time.LocalDateTime',
+        '--import-mappings', 'OffsetDateTime=java.time.LocalDateTime,DateTime=java.time.LocalDateTime',
         '--global-property', 'models=,apis=,supportingFiles='
     ]
     

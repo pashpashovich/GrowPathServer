@@ -13,13 +13,13 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:8081,http://localhost:8080}")
     private String allowedOrigins;
 
-    @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
+    @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS,PATCH}")
     private String allowedMethods;
 
-    @Value("${cors.allowed-headers:Content-Type,Authorization}")
+    @Value("${cors.allowed-headers:Content-Type,Authorization,Accept,X-Requested-With}")
     private String allowedHeaders;
 
     @Value("${cors.allow-credentials:true}")

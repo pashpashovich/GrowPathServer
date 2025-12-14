@@ -14,11 +14,12 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(ServerHttpSecurity.CorsSpec::disable) // Отключаем встроенный CORS, используем CorsWebFilter
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**", "/health").permitAll()
-                        .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .pathMatchers("/api/auth/login", "/api/auth/logout", "/api/auth/refresh").permitAll()
-                        .pathMatchers("/api/auth/user", "/api/auth/validate").authenticated()
+                        .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html", "/webjars/**").permitAll()
+                        .pathMatchers("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/refresh").permitAll()
+                        .pathMatchers("/api/v1/auth/user", "/api/v1/auth/validate").authenticated()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
