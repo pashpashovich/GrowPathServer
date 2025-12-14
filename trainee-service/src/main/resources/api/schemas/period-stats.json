@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "weekly": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "integer"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "overdue": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "monthly": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "integer"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "overdue": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

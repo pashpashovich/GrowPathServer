@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "internId": {
+      "type": "string"
+    },
+    "internName": {
+      "type": "string"
+    },
+    "mentorId": {
+      "type": "string"
+    },
+    "mentorName": {
+      "type": "string"
+    },
+    "internshipId": {
+      "type": "string"
+    },
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "comment": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "internId",
+    "mentorId",
+    "overallRating",
+    "createdAt"
+  ]
+}

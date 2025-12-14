@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "required": [
+    "role"
+  ],
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ]
+    }
+  }
+}

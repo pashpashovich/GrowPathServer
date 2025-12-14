@@ -1,0 +1,2699 @@
+openapi: 3.0.3
+info:
+  title: GrowPath API
+  description: Complete API specification for GrowPath Server
+  version: 1.0.0
+  contact:
+    name: GrowPath Team
+    email: support@growpath.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get list of users
+      description: Retrieve a paginated list of users with optional filtering
+      operationId: getUsers
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: role
+          in: query
+          description: Filter by role
+          required: false
+          schema:
+            type: string
+            enum: [ admin, hr, mentor, intern ]
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+            enum: [ active, blocked, pending ]
+        - name: search
+          in: query
+          description: Search by name or email
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      description: Create a new user with pending status
+      operationId: createUser
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-user-request'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve a user by their unique identifier
+      operationId: getUserById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Update user information
+      operationId: updateUser
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-user-request'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Delete a user by ID
+      operationId: deleteUser
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /users/{id}/block:
+    post:
+      tags:
+        - Users
+      summary: Block user
+      description: Block a user by ID
+      operationId: blockUser
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User blocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-status-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /users/{id}/unblock:
+    post:
+      tags:
+        - Users
+      summary: Unblock user
+      description: Unblock a user by ID
+      operationId: unblockUser
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User unblocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-status-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /users/{id}/role:
+    patch:
+      tags:
+        - Users
+      summary: Change user role
+      description: Change the role of a user
+      operationId: changeUserRole
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/change-role-request'
+      responses:
+        '200':
+          description: User role changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-role-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /users/{id}/invite:
+    post:
+      tags:
+        - Users
+      summary: Send invitation to user
+      description: Send an invitation to a user
+      operationId: inviteUser
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invitation-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Interns ====================
+  /interns:
+    get:
+      tags:
+        - Interns
+      summary: Get list of interns
+      description: Retrieve a paginated list of interns
+      operationId: getInterns
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search by name
+          schema:
+            type: string
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ active, completed, paused ]
+        - name: rating
+          in: query
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Interns
+      summary: Create intern
+      description: Create a new intern
+      operationId: createIntern
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-intern-request'
+      responses:
+        '201':
+          description: Intern created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /interns/{id}:
+    get:
+      tags:
+        - Interns
+      summary: Get intern by ID
+      operationId: getInternById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Interns
+      summary: Update intern
+      operationId: updateIntern
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-intern-request'
+      responses:
+        '200':
+          description: Intern updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Interns
+      summary: Delete intern
+      operationId: deleteIntern
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Intern deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /interns/{id}/progress:
+    get:
+      tags:
+        - Interns
+      summary: Get intern progress
+      operationId: getInternProgress
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-progress-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /interns/{id}/tasks:
+    get:
+      tags:
+        - Interns
+      summary: Get intern tasks
+      operationId: getInternTasks
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ pending, in_progress, submitted, completed, rejected ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /interns/{id}/assessments:
+    get:
+      tags:
+        - Interns
+      summary: Get intern assessments
+      operationId: getInternAssessments
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assessment-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Mentors ====================
+  /mentors:
+    get:
+      tags:
+        - Mentors
+      summary: Get list of mentors
+      operationId: getMentors
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mentor-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /mentors/{id}:
+    get:
+      tags:
+        - Mentors
+      summary: Get mentor by ID
+      operationId: getMentorById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mentor-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Mentor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /mentors/{id}/interns:
+    get:
+      tags:
+        - Mentors
+      summary: Get mentor's interns
+      operationId: getMentorInterns
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mentor-interns-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Mentor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Tasks ====================
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get list of tasks
+      operationId: getTasks
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ pending, in_progress, submitted, completed, rejected ]
+        - name: assignee
+          in: query
+          schema:
+            type: string
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [ low, medium, high ]
+        - name: internshipId
+          in: query
+          schema:
+            type: string
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Tasks
+      summary: Create task
+      operationId: createTask
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-task-request'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task by ID
+      operationId: getTaskById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Tasks
+      summary: Update task
+      operationId: updateTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-task-request'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task
+      operationId: deleteTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/take:
+    post:
+      tags:
+        - Tasks
+      summary: Take task in work
+      operationId: takeTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task taken successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-status-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/submit:
+    post:
+      tags:
+        - Tasks
+      summary: Submit task for review
+      operationId: submitTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submit-task-request'
+      responses:
+        '200':
+          description: Task submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-status-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/review:
+    post:
+      tags:
+        - Tasks
+      summary: Review task
+      operationId: reviewTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/review-task-request'
+      responses:
+        '200':
+          description: Task reviewed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-status-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/complete:
+    patch:
+      tags:
+        - Tasks
+      summary: Complete task
+      operationId: completeTask
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-status-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/comments:
+    get:
+      tags:
+        - Tasks
+      summary: Get task comments
+      operationId: getTaskComments
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Tasks
+      summary: Add comment to task
+      operationId: addTaskComment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-comment-request'
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/files:
+    post:
+      tags:
+        - Tasks
+      summary: Upload file for task
+      operationId: uploadTaskFile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/file-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Internship Programs ====================
+  /internship-programs:
+    get:
+      tags:
+        - Internship Programs
+      summary: Get list of internship programs
+      operationId: getInternshipPrograms
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ active, draft, completed, cancelled ]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internship-program-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Internship Programs
+      summary: Create internship program
+      operationId: createInternshipProgram
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-internship-program-request'
+      responses:
+        '201':
+          description: Program created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internship-program-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internship-programs/{id}:
+    get:
+      tags:
+        - Internship Programs
+      summary: Get internship program by ID
+      operationId: getInternshipProgramById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internship-program-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Internship Programs
+      summary: Update internship program
+      operationId: updateInternshipProgram
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-internship-program-request'
+      responses:
+        '200':
+          description: Program updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internship-program-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Internship Programs
+      summary: Delete internship program
+      operationId: deleteInternshipProgram
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Program deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internship-programs/{programId}/roadmaps:
+    get:
+      tags:
+        - Roadmaps
+      summary: Get roadmaps for program
+      operationId: getProgramRoadmaps
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Roadmaps ====================
+  /roadmaps:
+    post:
+      tags:
+        - Roadmaps
+      summary: Create roadmap
+      operationId: createRoadmap
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-roadmap-request'
+      responses:
+        '201':
+          description: Roadmap created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /roadmaps/{id}:
+    get:
+      tags:
+        - Roadmaps
+      summary: Get roadmap by ID
+      operationId: getRoadmapById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Roadmaps
+      summary: Update roadmap
+      operationId: updateRoadmap
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-roadmap-request'
+      responses:
+        '200':
+          description: Roadmap updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Roadmaps
+      summary: Delete roadmap
+      operationId: deleteRoadmap
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Roadmap deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /roadmaps/{roadmapId}/stages:
+    get:
+      tags:
+        - Stages
+      summary: Get roadmap stages
+      operationId: getRoadmapStages
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Stages
+      summary: Create stage
+      operationId: createStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-stage-request'
+      responses:
+        '201':
+          description: Stage created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /roadmaps/{roadmapId}/stages/{stageId}:
+    put:
+      tags:
+        - Stages
+      summary: Update stage
+      operationId: updateStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-stage-request'
+      responses:
+        '200':
+          description: Stage updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Stages
+      summary: Delete stage
+      operationId: deleteStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stage deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /roadmaps/{roadmapId}/stages/{stageId}/status:
+    patch:
+      tags:
+        - Stages
+      summary: Change stage status
+      operationId: changeStageStatus
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/change-stage-status-request'
+      responses:
+        '200':
+          description: Stage status changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /roadmaps/{roadmapId}/stages/reorder:
+    patch:
+      tags:
+        - Stages
+      summary: Reorder stages
+      operationId: reorderStages
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: roadmapId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reorder-stages-request'
+      responses:
+        '200':
+          description: Stages reordered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Roadmap not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Assessments ====================
+  /assessments:
+    get:
+      tags:
+        - Assessments
+      summary: Get list of assessments
+      operationId: getAssessments
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: internId
+          in: query
+          schema:
+            type: string
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+        - name: internshipId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assessment-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Assessments
+      summary: Create assessment
+      operationId: createAssessment
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-assessment-request'
+      responses:
+        '201':
+          description: Assessment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assessment-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /assessments/{id}:
+    get:
+      tags:
+        - Assessments
+      summary: Get assessment by ID
+      operationId: getAssessmentById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assessment-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Assessment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Assessments
+      summary: Update assessment
+      operationId: updateAssessment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-assessment-request'
+      responses:
+        '200':
+          description: Assessment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assessment-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Assessment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Assessments
+      summary: Delete assessment
+      operationId: deleteAssessment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Assessment deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Assessment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Ratings ====================
+  /ratings:
+    get:
+      tags:
+        - Ratings
+      summary: Get intern ratings
+      operationId: getRatings
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: internshipId
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [ overallRating, qualityRating, speedRating, communicationRating ]
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ asc, desc ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rating-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /ratings/interns/{internId}:
+    get:
+      tags:
+        - Ratings
+      summary: Get intern rating
+      operationId: getInternRating
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: internId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rating-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Reports ====================
+  /reports:
+    get:
+      tags:
+        - Reports
+      summary: Get reports
+      operationId: getReports
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: query
+          schema:
+            type: string
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [ weekly, monthly, program ]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/report-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /reports/mentor-workload:
+    get:
+      tags:
+        - Reports
+      summary: Get mentor workload
+      operationId: getMentorWorkload
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mentor-workload-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard data
+      operationId: getDashboard
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [ admin, hr, mentor, intern ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dashboard-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  # ==================== Departments ====================
+  /departments:
+    get:
+      tags:
+        - Departments
+      summary: Get list of departments
+      operationId: getDepartments
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/department-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    post:
+      tags:
+        - Departments
+      summary: Create department
+      operationId: createDepartment
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-department-request'
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/department-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /departments/{id}:
+    get:
+      tags:
+        - Departments
+      summary: Get department by ID
+      operationId: getDepartmentById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/department-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    put:
+      tags:
+        - Departments
+      summary: Update department
+      operationId: updateDepartment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-department-request'
+      responses:
+        '200':
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/department-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+    delete:
+      tags:
+        - Departments
+      summary: Delete department
+      operationId: deleteDepartment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Department deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Authentication schemas
+    message-response:
+      $ref: './schemas/message-response.json'
+    error-response:
+      $ref: './schemas/error-response.json'
+
+    # User schemas
+    user-response:
+      $ref: './schemas/user-response.json'
+    user-list-response:
+      $ref: './schemas/user-list-response.json'
+    create-user-request:
+      $ref: './schemas/create-user-request.json'
+    update-user-request:
+      $ref: './schemas/update-user-request.json'
+    user-status-response:
+      $ref: './schemas/user-status-response.json'
+    change-role-request:
+      $ref: './schemas/change-role-request.json'
+    user-role-response:
+      $ref: './schemas/user-role-response.json'
+    invitation-response:
+      $ref: './schemas/invitation-response.json'
+    pagination-response:
+      $ref: './schemas/pagination-response.json'
+
+    # Intern schemas
+    intern-response:
+      $ref: './schemas/intern-response.json'
+    intern-list-response:
+      $ref: './schemas/intern-list-response.json'
+    create-intern-request:
+      $ref: './schemas/create-intern-request.json'
+    update-intern-request:
+      $ref: './schemas/update-intern-request.json'
+    intern-progress-response:
+      $ref: './schemas/intern-progress-response.json'
+
+    # Mentor schemas
+    mentor-response:
+      $ref: './schemas/mentor-response.json'
+    mentor-list-response:
+      $ref: './schemas/mentor-list-response.json'
+    mentor-interns-response:
+      $ref: './schemas/mentor-interns-response.json'
+
+    # Task schemas
+    task-response:
+      $ref: './schemas/task-response.json'
+    task-list-response:
+      $ref: './schemas/task-list-response.json'
+    create-task-request:
+      $ref: './schemas/create-task-request.json'
+    update-task-request:
+      $ref: './schemas/update-task-request.json'
+    submit-task-request:
+      $ref: './schemas/submit-task-request.json'
+    review-task-request:
+      $ref: './schemas/review-task-request.json'
+    task-status-response:
+      $ref: './schemas/task-status-response.json'
+    file-response:
+      $ref: './schemas/file-response.json'
+    comment-response:
+      $ref: './schemas/comment-response.json'
+    comment-list-response:
+      $ref: './schemas/comment-list-response.json'
+    create-comment-request:
+      $ref: './schemas/create-comment-request.json'
+    task-status-history-item:
+      $ref: './schemas/task-status-history-item.json'
+
+    # Internship Program schemas
+    internship-program-response:
+      $ref: './schemas/internship-program-response.json'
+    internship-program-list-response:
+      $ref: './schemas/internship-program-list-response.json'
+    create-internship-program-request:
+      $ref: './schemas/create-internship-program-request.json'
+    update-internship-program-request:
+      $ref: './schemas/update-internship-program-request.json'
+    program-goal:
+      $ref: './schemas/program-goal.json'
+    selection-stage:
+      $ref: './schemas/selection-stage.json'
+
+    # Roadmap schemas
+    roadmap-response:
+      $ref: './schemas/roadmap-response.json'
+    roadmap-list-response:
+      $ref: './schemas/roadmap-list-response.json'
+    create-roadmap-request:
+      $ref: './schemas/create-roadmap-request.json'
+    update-roadmap-request:
+      $ref: './schemas/update-roadmap-request.json'
+
+    # Stage schemas
+    stage-response:
+      $ref: './schemas/stage-response.json'
+    stage-list-response:
+      $ref: './schemas/stage-list-response.json'
+    create-stage-request:
+      $ref: './schemas/create-stage-request.json'
+    update-stage-request:
+      $ref: './schemas/update-stage-request.json'
+    change-stage-status-request:
+      $ref: './schemas/change-stage-status-request.json'
+    reorder-stages-request:
+      $ref: './schemas/reorder-stages-request.json'
+
+    # Assessment schemas
+    assessment-response:
+      $ref: './schemas/assessment-response.json'
+    assessment-list-response:
+      $ref: './schemas/assessment-list-response.json'
+    create-assessment-request:
+      $ref: './schemas/create-assessment-request.json'
+    update-assessment-request:
+      $ref: './schemas/update-assessment-request.json'
+
+    # Rating schemas
+    rating-response:
+      $ref: './schemas/rating-response.json'
+    rating-list-response:
+      $ref: './schemas/rating-list-response.json'
+
+    # Report schemas
+    report-list-response:
+      $ref: './schemas/report-list-response.json'
+    mentor-workload-response:
+      $ref: './schemas/mentor-workload-response.json'
+    dashboard-response:
+      $ref: './schemas/dashboard-response.json'
+    intern-stats:
+      $ref: './schemas/intern-stats.json'
+    mentor-stats:
+      $ref: './schemas/mentor-stats.json'
+    period-stats:
+      $ref: './schemas/period-stats.json'
+    recent-activity:
+      $ref: './schemas/recent-activity.json'
+    upcoming-deadline:
+      $ref: './schemas/upcoming-deadline.json'
+    mentor-performance:
+      $ref: './schemas/mentor-performance.json'
+    competencies:
+      $ref: './schemas/competencies.json'
+
+    # Department schemas
+    department-response:
+      $ref: './schemas/department-response.json'
+    department-list-response:
+      $ref: './schemas/department-list-response.json'
+    create-department-request:
+      $ref: './schemas/create-department-request.json'
+    update-department-request:
+      $ref: './schemas/update-department-request.json'

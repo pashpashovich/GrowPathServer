@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "totalInterns": {
+      "type": "integer"
+    },
+    "activeTasks": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "userId",
+    "name",
+    "email",
+    "createdAt"
+  ]
+}

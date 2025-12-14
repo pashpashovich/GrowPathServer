@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": [
+    "status"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed"
+      ]
+    },
+    "comments": {
+      "type": "string"
+    }
+  }
+}

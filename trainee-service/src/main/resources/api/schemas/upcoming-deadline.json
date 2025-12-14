@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "stage"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "dueDate",
+    "type"
+  ]
+}

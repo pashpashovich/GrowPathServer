@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "properties": {
+    "internId": {
+      "type": "string"
+    },
+    "totalTasks": {
+      "type": "integer"
+    },
+    "completedTasks": {
+      "type": "integer"
+    },
+    "inProgressTasks": {
+      "type": "integer"
+    },
+    "pendingTasks": {
+      "type": "integer"
+    },
+    "completionRate": {
+      "type": "number",
+      "format": "double"
+    },
+    "averageTaskTime": {
+      "type": "number",
+      "format": "double"
+    },
+    "competencies": {
+      "$ref": "./competencies.json"
+    },
+    "stagesCompleted": {
+      "type": "integer"
+    },
+    "totalStages": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "internId",
+    "totalTasks",
+    "completedTasks",
+    "completionRate"
+  ]
+}

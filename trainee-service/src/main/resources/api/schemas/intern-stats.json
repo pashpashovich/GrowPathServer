@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "internId": {
+      "type": "string"
+    },
+    "internName": {
+      "type": "string"
+    },
+    "completedTasks": {
+      "type": "integer"
+    },
+    "totalTasks": {
+      "type": "integer"
+    },
+    "completionRate": {
+      "type": "number",
+      "format": "double"
+    },
+    "competencies": {
+      "$ref": "./competencies.json"
+    }
+  }
+}

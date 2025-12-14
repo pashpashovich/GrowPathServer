@@ -5,7 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import by.bsuir.growpathserver.trainee.dto.model.users.UserResponse;
+import by.bsuir.growpathserver.dto.model.UserResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 
 @Mapper(componentModel = "spring")

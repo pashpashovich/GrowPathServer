@@ -1,0 +1,77 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "internId": {
+      "type": "string"
+    },
+    "internName": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "mentorName": {
+      "type": "string"
+    },
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "experience": {
+      "type": "integer"
+    },
+    "tasksCompleted": {
+      "type": "integer"
+    },
+    "tasksOnTime": {
+      "type": "integer"
+    },
+    "averageTaskTime": {
+      "type": "number",
+      "format": "double"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trend": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down",
+        "stable"
+      ]
+    },
+    "previousRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "rank": {
+      "type": "integer"
+    },
+    "internshipId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "internId",
+    "overallRating"
+  ]
+}

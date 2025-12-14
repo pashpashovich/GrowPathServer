@@ -41,18 +41,15 @@
     "lastLogin": {
       "type": "string",
       "format": "date-time",
-      "nullable": true,
       "description": "Last login timestamp"
     },
     "invitedBy": {
       "type": "string",
-      "nullable": true,
       "description": "ID of user who invited this user"
     },
     "invitationSentAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true,
       "description": "Invitation sent timestamp"
     }
   },

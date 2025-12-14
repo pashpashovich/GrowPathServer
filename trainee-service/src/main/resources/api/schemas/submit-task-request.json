@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "./file-response.json"
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "comment": {
+      "type": "string"
+    }
+  }
+}

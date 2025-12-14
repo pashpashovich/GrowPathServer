@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": [
+    "status"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "rejected"
+      ]
+    },
+    "comment": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "format": "double"
+    }
+  }
+}

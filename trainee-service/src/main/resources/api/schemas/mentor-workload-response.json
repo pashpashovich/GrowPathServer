@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "mentorId": {
+            "type": "string"
+          },
+          "mentorName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "totalInterns": {
+            "type": "integer"
+          },
+          "activeTasks": {
+            "type": "integer"
+          },
+          "pendingReviews": {
+            "type": "integer"
+          },
+          "completedReviews": {
+            "type": "integer"
+          },
+          "averageReviewTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "workload": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "high",
+              "overload"
+            ]
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performance": {
+            "$ref": "./mentor-performance.json"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

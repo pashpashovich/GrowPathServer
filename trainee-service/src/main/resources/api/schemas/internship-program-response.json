@@ -1,0 +1,80 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "maxPlaces": {
+      "type": "integer"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "$ref": "./program-goal.json"
+      }
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selectionStages": {
+      "type": "array",
+      "items": {
+        "$ref": "./selection-stage.json"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "draft",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "createdBy": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "internships": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "status",
+    "createdAt"
+  ]
+}

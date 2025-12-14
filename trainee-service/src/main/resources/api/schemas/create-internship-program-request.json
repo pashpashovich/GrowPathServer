@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "required": [
+    "title",
+    "description",
+    "startDate",
+    "duration",
+    "maxPlaces"
+  ],
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "maxPlaces": {
+      "type": "integer"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "$ref": "./program-goal.json"
+      }
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selectionStages": {
+      "type": "array",
+      "items": {
+        "$ref": "./selection-stage.json"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "draft"
+      ]
+    }
+  }
+}

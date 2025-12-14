@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "isActive": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "name",
+    "order",
+    "isActive"
+  ]
+}

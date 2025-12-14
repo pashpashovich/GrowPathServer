@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "task_completed",
+        "task_created",
+        "assessment_created"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "type",
+    "description",
+    "timestamp"
+  ]
+}

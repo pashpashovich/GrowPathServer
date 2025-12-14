@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ]
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "totalUsers": {
+          "type": "integer"
+        },
+        "activeInterns": {
+          "type": "integer"
+        },
+        "activePrograms": {
+          "type": "integer"
+        },
+        "pendingTasks": {
+          "type": "integer"
+        },
+        "completedTasks": {
+          "type": "integer"
+        }
+      }
+    },
+    "recentActivity": {
+      "type": "array",
+      "items": {
+        "$ref": "./recent-activity.json"
+      }
+    },
+    "upcomingDeadlines": {
+      "type": "array",
+      "items": {
+        "$ref": "./upcoming-deadline.json"
+      }
+    }
+  },
+  "required": [
+    "role",
+    "stats"
+  ]
+}

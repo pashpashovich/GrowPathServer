@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "paused"
+            ]
+          },
+          "rating": {
+            "type": "number",
+            "format": "double"
+          },
+          "tasksCompleted": {
+            "type": "integer"
+          },
+          "totalTasks": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

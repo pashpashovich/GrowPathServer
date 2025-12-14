@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "assigneeId": {
+      "type": "string",
+      "nullable": true
+    },
+    "dueDate": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

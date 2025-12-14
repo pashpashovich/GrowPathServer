@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "completed",
+        "rejected"
+      ]
+    },
+    "takenAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "reviewComment": {
+      "type": "string",
+      "nullable": true
+    },
+    "rating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "statusHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "./task-status-history-item.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "status"
+  ]
+}

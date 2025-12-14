@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    },
+    "comment": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "taskId",
+    "userId",
+    "comment",
+    "createdAt"
+  ]
+}

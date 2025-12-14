@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "paused"
+      ]
+    },
+    "internshipProgramId": {
+      "type": "string"
+    },
+    "mentorId": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "format": "double"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "userId",
+    "name",
+    "email",
+    "status",
+    "createdAt"
+  ]
+}

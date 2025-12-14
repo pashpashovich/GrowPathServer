@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "programId": {
+            "type": "string"
+          },
+          "programTitle": {
+            "type": "string"
+          },
+          "totalTasks": {
+            "type": "integer"
+          },
+          "completedTasks": {
+            "type": "integer"
+          },
+          "overdueTasks": {
+            "type": "integer"
+          },
+          "inProgressTasks": {
+            "type": "integer"
+          },
+          "completionRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageCompletionTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "internStats": {
+            "type": "array",
+            "items": {
+              "$ref": "./intern-stats.json"
+            }
+          },
+          "mentorStats": {
+            "type": "array",
+            "items": {
+              "$ref": "./mentor-stats.json"
+            }
+          },
+          "periodStats": {
+            "$ref": "./period-stats.json"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

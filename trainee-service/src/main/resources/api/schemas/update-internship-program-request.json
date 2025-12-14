@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "maxPlaces": {
+      "type": "integer"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "$ref": "./program-goal.json"
+      }
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "draft",
+        "completed",
+        "cancelled"
+      ]
+    }
+  }
+}

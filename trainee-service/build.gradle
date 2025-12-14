@@ -27,7 +27,11 @@ dependencies {
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
     
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.14'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.16'
+    
+    runtimeOnly 'org.postgresql:postgresql:42.7.4'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
@@ -42,12 +46,12 @@ dependencies {
 
 def apiSpecDir = "${projectDir}/src/main/resources/api"
 def generatedSourcesDir = "${layout.buildDirectory.get()}/generated/sources/openapi"
-def generatedPackage = 'by.bsuir.growpathserver.trainee.dto'
+def generatedPackage = 'by.bsuir.growpathserver.dto'
 
 sourceSets {
     main {
         java {
-            srcDirs += "${generatedSourcesDir}/users/src/main/java"
+            srcDirs += "${generatedSourcesDir}/trainee-service/src/main/java"
         }
     }
 }
@@ -70,27 +74,26 @@ tasks.register("openApiGenerateUsers", JavaExec) {
     }
     
     def cliJar = configurations.openapiGenerator.singleFile
-    def inputFile = file("${apiSpecDir}/users-api.yaml")
+    def inputFile = file("${apiSpecDir}/trainee-api.yaml")
     
     classpath = files(cliJar)
     mainClass = "org.openapitools.codegen.OpenAPIGenerator"
     args = [
         'generate',
         '-i', inputFile.absolutePath,
-        '-g', 'java',
-        '-o', "${generatedSourcesDir}/users",
-        '--api-package', "${generatedPackage}.api.users",
-        '--model-package', "${generatedPackage}.model.users",
-        '--invoker-package', "${generatedPackage}.invoker.users",
-        '--library', 'native',
-        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=true,useBeanValidation=true,hideGenerationTimestamp=true',
+        '-g', 'spring',
+        '-o', "${generatedSourcesDir}/trainee-service",
+        '--api-package', "${generatedPackage}.api",
+        '--model-package', "${generatedPackage}.model",
+        '--invoker-package', "${generatedPackage}.invoker",
+        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=true,useBeanValidation=true,hideGenerationTimestamp=true,interfaceOnly=true,useSpringBoot3=true,library=spring-boot',
         '--type-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
         '--import-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
         '--global-property', 'models=,apis=,supportingFiles='
     ]
     
     inputs.file(inputFile)
-    outputs.dir("${generatedSourcesDir}/users")
+    outputs.dir("${generatedSourcesDir}/trainee-service")
 }
 
 afterEvaluate {

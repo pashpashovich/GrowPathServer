@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "./roadmap-response.json"
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}
