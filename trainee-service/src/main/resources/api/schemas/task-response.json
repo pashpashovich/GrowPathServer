@@ -1,0 +1,126 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "completed",
+        "rejected"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "assigneeId": {
+      "type": "string",
+      "nullable": true
+    },
+    "assigneeName": {
+      "type": "string",
+      "nullable": true
+    },
+    "mentorId": {
+      "type": "string"
+    },
+    "mentorName": {
+      "type": "string"
+    },
+    "internshipId": {
+      "type": "string"
+    },
+    "stageId": {
+      "type": "string",
+      "nullable": true
+    },
+    "dueDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "takenAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "rating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "reviewComment": {
+      "type": "string",
+      "nullable": true
+    },
+    "submissionFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "./file-response.json"
+      }
+    },
+    "submissionLinks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "submissionComment": {
+      "type": "string",
+      "nullable": true
+    },
+    "statusHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "./task-status-history-item.json"
+      }
+    },
+    "comments": {
+      "type": "array",
+      "items": {
+        "$ref": "./comment-response.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "mentorId",
+    "internshipId",
+    "createdAt"
+  ]
+}

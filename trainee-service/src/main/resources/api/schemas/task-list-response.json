@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "./task-response.json"
+      }
+    },
+    "pagination": {
+      "$ref": "./pagination-response.json"
+    }
+  },
+  "required": [
+    "data",
+    "pagination"
+  ]
+}

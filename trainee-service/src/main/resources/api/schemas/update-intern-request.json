@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "department": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "paused"
+      ]
+    },
+    "mentorId": {
+      "type": "string"
+    }
+  }
+}

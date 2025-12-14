@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "required": [
+    "title",
+    "description",
+    "priority",
+    "internshipId"
+  ],
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "assigneeId": {
+      "type": "string",
+      "nullable": true
+    },
+    "internshipId": {
+      "type": "string"
+    },
+    "stageId": {
+      "type": "string",
+      "nullable": true
+    },
+    "dueDate": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

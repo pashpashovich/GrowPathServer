@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": [
+    "userId",
+    "department",
+    "position",
+    "internshipProgramId"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "internshipProgramId": {
+      "type": "string"
+    },
+    "mentorId": {
+      "type": "string"
+    }
+  }
+}

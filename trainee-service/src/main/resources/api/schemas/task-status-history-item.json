@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "completed",
+        "rejected"
+      ]
+    },
+    "changedBy": {
+      "type": "string"
+    },
+    "changedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "comment": {
+      "type": "string",
+      "nullable": true
+    },
+    "rating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    }
+  },
+  "required": [
+    "status",
+    "changedBy",
+    "changedAt"
+  ]
+}

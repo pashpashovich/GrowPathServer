@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "required": [
+    "internId",
+    "internshipId",
+    "overallRating"
+  ],
+  "properties": {
+    "internId": {
+      "type": "string"
+    },
+    "internshipId": {
+      "type": "string"
+    },
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "comment": {
+      "type": "string"
+    }
+  }
+}

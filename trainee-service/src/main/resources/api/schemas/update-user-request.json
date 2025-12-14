@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "User full name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ],
+      "description": "User role"
+    }
+  }
+}

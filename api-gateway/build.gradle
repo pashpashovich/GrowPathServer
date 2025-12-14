@@ -65,13 +65,12 @@ tasks.register("openApiGenerateAuth", JavaExec) {
     args = [
         'generate',
         '-i', inputFile.absolutePath,
-        '-g', 'java',
+        '-g', 'spring',
         '-o', "${generatedSourcesDir}/auth",
         '--api-package', "${generatedPackage}.api.auth",
         '--model-package', "${generatedPackage}.model.auth",
         '--invoker-package', "${generatedPackage}.invoker.auth",
-        '--library', 'native',
-        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=true,useBeanValidation=true,hideGenerationTimestamp=true',
+        '--additional-properties', 'dateLibrary=java8,java8=true,useJakartaEe=true,serializationLibrary=jackson,openApiNullable=true,useBeanValidation=true,hideGenerationTimestamp=true,interfaceOnly=true,useSpringBoot3=true,library=spring-boot,reactive=true',
         '--type-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
         '--import-mappings', 'OffsetDateTime=java.time.OffsetDateTime,DateTime=java.time.OffsetDateTime',
         '--global-property', 'models=,apis=,supportingFiles='

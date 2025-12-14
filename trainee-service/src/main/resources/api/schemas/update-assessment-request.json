@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "comment": {
+      "type": "string"
+    }
+  }
+}

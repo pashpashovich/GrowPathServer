@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "responseTime": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityScore": {
+      "type": "number",
+      "format": "double"
+    },
+    "internSatisfaction": {
+      "type": "number",
+      "format": "double"
+    }
+  }
+}
