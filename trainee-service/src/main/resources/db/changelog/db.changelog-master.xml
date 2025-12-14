@@ -8,5 +8,7 @@
   <include file="db/changelog/changes/001-create-users-table.xml"/>
   <include file="db/changelog/changes/002-create-tasks-table.xml"/>
   <include file="db/changelog/changes/003-insert-mock-tasks.xml"/>
+  <include file="db/changelog/changes/004-insert-mock-users.xml"/>
+  <include file="db/changelog/changes/005-fix-user-enum-values.xml"/>
 
 </databaseChangeLog>

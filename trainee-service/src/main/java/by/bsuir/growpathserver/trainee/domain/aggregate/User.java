@@ -1,6 +1,6 @@
 package by.bsuir.growpathserver.trainee.domain.aggregate;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.Email;
@@ -15,10 +15,10 @@ public class User {
     private final String name;
     private final UserRole role;
     private final UserStatus status;
-    private final OffsetDateTime createdAt;
-    private OffsetDateTime lastLogin;
+    private final LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
     private final String invitedBy;
-    private final OffsetDateTime invitationSentAt;
+    private final LocalDateTime invitationSentAt;
 
     private User(UserEntity entity) {
         this.id = entity.getId();
@@ -57,11 +57,11 @@ public class User {
         entity.setRole(role);
         entity.setStatus(UserStatus.PENDING);
         entity.setInvitedBy(invitedBy);
-        entity.setInvitationSentAt(OffsetDateTime.now());
+        entity.setInvitationSentAt(LocalDateTime.now());
         return fromEntity(entity);
     }
 
     public void updateLastLogin() {
-        this.lastLogin = OffsetDateTime.now();
+        this.lastLogin = LocalDateTime.now();
     }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="005-fix-user-enum-values" author="growpath">
+    <update tableName="users">
+      <column name="role" value="ADMIN"/>
+      <where>role = 'admin'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="role" value="HR"/>
+      <where>role = 'hr'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="role" value="MENTOR"/>
+      <where>role = 'mentor'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="role" value="INTERN"/>
+      <where>role = 'intern'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="status" value="ACTIVE"/>
+      <where>status = 'active'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="status" value="BLOCKED"/>
+      <where>status = 'blocked'</where>
+    </update>
+
+    <update tableName="users">
+      <column name="status" value="PENDING"/>
+      <where>status = 'pending'</where>
+    </update>
+  </changeSet>
+
+</databaseChangeLog>
