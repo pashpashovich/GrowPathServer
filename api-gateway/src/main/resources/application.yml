@@ -9,48 +9,54 @@ spring:
             - id: login
               uri: no://op
               predicates:
-                - Path=${application.rest.authentication.path:/api/auth}/login
+                - Path=${application.rest.authentication.path:/api/v1/auth}/login
                 - Method=POST
               filters:
                 - KeycloakAuthentication
             - id: logout
               uri: no://op
               predicates:
-                - Path=${application.rest.authentication.path:/api/auth}/logout
+                - Path=${application.rest.authentication.path:/api/v1/auth}/logout
                 - Method=POST
               filters:
                 - KeycloakLogout
             - id: refresh
               uri: no://op
               predicates:
-                - Path=${application.rest.authentication.path:/api/auth}/refresh
+                - Path=${application.rest.authentication.path:/api/v1/auth}/refresh
                 - Method=POST
               filters:
                 - KeycloakRefresh
             - id: user
               uri: no://op
               predicates:
-                - Path=${application.rest.authentication.path:/api/auth}/user
+                - Path=${application.rest.authentication.path:/api/v1/auth}/user
                 - Method=GET
               filters:
                 - KeycloakUserInfo
             - id: validate
               uri: no://op
               predicates:
-                - Path=${application.rest.authentication.path:/api/auth}/validate
+                - Path=${application.rest.authentication.path:/api/v1/auth}/validate
                 - Method=GET
               filters:
                 - KeycloakValidate
             - id: trainee-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
-                - Path=/api/trainee/**
+                - Path=/api/v1/trainee/**
+              filters:
+                - StripPrefix=2
+            - id: tasks-service
+              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              predicates:
+                - Path=/api/v1/tasks/**
               filters:
                 - StripPrefix=2
             - id: notification-service
               uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
               predicates:
-                - Path=/api/notification/**
+                - Path=/api/v1/notification/**
               filters:
                 - StripPrefix=2
   security:
@@ -63,7 +69,7 @@ spring:
 application:
   rest:
     authentication:
-      path: /api/auth
+      path: /api/v1/auth
 
 keycloak:
   client:
@@ -71,9 +77,9 @@ keycloak:
     secret: ${KEYCLOAK_CLIENT_SECRET:api-gateway-secret}
 
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
-  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
-  allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization}
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:8081,http://localhost:8080}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS,PATCH}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization,Accept,X-Requested-With}
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
 
 server:
@@ -89,3 +95,13 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.security: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true

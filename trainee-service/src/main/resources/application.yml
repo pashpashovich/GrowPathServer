@@ -36,8 +36,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:growpath}
-          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:growpath}/protocol/openid-connect/certs
+          # Если Keycloak в Docker, используйте http://keycloak:8080
+          # Если Keycloak на localhost, используйте http://localhost:8080
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:growpath}
+          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:growpath}/protocol/openid-connect/certs
 
 server:
   port: ${TRAINEE_SERVICE_PORT:8081}
@@ -54,6 +56,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+    try-it-out-enabled: true
+    persist-authorization: true
+    filter: true
 
 logging:
   level:
