@@ -1,6 +1,6 @@
 package by.bsuir.growpathserver.trainee.domain.entity;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
@@ -43,21 +43,21 @@ public class UserEntity {
     private UserStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "last_login")
-    private OffsetDateTime lastLogin;
+    private LocalDateTime lastLogin;
 
     @Column(name = "invited_by")
     private String invitedBy;
 
     @Column(name = "invitation_sent_at")
-    private OffsetDateTime invitationSentAt;
+    private LocalDateTime invitationSentAt;
 
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
-            createdAt = OffsetDateTime.now();
+            createdAt = LocalDateTime.now();
         }
         if (status == null) {
             status = UserStatus.PENDING;
