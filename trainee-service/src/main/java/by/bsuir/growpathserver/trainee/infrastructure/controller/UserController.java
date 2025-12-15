@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.UsersApi;
@@ -44,6 +45,7 @@ import by.bsuir.growpathserver.trainee.infrastructure.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
