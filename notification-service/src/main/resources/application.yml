@@ -8,12 +8,14 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:none}
     show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: ${JPA_FORMAT_SQL:true}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
@@ -63,3 +65,13 @@ logging:
     org.springframework.kafka: DEBUG
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true

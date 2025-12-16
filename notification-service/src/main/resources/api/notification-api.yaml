@@ -1,0 +1,1179 @@
+openapi: 3.0.3
+info:
+  title: Notification Service API
+  description: API specification for Notification Service
+  version: 1.0.0
+  contact:
+    name: GrowPath Team
+    email: support@growpath.com
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+
+paths:
+  /email-templates:
+    get:
+      tags:
+        - Email Templates
+      summary: Get list of email templates
+      operationId: getEmailTemplates
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplateListResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Email Templates
+      summary: Create email template
+      operationId: createEmailTemplate
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmailTemplateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplateResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /email-templates/{id}:
+    get:
+      tags:
+        - Email Templates
+      summary: Get email template by ID
+      operationId: getEmailTemplateById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplateResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    put:
+      tags:
+        - Email Templates
+      summary: Update email template
+      operationId: updateEmailTemplate
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailTemplateRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplateResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Email Templates
+      summary: Delete email template
+      operationId: deleteEmailTemplate
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /mailings:
+    get:
+      tags:
+        - Mailings
+      summary: Get list of mailings
+      operationId: getMailings
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, scheduled, sent, cancelled]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [immediate, scheduled, recurring]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingListResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Mailings
+      summary: Create mailing
+      operationId: createMailing
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMailingRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /mailings/{id}:
+    get:
+      tags:
+        - Mailings
+      summary: Get mailing by ID
+      operationId: getMailingById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    put:
+      tags:
+        - Mailings
+      summary: Update mailing
+      operationId: updateMailing
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailingRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Mailings
+      summary: Delete mailing
+      operationId: deleteMailing
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /mailings/{id}/send:
+    post:
+      tags:
+        - Mailings
+      summary: Send mailing
+      operationId: sendMailing
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /recipients:
+    get:
+      tags:
+        - Recipients
+      summary: Get list of recipients
+      operationId: getRecipients
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [user, external]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientListResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Recipients
+      summary: Create recipient
+      operationId: createRecipient
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecipientRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /recipients/{id}:
+    get:
+      tags:
+        - Recipients
+      summary: Get recipient by ID
+      operationId: getRecipientById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    put:
+      tags:
+        - Recipients
+      summary: Update recipient
+      operationId: updateRecipient
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRecipientRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Recipients
+      summary: Delete recipient
+      operationId: deleteRecipient
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /distribution-groups:
+    get:
+      tags:
+        - Distribution Groups
+      summary: Get list of distribution groups
+      operationId: getDistributionGroups
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionGroupListResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Distribution Groups
+      summary: Create distribution group
+      operationId: createDistributionGroup
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDistributionGroupRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionGroupResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /distribution-groups/{id}:
+    get:
+      tags:
+        - Distribution Groups
+      summary: Get distribution group by ID
+      operationId: getDistributionGroupById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionGroupResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    put:
+      tags:
+        - Distribution Groups
+      summary: Update distribution group
+      operationId: updateDistributionGroup
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDistributionGroupRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionGroupResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Distribution Groups
+      summary: Delete distribution group
+      operationId: deleteDistributionGroup
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /distribution-groups/{id}/recipients:
+    get:
+      tags:
+        - Distribution Groups
+      summary: Get recipients in distribution group
+      operationId: getDistributionGroupRecipients
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientListResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Distribution Groups
+      summary: Add recipient to distribution group
+      operationId: addRecipientToDistributionGroup
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipientId:
+                  type: string
+      responses:
+        '201':
+          description: Created
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Distribution Groups
+      summary: Remove recipient from distribution group
+      operationId: removeRecipientFromDistributionGroup
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: recipientId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /in-app-notifications:
+    get:
+      tags:
+        - In-App Notifications
+      summary: Get user notifications
+      operationId: getInAppNotifications
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [unread, read]
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotificationListResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - In-App Notifications
+      summary: Create in-app notification
+      operationId: createInAppNotification
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInAppNotificationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotificationResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /in-app-notifications/{id}:
+    get:
+      tags:
+        - In-App Notifications
+      summary: Get in-app notification by ID
+      operationId: getInAppNotificationById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotificationResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    put:
+      tags:
+        - In-App Notifications
+      summary: Mark notification as read
+      operationId: markNotificationAsRead
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotificationResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - In-App Notifications
+      summary: Delete in-app notification
+      operationId: deleteInAppNotification
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
+  /in-app-notifications/read-all:
+    post:
+      tags:
+        - In-App Notifications
+      summary: Mark all notifications as read
+      operationId: markAllNotificationsAsRead
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    EmailTemplateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailTemplateAttachmentResponse'
+      required:
+        - id
+        - name
+        - subject
+        - body
+
+    EmailTemplateAttachmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        token:
+          type: string
+      required:
+        - id
+        - name
+        - token
+
+    CreateEmailTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailTemplateAttachmentRequest'
+      required:
+        - name
+        - subject
+        - body
+
+    UpdateEmailTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailTemplateAttachmentRequest'
+    EmailTemplateAttachmentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        token:
+          type: string
+      required:
+        - name
+        - token
+
+    EmailTemplateListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailTemplateResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    MailingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [immediate, scheduled, recurring]
+        status:
+          type: string
+          enum: [draft, scheduled, sent, cancelled]
+        emailTemplateId:
+          type: string
+        executeAt:
+          type: string
+          format: date-time
+        distributionGroupIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - type
+        - status
+        - emailTemplateId
+
+    CreateMailingRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [immediate, scheduled, recurring]
+        emailTemplateId:
+          type: string
+        executeAt:
+          type: string
+          format: date-time
+        distributionGroupIds:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: object
+          properties:
+            weekDay:
+              type: string
+              enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+            executeTime:
+              type: string
+              format: time
+      required:
+        - name
+        - type
+        - emailTemplateId
+
+    UpdateMailingRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [immediate, scheduled, recurring]
+        emailTemplateId:
+          type: string
+        executeAt:
+          type: string
+          format: date-time
+        distributionGroupIds:
+          type: array
+          items:
+            type: string
+
+    MailingListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailingResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    RecipientResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        userId:
+          type: string
+        type:
+          type: string
+          enum: [user, external]
+        distributionGroupIds:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - email
+        - fullName
+        - type
+
+    CreateRecipientRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        userId:
+          type: string
+        type:
+          type: string
+          enum: [user, external]
+      required:
+        - email
+        - fullName
+        - type
+
+    UpdateRecipientRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        userId:
+          type: string
+
+    RecipientListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipientResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    DistributionGroupResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        recipientCount:
+          type: integer
+      required:
+        - id
+        - name
+
+    CreateDistributionGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+
+    UpdateDistributionGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    DistributionGroupListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistributionGroupResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    InAppNotificationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [unread, read]
+        createdAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - title
+        - message
+        - type
+        - status
+
+    CreateInAppNotificationRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+      required:
+        - userId
+        - title
+        - message
+        - type
+
+    InAppNotificationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InAppNotificationResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    PaginationResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+      required:
+        - message

@@ -59,6 +59,36 @@ spring:
                 - Path=/api/v1/notification/**
               filters:
                 - StripPrefix=2
+            - id: mailings-service
+              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              predicates:
+                - Path=/api/v1/mailings/**
+              filters:
+                - StripPrefix=2
+            - id: recipients-service
+              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              predicates:
+                - Path=/api/v1/recipients/**
+              filters:
+                - StripPrefix=2
+            - id: email-templates-service
+              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              predicates:
+                - Path=/api/v1/email-templates/**
+              filters:
+                - StripPrefix=2
+            - id: distribution-groups-service
+              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              predicates:
+                - Path=/api/v1/distribution-groups/**
+              filters:
+                - StripPrefix=2
+            - id: in-app-notifications-service
+              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              predicates:
+                - Path=/api/v1/in-app-notifications/**
+              filters:
+                - StripPrefix=2
   security:
     oauth2:
       resourceserver:
