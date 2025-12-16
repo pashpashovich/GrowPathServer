@@ -7,9 +7,9 @@
 
   <changeSet id="007-insert-mock-assessments" author="growpath">
     <insert tableName="assessments">
-      <column name="intern_id" value="user-001"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-001"/>
+      <column name="intern_id" value="7"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="1"/>
       <column name="overall_rating" value="4.5"/>
       <column name="quality_rating" value="4.7"/>
       <column name="speed_rating" value="4.3"/>
@@ -20,9 +20,9 @@
     </insert>
 
     <insert tableName="assessments">
-      <column name="intern_id" value="user-002"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-001"/>
+      <column name="intern_id" value="8"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="1"/>
       <column name="overall_rating" value="4.2"/>
       <column name="quality_rating" value="4.0"/>
       <column name="speed_rating" value="4.5"/>
@@ -33,9 +33,9 @@
     </insert>
 
     <insert tableName="assessments">
-      <column name="intern_id" value="user-003"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-002"/>
+      <column name="intern_id" value="9"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="2"/>
       <column name="overall_rating" value="4.8"/>
       <column name="quality_rating" value="5.0"/>
       <column name="speed_rating" value="4.6"/>
@@ -46,9 +46,9 @@
     </insert>
 
     <insert tableName="assessments">
-      <column name="intern_id" value="user-001"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-001"/>
+      <column name="intern_id" value="7"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="1"/>
       <column name="overall_rating" value="3.8"/>
       <column name="quality_rating" value="3.5"/>
       <column name="speed_rating" value="4.0"/>
@@ -59,9 +59,9 @@
     </insert>
 
     <insert tableName="assessments">
-      <column name="intern_id" value="user-002"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-002"/>
+      <column name="intern_id" value="8"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="2"/>
       <column name="overall_rating" value="4.0"/>
       <column name="quality_rating" value="4.2"/>
       <column name="speed_rating" value="3.8"/>
@@ -72,9 +72,9 @@
     </insert>
 
     <insert tableName="assessments">
-      <column name="intern_id" value="user-003"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-002"/>
+      <column name="intern_id" value="9"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="2"/>
       <column name="overall_rating" value="4.6"/>
       <column name="quality_rating" value="4.5"/>
       <column name="speed_rating" value="4.7"/>

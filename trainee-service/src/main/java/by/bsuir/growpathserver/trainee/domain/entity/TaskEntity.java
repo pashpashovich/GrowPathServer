@@ -44,16 +44,16 @@ public class TaskEntity {
     private TaskPriority priority;
 
     @Column(name = "assignee_id")
-    private String assigneeId;
+    private Long assigneeId;
 
     @Column(name = "mentor_id", nullable = false)
-    private String mentorId;
+    private Long mentorId;
 
     @Column(name = "internship_id", nullable = false)
-    private String internshipId;
+    private Long internshipId;
 
     @Column(name = "stage_id")
-    private String stageId;
+    private Long stageId;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;

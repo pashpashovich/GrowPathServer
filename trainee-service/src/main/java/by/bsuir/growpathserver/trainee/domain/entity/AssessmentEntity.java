@@ -26,13 +26,13 @@ public class AssessmentEntity {
     private Long id;
 
     @Column(name = "intern_id", nullable = false)
-    private String internId;
+    private Long internId;
 
     @Column(name = "mentor_id", nullable = false)
-    private String mentorId;
+    private Long mentorId;
 
     @Column(name = "internship_id", nullable = false)
-    private String internshipId;
+    private Long internshipId;
 
     @Column(name = "overall_rating", nullable = false)
     private Double overallRating;

@@ -10,10 +10,10 @@ public record CreateTaskCommand(
         String title,
         String description,
         TaskPriority priority,
-        String assigneeId,
-        String mentorId,
-        String internshipId,
-        String stageId,
+        Long assigneeId,
+        Long mentorId,
+        Long internshipId,
+        Long stageId,
         LocalDateTime dueDate
 ) {
 }

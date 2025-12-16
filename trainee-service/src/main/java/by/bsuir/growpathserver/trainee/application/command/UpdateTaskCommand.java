@@ -13,8 +13,8 @@ public record UpdateTaskCommand(
         String description,
         TaskStatus status,
         TaskPriority priority,
-        String assigneeId,
-        String stageId,
+        Long assigneeId,
+        Long stageId,
         LocalDateTime dueDate
 ) {
 }

@@ -14,10 +14,10 @@ public class Task {
     private final String description;
     private final TaskStatus status;
     private final TaskPriority priority;
-    private final String assigneeId;
-    private final String mentorId;
-    private final String internshipId;
-    private final String stageId;
+    private final Long assigneeId;
+    private final Long mentorId;
+    private final Long internshipId;
+    private final Long stageId;
     private final LocalDateTime dueDate;
     private final LocalDateTime takenAt;
     private final LocalDateTime submittedAt;
@@ -77,8 +77,8 @@ public class Task {
     }
 
     public static Task create(String title, String description, TaskPriority priority,
-                              String mentorId, String internshipId, String stageId,
-                              String assigneeId, LocalDateTime dueDate) {
+                              Long mentorId, Long internshipId, Long stageId,
+                              Long assigneeId, LocalDateTime dueDate) {
         TaskEntity entity = new TaskEntity();
         entity.setTitle(title);
         entity.setDescription(description);
