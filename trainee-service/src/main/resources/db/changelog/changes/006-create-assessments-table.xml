@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+  <changeSet id="006-create-assessments-table" author="growpath">
+    <createTable tableName="assessments">
+      <column name="id" type="VARCHAR(36)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="intern_id" type="VARCHAR(36)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mentor_id" type="VARCHAR(36)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="internship_id" type="VARCHAR(36)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="overall_rating" type="DOUBLE PRECISION">
+        <constraints nullable="false"/>
+      </column>
+      <column name="quality_rating" type="DOUBLE PRECISION">
+        <constraints nullable="true"/>
+      </column>
+      <column name="speed_rating" type="DOUBLE PRECISION">
+        <constraints nullable="true"/>
+      </column>
+      <column name="communication_rating" type="DOUBLE PRECISION">
+        <constraints nullable="true"/>
+      </column>
+      <column name="comment" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <createIndex indexName="idx_assessments_intern_id" tableName="assessments">
+      <column name="intern_id"/>
+    </createIndex>
+
+    <createIndex indexName="idx_assessments_mentor_id" tableName="assessments">
+      <column name="mentor_id"/>
+    </createIndex>
+
+    <createIndex indexName="idx_assessments_internship_id" tableName="assessments">
+      <column name="internship_id"/>
+    </createIndex>
+
+    <createIndex indexName="idx_assessments_created_at" tableName="assessments">
+      <column name="created_at"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>
+
