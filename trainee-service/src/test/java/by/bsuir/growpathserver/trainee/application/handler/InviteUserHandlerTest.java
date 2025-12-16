@@ -39,7 +39,7 @@ class InviteUserHandlerTest {
     @BeforeEach
     void setUp() {
         pendingUser = new UserEntity();
-        pendingUser.setId("user-001");
+        pendingUser.setId(1L);
         pendingUser.setEmail("user@example.com");
         pendingUser.setName("Test User");
         pendingUser.setRole(UserRole.INTERN);
@@ -51,9 +51,9 @@ class InviteUserHandlerTest {
     @Test
     void shouldInviteUserSuccessfully() {
         // Given
-        InviteUserCommand command = new InviteUserCommand("user-001");
+        InviteUserCommand command = new InviteUserCommand(1L);
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(pendingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(pendingUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -65,16 +65,16 @@ class InviteUserHandlerTest {
         // Then
         assertNotNull(result);
         assertNotNull(result.getInvitationSentAt());
-        verify(userRepository).findById("user-001");
+        verify(userRepository).findById(1L);
         verify(userRepository).save(any(UserEntity.class));
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        InviteUserCommand command = new InviteUserCommand("non-existent");
+        InviteUserCommand command = new InviteUserCommand(999L);
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> inviteUserHandler.handle(command));

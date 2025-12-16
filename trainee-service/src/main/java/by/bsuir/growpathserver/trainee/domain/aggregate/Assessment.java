@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class Assessment {
-    private final String id;
+    private final Long id;
     private final String internId;
     private final String mentorId;
     private final String internshipId;

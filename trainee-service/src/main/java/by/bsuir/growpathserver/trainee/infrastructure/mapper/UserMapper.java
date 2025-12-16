@@ -10,6 +10,7 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
+    @Mapping(target = "id", expression = "java(String.valueOf(user.getId()))")
     @Mapping(source = "email.value", target = "email")
     @Mapping(source = "invitedBy", target = "invitedBy", nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
     public abstract UserResponse toUserResponse(User user);

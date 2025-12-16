@@ -7,7 +7,6 @@
 
   <changeSet id="004-insert-mock-users" author="growpath">
     <insert tableName="users">
-      <column name="id" value="admin-001"/>
       <column name="email" value="admin@growpath.com"/>
       <column name="name" value="Иван Админов"/>
       <column name="role" value="ADMIN"/>
@@ -19,7 +18,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="hr-001"/>
       <column name="email" value="hr1@growpath.com"/>
       <column name="name" value="Анна Петрова"/>
       <column name="role" value="HR"/>
@@ -31,7 +29,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="hr-002"/>
       <column name="email" value="hr2@growpath.com"/>
       <column name="name" value="Дмитрий Смирнов"/>
       <column name="role" value="HR"/>
@@ -43,7 +40,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="mentor-001"/>
       <column name="email" value="mentor1@growpath.com"/>
       <column name="name" value="Сергей Иванов"/>
       <column name="role" value="MENTOR"/>
@@ -55,7 +51,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="mentor-002"/>
       <column name="email" value="mentor2@growpath.com"/>
       <column name="name" value="Мария Козлова"/>
       <column name="role" value="MENTOR"/>
@@ -67,7 +62,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="mentor-003"/>
       <column name="email" value="mentor3@growpath.com"/>
       <column name="name" value="Александр Волков"/>
       <column name="role" value="MENTOR"/>
@@ -79,7 +73,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-001"/>
       <column name="email" value="intern1@growpath.com"/>
       <column name="name" value="Петр Сидоров"/>
       <column name="role" value="INTERN"/>
@@ -91,7 +84,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-002"/>
       <column name="email" value="intern2@growpath.com"/>
       <column name="name" value="Елена Новикова"/>
       <column name="role" value="INTERN"/>
@@ -103,7 +95,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-003"/>
       <column name="email" value="intern3@growpath.com"/>
       <column name="name" value="Андрей Морозов"/>
       <column name="role" value="INTERN"/>
@@ -115,7 +106,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-004"/>
       <column name="email" value="intern4@growpath.com"/>
       <column name="name" value="Ольга Лебедева"/>
       <column name="role" value="INTERN"/>
@@ -126,7 +116,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-005"/>
       <column name="email" value="intern5@growpath.com"/>
       <column name="name" value="Игорь Соколов"/>
       <column name="role" value="INTERN"/>
@@ -137,7 +126,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-006"/>
       <column name="email" value="intern6@growpath.com"/>
       <column name="name" value="Татьяна Орлова"/>
       <column name="role" value="INTERN"/>
@@ -149,7 +137,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-007"/>
       <column name="email" value="intern7@growpath.com"/>
       <column name="name" value="Владимир Павлов"/>
       <column name="role" value="INTERN"/>
@@ -161,7 +148,6 @@
     </insert>
 
     <insert tableName="users">
-      <column name="id" value="user-008"/>
       <column name="email" value="intern8@growpath.com"/>
       <column name="name" value="Наталья Федорова"/>
       <column name="role" value="INTERN"/>

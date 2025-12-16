@@ -38,7 +38,7 @@ class GetUserByIdHandlerTest {
     @BeforeEach
     void setUp() {
         testUser = new UserEntity();
-        testUser.setId("user-001");
+        testUser.setId(1L);
         testUser.setEmail("user@example.com");
         testUser.setName("Test User");
         testUser.setRole(UserRole.INTERN);
@@ -49,29 +49,29 @@ class GetUserByIdHandlerTest {
     @Test
     void shouldGetUserByIdSuccessfully() {
         // Given
-        GetUserByIdQuery query = new GetUserByIdQuery("user-001");
+        GetUserByIdQuery query = new GetUserByIdQuery(1L);
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
         // When
         User result = getUserByIdHandler.handle(query);
 
         // Then
         assertNotNull(result);
-        assertEquals("user-001", result.getId());
+        assertEquals(1L, result.getId());
         assertEquals("user@example.com", result.getEmail().value());
         assertEquals("Test User", result.getName());
         assertEquals(UserRole.INTERN, result.getRole());
         assertEquals(UserStatus.ACTIVE, result.getStatus());
-        verify(userRepository).findById("user-001");
+        verify(userRepository).findById(1L);
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        GetUserByIdQuery query = new GetUserByIdQuery("non-existent");
+        GetUserByIdQuery query = new GetUserByIdQuery(999L);
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> getUserByIdHandler.handle(query));

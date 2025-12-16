@@ -15,39 +15,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "assessments")
+@Table(name = "departments")
 @Getter
 @Setter
 @NoArgsConstructor
-public class AssessmentEntity {
+public class DepartmentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "intern_id", nullable = false)
-    private String internId;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "mentor_id", nullable = false)
-    private String mentorId;
-
-    @Column(name = "internship_id", nullable = false)
-    private String internshipId;
-
-    @Column(name = "overall_rating", nullable = false)
-    private Double overallRating;
-
-    @Column(name = "quality_rating")
-    private Double qualityRating;
-
-    @Column(name = "speed_rating")
-    private Double speedRating;
-
-    @Column(name = "communication_rating")
-    private Double communicationRating;
-
-    @Column(name = "comment", columnDefinition = "TEXT")
-    private String comment;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

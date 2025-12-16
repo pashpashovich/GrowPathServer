@@ -81,7 +81,8 @@ public class AssessmentController implements AssessmentsApi {
     @Override
     public ResponseEntity<MessageResponse> deleteAssessment(String id) {
         try {
-            DeleteAssessmentCommand command = new DeleteAssessmentCommand(id);
+            Long assessmentId = Long.parseLong(id);
+            DeleteAssessmentCommand command = new DeleteAssessmentCommand(assessmentId);
             deleteAssessmentHandler.handle(command);
 
             MessageResponse response = new MessageResponse();
@@ -96,7 +97,8 @@ public class AssessmentController implements AssessmentsApi {
     @Override
     public ResponseEntity<AssessmentResponse> getAssessmentById(String id) {
         try {
-            GetAssessmentByIdQuery query = new GetAssessmentByIdQuery(id);
+            Long assessmentId = Long.parseLong(id);
+            GetAssessmentByIdQuery query = new GetAssessmentByIdQuery(assessmentId);
             Assessment assessment = getAssessmentByIdHandler.handle(query);
             AssessmentResponse response = assessmentMapper.toAssessmentResponse(assessment);
             return ResponseEntity.ok(response);
@@ -146,8 +148,9 @@ public class AssessmentController implements AssessmentsApi {
     public ResponseEntity<AssessmentResponse> updateAssessment(String id,
                                                                UpdateAssessmentRequest updateAssessmentRequest) {
         try {
+            Long assessmentId = Long.parseLong(id);
             UpdateAssessmentCommand command = UpdateAssessmentCommand.builder()
-                    .id(id)
+                    .id(assessmentId)
                     .overallRating(updateAssessmentRequest.getOverallRating())
                     .qualityRating(updateAssessmentRequest.getQualityRating())
                     .speedRating(updateAssessmentRequest.getSpeedRating())

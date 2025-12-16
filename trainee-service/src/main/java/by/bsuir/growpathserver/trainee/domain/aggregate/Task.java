@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 public class Task {
-    private final String id;
+    private final Long id;
     private final String title;
     private final String description;
     private final TaskStatus status;

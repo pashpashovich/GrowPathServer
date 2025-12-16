@@ -56,11 +56,12 @@ public class TaskController implements TasksApi {
     @Override
     public ResponseEntity<TaskStatusResponse> completeTask(String id) {
         try {
-            CompleteTaskCommand command = new CompleteTaskCommand(id);
+            Long taskId = Long.parseLong(id);
+            CompleteTaskCommand command = new CompleteTaskCommand(taskId);
             Task task = completeTaskHandler.handle(command);
 
             TaskStatusResponse response = new TaskStatusResponse();
-            response.setId(task.getId());
+            response.setId(String.valueOf(task.getId()));
             response.setStatus(TaskStatusResponse.StatusEnum.fromValue(task.getStatus().getValue()));
             response.setCompletedAt(task.getCompletedAt());
 
@@ -106,7 +107,8 @@ public class TaskController implements TasksApi {
     @Override
     public ResponseEntity<MessageResponse> deleteTask(String id) {
         try {
-            DeleteTaskCommand command = new DeleteTaskCommand(id);
+            Long taskId = Long.parseLong(id);
+            DeleteTaskCommand command = new DeleteTaskCommand(taskId);
             deleteTaskHandler.handle(command);
 
             MessageResponse response = new MessageResponse();
@@ -121,7 +123,8 @@ public class TaskController implements TasksApi {
     @Override
     public ResponseEntity<TaskResponse> getTaskById(String id) {
         try {
-            GetTaskByIdQuery query = new GetTaskByIdQuery(id);
+            Long taskId = Long.parseLong(id);
+            GetTaskByIdQuery query = new GetTaskByIdQuery(taskId);
             Task task = getTaskByIdHandler.handle(query);
             TaskResponse response = taskMapper.toTaskResponse(task);
             return ResponseEntity.ok(response);
@@ -174,11 +177,12 @@ public class TaskController implements TasksApi {
     @Override
     public ResponseEntity<TaskResponse> updateTask(String id, UpdateTaskRequest updateTaskRequest) {
         try {
+            Long taskId = Long.parseLong(id);
             String assigneeId = updateTaskRequest.getAssigneeId();
             java.time.LocalDateTime dueDate = updateTaskRequest.getDueDate();
 
             UpdateTaskCommand command = UpdateTaskCommand.builder()
-                    .id(id)
+                    .id(taskId)
                     .title(updateTaskRequest.getTitle())
                     .description(updateTaskRequest.getDescription())
                     .status(null)

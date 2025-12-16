@@ -8,6 +8,7 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
+    @Mapping(target = "id", expression = "java(String.valueOf(task.getId()))")
     @Mapping(target = "assigneeName", ignore = true)
     @Mapping(target = "mentorName", ignore = true)
     @Mapping(target = "submissionFiles", ignore = true)

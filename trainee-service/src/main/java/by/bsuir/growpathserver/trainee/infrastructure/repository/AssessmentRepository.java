@@ -10,6 +10,6 @@ import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 
 @Repository
 public interface AssessmentRepository
-        extends JpaRepository<AssessmentEntity, String>, JpaSpecificationExecutor<AssessmentEntity> {
-    Optional<AssessmentEntity> findById(String id);
+        extends JpaRepository<AssessmentEntity, Long>, JpaSpecificationExecutor<AssessmentEntity> {
+    Optional<AssessmentEntity> findById(Long id);
 }

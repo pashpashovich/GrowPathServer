@@ -15,5 +15,5 @@ public interface TaskService {
 
     void deleteTask(DeleteTaskCommand command);
 
-    Task getTaskById(String id);
+    Task getTaskById(Long id);
 }

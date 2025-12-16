@@ -40,7 +40,7 @@ class BlockUserHandlerTest {
     @BeforeEach
     void setUp() {
         activeUser = new UserEntity();
-        activeUser.setId("user-001");
+        activeUser.setId(1L);
         activeUser.setEmail("user@example.com");
         activeUser.setName("Test User");
         activeUser.setRole(UserRole.INTERN);
@@ -51,9 +51,9 @@ class BlockUserHandlerTest {
     @Test
     void shouldBlockUserSuccessfully() {
         // Given
-        BlockUserCommand command = new BlockUserCommand("user-001");
+        BlockUserCommand command = new BlockUserCommand(1L);
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(activeUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -65,17 +65,17 @@ class BlockUserHandlerTest {
         // Then
         assertNotNull(result);
         assertEquals(UserStatus.BLOCKED, result.getStatus());
-        assertEquals("user-001", result.getId());
-        verify(userRepository).findById("user-001");
+        assertEquals(1L, result.getId());
+        verify(userRepository).findById(1L);
         verify(userRepository).save(any(UserEntity.class));
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        BlockUserCommand command = new BlockUserCommand("non-existent");
+        BlockUserCommand command = new BlockUserCommand(999L);
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> blockUserHandler.handle(command));

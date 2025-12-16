@@ -40,7 +40,7 @@ class UpdateUserHandlerTest {
     @BeforeEach
     void setUp() {
         existingUser = new UserEntity();
-        existingUser.setId("user-001");
+        existingUser.setId(1L);
         existingUser.setEmail("old@example.com");
         existingUser.setName("Old Name");
         existingUser.setRole(UserRole.INTERN);
@@ -52,13 +52,13 @@ class UpdateUserHandlerTest {
     void shouldUpdateUserSuccessfully() {
         // Given
         UpdateUserCommand command = UpdateUserCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .email("new@example.com")
                 .name("New Name")
                 .role(UserRole.MENTOR)
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
@@ -73,7 +73,7 @@ class UpdateUserHandlerTest {
         assertEquals("new@example.com", result.getEmail().value());
         assertEquals("New Name", result.getName());
         assertEquals(UserRole.MENTOR, result.getRole());
-        verify(userRepository).findById("user-001");
+        verify(userRepository).findById(1L);
         verify(userRepository).existsByEmail("new@example.com");
         verify(userRepository).save(any(UserEntity.class));
     }
@@ -82,11 +82,11 @@ class UpdateUserHandlerTest {
     void shouldUpdateOnlyNameWhenOtherFieldsAreNull() {
         // Given
         UpdateUserCommand command = UpdateUserCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .name("Updated Name")
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -107,12 +107,12 @@ class UpdateUserHandlerTest {
     void shouldNotUpdateEmailIfSameAsCurrent() {
         // Given
         UpdateUserCommand command = UpdateUserCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .email("old@example.com")
                 .name("New Name")
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -132,11 +132,11 @@ class UpdateUserHandlerTest {
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
         UpdateUserCommand command = UpdateUserCommand.builder()
-                .userId("non-existent")
+                .userId(999L)
                 .name("New Name")
                 .build();
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> updateUserHandler.handle(command));
@@ -147,11 +147,11 @@ class UpdateUserHandlerTest {
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Given
         UpdateUserCommand command = UpdateUserCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .email("existing@example.com")
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
         // When & Then

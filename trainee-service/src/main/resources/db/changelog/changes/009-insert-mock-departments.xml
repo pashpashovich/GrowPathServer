@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+  <changeSet id="009-insert-mock-departments" author="growpath">
+    <insert tableName="departments">
+      <column name="name" value="Разработка"/>
+      <column name="description" value="Отдел разработки программного обеспечения. Занимается созданием и поддержкой веб-приложений, мобильных приложений и backend-систем."/>
+      <column name="created_at" value="2024-01-15 10:00:00"/>
+      <column name="updated_at" value="2024-01-15 10:00:00"/>
+    </insert>
+    <insert tableName="departments">
+      <column name="name" value="Тестирование"/>
+      <column name="description" value="Отдел тестирования и обеспечения качества. Проводит функциональное, интеграционное и автоматизированное тестирование."/>
+      <column name="created_at" value="2024-01-15 10:00:00"/>
+      <column name="updated_at" value="2024-01-15 10:00:00"/>
+    </insert>
+    <insert tableName="departments">
+      <column name="name" value="DevOps"/>
+      <column name="description" value="Отдел DevOps. Занимается настройкой CI/CD, инфраструктурой, мониторингом и автоматизацией процессов развертывания."/>
+      <column name="created_at" value="2024-01-15 10:00:00"/>
+      <column name="updated_at" value="2024-01-15 10:00:00"/>
+    </insert>
+    <insert tableName="departments">
+      <column name="name" value="Аналитика"/>
+      <column name="description" value="Отдел аналитики данных. Занимается анализом бизнес-процессов, созданием отчетов и дашбордов."/>
+      <column name="created_at" value="2024-01-15 10:00:00"/>
+      <column name="updated_at" value="2024-01-15 10:00:00"/>
+    </insert>
+    <insert tableName="departments">
+      <column name="name" value="Дизайн"/>
+      <column name="description" value="Отдел дизайна. Создает пользовательские интерфейсы, графический дизайн и обеспечивает удобство использования продуктов."/>
+      <column name="created_at" value="2024-01-15 10:00:00"/>
+      <column name="updated_at" value="2024-01-15 10:00:00"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

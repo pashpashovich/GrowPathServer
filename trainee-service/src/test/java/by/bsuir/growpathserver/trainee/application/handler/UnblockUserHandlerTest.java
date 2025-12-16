@@ -40,7 +40,7 @@ class UnblockUserHandlerTest {
     @BeforeEach
     void setUp() {
         blockedUser = new UserEntity();
-        blockedUser.setId("user-001");
+        blockedUser.setId(1L);
         blockedUser.setEmail("user@example.com");
         blockedUser.setName("Test User");
         blockedUser.setRole(UserRole.INTERN);
@@ -51,9 +51,9 @@ class UnblockUserHandlerTest {
     @Test
     void shouldUnblockUserSuccessfully() {
         // Given
-        UnblockUserCommand command = new UnblockUserCommand("user-001");
+        UnblockUserCommand command = new UnblockUserCommand(1L);
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(blockedUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(blockedUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -65,17 +65,17 @@ class UnblockUserHandlerTest {
         // Then
         assertNotNull(result);
         assertEquals(UserStatus.ACTIVE, result.getStatus());
-        assertEquals("user-001", result.getId());
-        verify(userRepository).findById("user-001");
+        assertEquals(1L, result.getId());
+        verify(userRepository).findById(1L);
         verify(userRepository).save(any(UserEntity.class));
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        UnblockUserCommand command = new UnblockUserCommand("non-existent");
+        UnblockUserCommand command = new UnblockUserCommand(999L);
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> unblockUserHandler.handle(command));
