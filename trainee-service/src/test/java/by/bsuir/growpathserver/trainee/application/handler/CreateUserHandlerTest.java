@@ -33,11 +33,11 @@ class CreateUserHandlerTest {
                 .email("user@example.com")
                 .name("Test User")
                 .role(UserRole.INTERN)
-                .invitedBy("admin-001")
+                .invitedBy(1L)
                 .build();
 
         UserEntity entity = new UserEntity();
-        entity.setId("user-001");
+        entity.setId(1L);
         entity.setEmail("user@example.com");
         entity.setName("Test User");
         entity.setRole(UserRole.INTERN);
@@ -51,7 +51,7 @@ class CreateUserHandlerTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("user-001", result.getId());
+        assertEquals(1L, result.getId());
         assertEquals("user@example.com", result.getEmail().value());
         verify(userService).createUser(command);
     }

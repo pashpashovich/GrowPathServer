@@ -1,4 +1,4 @@
 package by.bsuir.growpathserver.trainee.application.query;
 
-public record GetUserByIdQuery(String userId) {
+public record GetUserByIdQuery(Long userId) {
 }

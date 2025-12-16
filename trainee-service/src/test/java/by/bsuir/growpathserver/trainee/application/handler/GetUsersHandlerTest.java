@@ -42,7 +42,7 @@ class GetUsersHandlerTest {
     @BeforeEach
     void setUp() {
         UserEntity user1 = new UserEntity();
-        user1.setId("user-001");
+        user1.setId(1L);
         user1.setEmail("user1@example.com");
         user1.setName("User One");
         user1.setRole(UserRole.INTERN);
@@ -50,7 +50,7 @@ class GetUsersHandlerTest {
         user1.setCreatedAt(LocalDateTime.now());
 
         UserEntity user2 = new UserEntity();
-        user2.setId("user-002");
+        user2.setId(2L);
         user2.setEmail("user2@example.com");
         user2.setName("User Two");
         user2.setRole(UserRole.MENTOR);

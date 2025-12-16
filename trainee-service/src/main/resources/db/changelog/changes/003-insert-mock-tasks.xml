@@ -7,7 +7,6 @@
 
   <changeSet id="003-insert-mock-tasks" author="growpath">
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440001"/>
       <column name="title" value="Изучить основы Spring Boot"/>
       <column name="description" value="Изучить основные концепции Spring Boot, включая dependency injection, autoconfiguration и starter dependencies"/>
       <column name="status" value="PENDING"/>
@@ -22,7 +21,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440002"/>
       <column name="title" value="Реализовать REST API для управления задачами"/>
       <column name="description" value="Создать REST API с CRUD операциями для управления задачами, включая создание, обновление, удаление и получение списка задач"/>
       <column name="status" value="IN_PROGRESS"/>
@@ -38,7 +36,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440003"/>
       <column name="title" value="Написать unit-тесты для сервисного слоя"/>
       <column name="description" value="Создать unit-тесты для всех методов сервисного слоя, используя JUnit и Mockito"/>
       <column name="status" value="SUBMITTED"/>
@@ -56,7 +53,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440004"/>
       <column name="title" value="Изучить Docker и контейнеризацию"/>
       <column name="description" value="Изучить основы Docker, создать Dockerfile для приложения и настроить docker-compose"/>
       <column name="status" value="COMPLETED"/>
@@ -77,7 +73,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440005"/>
       <column name="title" value="Настроить CI/CD pipeline"/>
       <column name="description" value="Настроить непрерывную интеграцию и развертывание с использованием GitHub Actions или GitLab CI"/>
       <column name="status" value="PENDING"/>
@@ -92,7 +87,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440006"/>
       <column name="title" value="Реализовать аутентификацию через Keycloak"/>
       <column name="description" value="Интегрировать Keycloak для аутентификации и авторизации пользователей в приложении"/>
       <column name="status" value="IN_PROGRESS"/>
@@ -108,7 +102,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440007"/>
       <column name="title" value="Оптимизировать запросы к базе данных"/>
       <column name="description" value="Проанализировать и оптимизировать медленные SQL запросы, добавить необходимые индексы"/>
       <column name="status" value="REJECTED"/>
@@ -127,7 +120,6 @@
     </insert>
 
     <insert tableName="tasks">
-      <column name="id" value="550e8400-e29b-41d4-a716-446655440008"/>
       <column name="title" value="Создать документацию API"/>
       <column name="description" value="Написать документацию для всех REST API endpoints с примерами запросов и ответов"/>
       <column name="status" value="PENDING"/>

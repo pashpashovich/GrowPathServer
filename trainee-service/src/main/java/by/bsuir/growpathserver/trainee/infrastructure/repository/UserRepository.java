@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, String>, JpaSpecificationExecutor<UserEntity> {
+public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
     boolean existsByEmail(String email);
 
     Optional<UserEntity> findByEmail(String email);

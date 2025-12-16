@@ -101,7 +101,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public Task getTaskById(String id) {
+    public Task getTaskById(Long id) {
         TaskEntity entity = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + id));
         return Task.fromEntity(entity);

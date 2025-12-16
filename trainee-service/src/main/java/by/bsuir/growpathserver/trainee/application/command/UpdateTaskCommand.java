@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record UpdateTaskCommand(
-        String id,
+        Long id,
         String title,
         String description,
         TaskStatus status,

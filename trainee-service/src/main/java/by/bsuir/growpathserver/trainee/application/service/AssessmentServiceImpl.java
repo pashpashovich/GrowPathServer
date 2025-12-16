@@ -75,7 +75,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Assessment getAssessmentById(String id) {
+    public Assessment getAssessmentById(Long id) {
         AssessmentEntity entity = assessmentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Assessment not found with id: " + id));
         return Assessment.fromEntity(entity);

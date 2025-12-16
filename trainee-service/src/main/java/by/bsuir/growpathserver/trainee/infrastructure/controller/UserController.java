@@ -99,7 +99,8 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserResponse> getUserById(String id) {
         try {
-            GetUserByIdQuery query = new GetUserByIdQuery(id);
+            Long userId = Long.parseLong(id);
+            GetUserByIdQuery query = new GetUserByIdQuery(userId);
             User user = getUserByIdHandler.handle(query);
             UserResponse response = userMapper.toUserResponse(user);
             return ResponseEntity.ok(response);
@@ -113,7 +114,7 @@ public class UserController implements UsersApi {
     public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
         try {
             // TODO: Get invitedBy from JWT token when authentication is properly configured
-            String invitedBy = "system"; // Should be extracted from JWT
+            Long invitedBy = null; // Should be extracted from JWT
 
             CreateUserCommand command = CreateUserCommand.builder()
                     .email(createUserRequest.getEmail())
@@ -134,8 +135,9 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest updateUserRequest) {
         try {
+            Long userId = Long.parseLong(id);
             UpdateUserCommand command = UpdateUserCommand.builder()
-                    .userId(id)
+                    .userId(userId)
                     .email(updateUserRequest.getEmail())
                     .name(updateUserRequest.getName())
                     .role(updateUserRequest.getRole() != null ?
@@ -157,7 +159,8 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<MessageResponse> deleteUser(String id) {
         try {
-            DeleteUserCommand command = new DeleteUserCommand(id);
+            Long userId = Long.parseLong(id);
+            DeleteUserCommand command = new DeleteUserCommand(userId);
             deleteUserHandler.handle(command);
 
             MessageResponse response = new MessageResponse();
@@ -172,11 +175,12 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserStatusResponse> blockUser(String id) {
         try {
-            BlockUserCommand command = new BlockUserCommand(id);
+            Long userId = Long.parseLong(id);
+            BlockUserCommand command = new BlockUserCommand(userId);
             User user = blockUserHandler.handle(command);
 
             UserStatusResponse response = new UserStatusResponse();
-            response.setId(user.getId());
+            response.setId(String.valueOf(user.getId()));
             response.setStatus(UserStatusResponse.StatusEnum.fromValue(user.getStatus().getValue()));
             response.setUpdatedAt(LocalDateTime.now());
 
@@ -190,11 +194,12 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserStatusResponse> unblockUser(String id) {
         try {
-            UnblockUserCommand command = new UnblockUserCommand(id);
+            Long userId = Long.parseLong(id);
+            UnblockUserCommand command = new UnblockUserCommand(userId);
             User user = unblockUserHandler.handle(command);
 
             UserStatusResponse response = new UserStatusResponse();
-            response.setId(user.getId());
+            response.setId(String.valueOf(user.getId()));
             response.setStatus(UserStatusResponse.StatusEnum.fromValue(user.getStatus().getValue()));
             response.setUpdatedAt(LocalDateTime.now());
 
@@ -208,15 +213,16 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserRoleResponse> changeUserRole(String id, ChangeRoleRequest changeRoleRequest) {
         try {
+            Long userId = Long.parseLong(id);
             ChangeUserRoleCommand command = ChangeUserRoleCommand.builder()
-                    .userId(id)
+                    .userId(userId)
                     .role(UserRole.fromString(changeRoleRequest.getRole().getValue()))
                     .build();
 
             User user = changeUserRoleHandler.handle(command);
 
             UserRoleResponse response = new UserRoleResponse();
-            response.setId(user.getId());
+            response.setId(String.valueOf(user.getId()));
             response.setRole(UserRoleResponse.RoleEnum.fromValue(user.getRole().getValue()));
             response.setUpdatedAt(LocalDateTime.now());
 
@@ -233,11 +239,12 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<InvitationResponse> inviteUser(String id) {
         try {
-            InviteUserCommand command = new InviteUserCommand(id);
+            Long userId = Long.parseLong(id);
+            InviteUserCommand command = new InviteUserCommand(userId);
             User user = inviteUserHandler.handle(command);
 
             InvitationResponse response = new InvitationResponse();
-            response.setId(user.getId());
+            response.setId(String.valueOf(user.getId()));
             if (user.getInvitationSentAt() != null) {
                 response.setInvitationSentAt(user.getInvitationSentAt());
             }

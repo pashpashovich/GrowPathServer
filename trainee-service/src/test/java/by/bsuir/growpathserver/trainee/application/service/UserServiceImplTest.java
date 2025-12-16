@@ -42,13 +42,13 @@ class UserServiceImplTest {
                 .email("newuser@example.com")
                 .name("New User")
                 .role(UserRole.INTERN)
-                .invitedBy("admin-001")
+                .invitedBy(1L)
                 .build();
 
         when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
-            entity.setId("generated-id");
+            entity.setId(1L);
             return entity;
         });
 
@@ -77,7 +77,7 @@ class UserServiceImplTest {
                 .email("existing@example.com")
                 .name("New User")
                 .role(UserRole.INTERN)
-                .invitedBy("admin-001")
+                .invitedBy(1L)
                 .build();
 
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);

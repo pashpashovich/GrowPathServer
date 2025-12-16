@@ -177,7 +177,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/v1/users/{id}", "non-existent")
+        mockMvc.perform(get("/api/v1/users/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -226,7 +226,7 @@ class UserControllerIntegrationTest {
         request.setName("Updated Name");
 
         // When & Then
-        mockMvc.perform(put("/api/v1/users/{id}", "non-existent")
+        mockMvc.perform(put("/api/v1/users/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -244,7 +244,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenDeletingNonExistentUser() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/v1/users/{id}", "non-existent")
+        mockMvc.perform(delete("/api/v1/users/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -262,7 +262,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenBlockingNonExistentUser() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/v1/users/{id}/block", "non-existent")
+        mockMvc.perform(post("/api/v1/users/{id}/block", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -311,7 +311,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenInvitingNonExistentUser() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/v1/users/{id}/invite", "non-existent")
+        mockMvc.perform(post("/api/v1/users/{id}/invite", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

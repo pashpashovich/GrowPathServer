@@ -12,5 +12,5 @@ public interface AssessmentService {
 
     void deleteAssessment(DeleteAssessmentCommand command);
 
-    Assessment getAssessmentById(String id);
+    Assessment getAssessmentById(Long id);
 }

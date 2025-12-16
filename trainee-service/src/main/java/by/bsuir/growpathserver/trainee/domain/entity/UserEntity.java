@@ -25,8 +25,8 @@ import lombok.Setter;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -49,7 +49,7 @@ public class UserEntity {
     private LocalDateTime lastLogin;
 
     @Column(name = "invited_by")
-    private String invitedBy;
+    private Long invitedBy;
 
     @Column(name = "invitation_sent_at")
     private LocalDateTime invitationSentAt;

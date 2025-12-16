@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record UpdateAssessmentCommand(
-        String id,
+        Long id,
         Double overallRating,
         Double qualityRating,
         Double speedRating,

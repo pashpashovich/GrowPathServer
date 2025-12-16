@@ -40,7 +40,7 @@ class ChangeUserRoleHandlerTest {
     @BeforeEach
     void setUp() {
         internUser = new UserEntity();
-        internUser.setId("user-001");
+        internUser.setId(1L);
         internUser.setEmail("user@example.com");
         internUser.setName("Test User");
         internUser.setRole(UserRole.INTERN);
@@ -52,11 +52,11 @@ class ChangeUserRoleHandlerTest {
     void shouldChangeUserRoleSuccessfully() {
         // Given
         ChangeUserRoleCommand command = ChangeUserRoleCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .role(UserRole.MENTOR)
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(internUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(internUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -68,8 +68,8 @@ class ChangeUserRoleHandlerTest {
         // Then
         assertNotNull(result);
         assertEquals(UserRole.MENTOR, result.getRole());
-        assertEquals("user-001", result.getId());
-        verify(userRepository).findById("user-001");
+        assertEquals(1L, result.getId());
+        verify(userRepository).findById(1L);
         verify(userRepository).save(any(UserEntity.class));
     }
 
@@ -77,11 +77,11 @@ class ChangeUserRoleHandlerTest {
     void shouldChangeRoleFromInternToHr() {
         // Given
         ChangeUserRoleCommand command = ChangeUserRoleCommand.builder()
-                .userId("user-001")
+                .userId(1L)
                 .role(UserRole.HR)
                 .build();
 
-        when(userRepository.findById("user-001")).thenReturn(Optional.of(internUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(internUser));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity entity = invocation.getArgument(0);
             return entity;
@@ -99,11 +99,11 @@ class ChangeUserRoleHandlerTest {
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
         ChangeUserRoleCommand command = ChangeUserRoleCommand.builder()
-                .userId("non-existent")
+                .userId(999L)
                 .role(UserRole.MENTOR)
                 .build();
 
-        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> changeUserRoleHandler.handle(command));

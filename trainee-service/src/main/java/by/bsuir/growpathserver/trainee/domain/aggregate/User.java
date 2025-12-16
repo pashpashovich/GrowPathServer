@@ -10,14 +10,14 @@ import lombok.Getter;
 
 @Getter
 public class User {
-    private final String id;
+    private final Long id;
     private final Email email;
     private final String name;
     private final UserRole role;
     private final UserStatus status;
     private final LocalDateTime createdAt;
     private LocalDateTime lastLogin;
-    private final String invitedBy;
+    private final Long invitedBy;
     private final LocalDateTime invitationSentAt;
 
     private User(UserEntity entity) {
@@ -50,7 +50,7 @@ public class User {
         return entity;
     }
 
-    public static User create(String email, String name, UserRole role, String invitedBy) {
+    public static User create(String email, String name, UserRole role, Long invitedBy) {
         UserEntity entity = new UserEntity();
         entity.setEmail(email);
         entity.setName(name);

@@ -8,6 +8,7 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 
 @Mapper(componentModel = "spring")
 public interface AssessmentMapper {
+    @Mapping(target = "id", expression = "java(String.valueOf(assessment.getId()))")
     @Mapping(target = "internName", ignore = true)
     @Mapping(target = "mentorName", ignore = true)
     AssessmentResponse toAssessmentResponse(Assessment assessment);

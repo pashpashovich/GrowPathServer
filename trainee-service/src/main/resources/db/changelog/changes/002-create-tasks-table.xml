@@ -6,7 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
   <changeSet id="002-create-tasks-table" author="growpath">
     <createTable tableName="tasks">
-      <column name="id" type="VARCHAR(36)">
+      <column name="id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="title" type="VARCHAR(255)">
@@ -21,16 +21,16 @@
       <column name="priority" type="VARCHAR(50)">
         <constraints nullable="false"/>
       </column>
-      <column name="assignee_id" type="VARCHAR(36)">
+      <column name="assignee_id" type="VARCHAR(255)">
         <constraints nullable="true"/>
       </column>
-      <column name="mentor_id" type="VARCHAR(36)">
+      <column name="mentor_id" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="internship_id" type="VARCHAR(36)">
+      <column name="internship_id" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="stage_id" type="VARCHAR(36)">
+      <column name="stage_id" type="VARCHAR(255)">
         <constraints nullable="true"/>
       </column>
       <column name="due_date" type="TIMESTAMP">

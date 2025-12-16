@@ -29,24 +29,24 @@ class DeleteUserHandlerTest {
     @Test
     void shouldDeleteUserSuccessfully() {
         // Given
-        DeleteUserCommand command = new DeleteUserCommand("user-001");
+        DeleteUserCommand command = new DeleteUserCommand(1L);
 
-        when(userRepository.existsById("user-001")).thenReturn(true);
+        when(userRepository.existsById(1L)).thenReturn(true);
 
         // When
         deleteUserHandler.handle(command);
 
         // Then
-        verify(userRepository).existsById("user-001");
-        verify(userRepository).deleteById("user-001");
+        verify(userRepository).existsById(1L);
+        verify(userRepository).deleteById(1L);
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        DeleteUserCommand command = new DeleteUserCommand("non-existent");
+        DeleteUserCommand command = new DeleteUserCommand(999L);
 
-        when(userRepository.existsById("non-existent")).thenReturn(false);
+        when(userRepository.existsById(999L)).thenReturn(false);
 
         // When & Then
         assertThrows(NoSuchElementException.class, () -> deleteUserHandler.handle(command));

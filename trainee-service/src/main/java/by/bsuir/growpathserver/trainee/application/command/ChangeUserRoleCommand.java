@@ -4,5 +4,5 @@ import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import lombok.Builder;
 
 @Builder
-public record ChangeUserRoleCommand(String userId, UserRole role) {
+public record ChangeUserRoleCommand(Long userId, UserRole role) {
 }

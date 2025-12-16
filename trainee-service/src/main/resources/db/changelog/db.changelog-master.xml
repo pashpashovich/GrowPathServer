@@ -12,5 +12,7 @@
   <include file="db/changelog/changes/005-fix-user-enum-values.xml"/>
   <include file="db/changelog/changes/006-create-assessments-table.xml"/>
   <include file="db/changelog/changes/007-insert-mock-assessments.xml"/>
+  <include file="db/changelog/changes/008-create-departments-table.xml"/>
+  <include file="db/changelog/changes/009-insert-mock-departments.xml"/>
 
 </databaseChangeLog>

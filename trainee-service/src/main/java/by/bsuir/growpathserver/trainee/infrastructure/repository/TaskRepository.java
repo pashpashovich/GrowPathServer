@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 
 @Repository
-public interface TaskRepository extends JpaRepository<TaskEntity, String>, JpaSpecificationExecutor<TaskEntity> {
-    Optional<TaskEntity> findById(String id);
+public interface TaskRepository extends JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity> {
+    Optional<TaskEntity> findById(Long id);
 }
