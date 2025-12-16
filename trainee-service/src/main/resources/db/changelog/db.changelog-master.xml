@@ -10,5 +10,7 @@
   <include file="db/changelog/changes/003-insert-mock-tasks.xml"/>
   <include file="db/changelog/changes/004-insert-mock-users.xml"/>
   <include file="db/changelog/changes/005-fix-user-enum-values.xml"/>
+  <include file="db/changelog/changes/006-create-assessments-table.xml"/>
+  <include file="db/changelog/changes/007-insert-mock-assessments.xml"/>
 
 </databaseChangeLog>

@@ -1,14 +1,15 @@
 package by.bsuir.growpathserver.common.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtUtils {
@@ -54,5 +55,9 @@ public class JwtUtils {
     public static String getLastName(Jwt jwt) {
         Object claim = jwt.getClaims().get("family_name");
         return claim instanceof String ? (String) claim : null;
+    }
+
+    public static String getUserId(Jwt jwt) {
+        return jwt.getSubject();
     }
 }

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="007-insert-mock-assessments" author="growpath">
+    <insert tableName="assessments">
+      <column name="id" value="assessment-001"/>
+      <column name="intern_id" value="user-001"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="overall_rating" value="4.5"/>
+      <column name="quality_rating" value="4.7"/>
+      <column name="speed_rating" value="4.3"/>
+      <column name="communication_rating" value="4.6"/>
+      <column name="comment" value="Отличная работа! Продемонстрировал хорошие навыки программирования и понимание архитектуры. Рекомендую продолжить развитие в области backend разработки."/>
+      <column name="created_at" value="2024-12-15 10:00:00"/>
+      <column name="updated_at" value="2024-12-15 10:00:00"/>
+    </insert>
+
+    <insert tableName="assessments">
+      <column name="id" value="assessment-002"/>
+      <column name="intern_id" value="user-002"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="overall_rating" value="4.2"/>
+      <column name="quality_rating" value="4.0"/>
+      <column name="speed_rating" value="4.5"/>
+      <column name="communication_rating" value="4.1"/>
+      <column name="comment" value="Хорошие результаты. Быстро обучается и применяет новые знания на практике. Есть потенциал для роста."/>
+      <column name="created_at" value="2024-12-16 14:30:00"/>
+      <column name="updated_at" value="2024-12-16 14:30:00"/>
+    </insert>
+
+    <insert tableName="assessments">
+      <column name="id" value="assessment-003"/>
+      <column name="intern_id" value="user-003"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="overall_rating" value="4.8"/>
+      <column name="quality_rating" value="5.0"/>
+      <column name="speed_rating" value="4.6"/>
+      <column name="communication_rating" value="4.9"/>
+      <column name="comment" value="Превосходная работа! Показывает глубокое понимание технологий и отличные навыки решения задач. Очень перспективный кандидат."/>
+      <column name="created_at" value="2024-12-17 09:15:00"/>
+      <column name="updated_at" value="2024-12-17 09:15:00"/>
+    </insert>
+
+    <insert tableName="assessments">
+      <column name="id" value="assessment-004"/>
+      <column name="intern_id" value="user-001"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-001"/>
+      <column name="overall_rating" value="3.8"/>
+      <column name="quality_rating" value="3.5"/>
+      <column name="speed_rating" value="4.0"/>
+      <column name="communication_rating" value="3.9"/>
+      <column name="comment" value="Неплохие результаты, но есть области для улучшения. Рекомендую больше внимания уделять качеству кода и тестированию."/>
+      <column name="created_at" value="2024-12-18 11:20:00"/>
+      <column name="updated_at" value="2024-12-18 11:20:00"/>
+    </insert>
+
+    <insert tableName="assessments">
+      <column name="id" value="assessment-005"/>
+      <column name="intern_id" value="user-002"/>
+      <column name="mentor_id" value="mentor-002"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="overall_rating" value="4.0"/>
+      <column name="quality_rating" value="4.2"/>
+      <column name="speed_rating" value="3.8"/>
+      <column name="communication_rating" value="4.0"/>
+      <column name="comment" value="Стабильная работа. Показывает хорошее понимание задач и способность работать в команде."/>
+      <column name="created_at" value="2024-12-19 16:45:00"/>
+      <column name="updated_at" value="2024-12-19 16:45:00"/>
+    </insert>
+
+    <insert tableName="assessments">
+      <column name="id" value="assessment-006"/>
+      <column name="intern_id" value="user-003"/>
+      <column name="mentor_id" value="mentor-001"/>
+      <column name="internship_id" value="internship-002"/>
+      <column name="overall_rating" value="4.6"/>
+      <column name="quality_rating" value="4.5"/>
+      <column name="speed_rating" value="4.7"/>
+      <column name="communication_rating" value="4.6"/>
+      <column name="comment" value="Отличные результаты по всем критериям. Проактивный подход к решению задач и хорошие коммуникативные навыки."/>
+      <column name="created_at" value="2024-12-20 13:10:00"/>
+      <column name="updated_at" value="2024-12-20 13:10:00"/>
+    </insert>
+  </changeSet>
+
+</databaseChangeLog>
+
