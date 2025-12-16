@@ -27,7 +27,7 @@
       <column name="last_login" type="TIMESTAMP WITH TIME ZONE">
         <constraints nullable="true"/>
       </column>
-      <column name="invited_by" type="VARCHAR(255)">
+      <column name="invited_by" type="BIGINT">
         <constraints nullable="true"/>
       </column>
       <column name="invitation_sent_at" type="TIMESTAMP WITH TIME ZONE">

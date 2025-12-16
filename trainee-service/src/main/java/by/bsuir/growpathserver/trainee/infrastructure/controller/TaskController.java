@@ -79,9 +79,10 @@ public class TaskController implements TasksApi {
     public ResponseEntity<TaskResponse> createTask(CreateTaskRequest createTaskRequest) {
         try {
             // TODO: Get mentorId from JWT token when authentication is properly configured
-            String mentorId = "mentor-id-placeholder"; // Should be extracted from JWT
-            String assigneeId = createTaskRequest.getAssigneeId();
-            String stageId = createTaskRequest.getStageId();
+            Long mentorId = 1L; // Should be extracted from JWT
+            Long assigneeId = createTaskRequest.getAssigneeId() != null ? Long.parseLong(createTaskRequest.getAssigneeId()) : null;
+            Long stageId = createTaskRequest.getStageId() != null ? Long.parseLong(createTaskRequest.getStageId()) : null;
+            Long internshipId = Long.parseLong(createTaskRequest.getInternshipId());
             java.time.LocalDateTime dueDate = createTaskRequest.getDueDate();
 
             CreateTaskCommand command = CreateTaskCommand.builder()
@@ -90,7 +91,7 @@ public class TaskController implements TasksApi {
                     .priority(TaskPriority.fromString(createTaskRequest.getPriority().getValue()))
                     .assigneeId(assigneeId)
                     .mentorId(mentorId)
-                    .internshipId(createTaskRequest.getInternshipId())
+                    .internshipId(internshipId)
                     .stageId(stageId)
                     .dueDate(dueDate)
                     .build();
@@ -178,7 +179,7 @@ public class TaskController implements TasksApi {
     public ResponseEntity<TaskResponse> updateTask(String id, UpdateTaskRequest updateTaskRequest) {
         try {
             Long taskId = Long.parseLong(id);
-            String assigneeId = updateTaskRequest.getAssigneeId();
+            Long assigneeId = updateTaskRequest.getAssigneeId() != null ? Long.parseLong(updateTaskRequest.getAssigneeId()) : null;
             java.time.LocalDateTime dueDate = updateTaskRequest.getDueDate();
 
             UpdateTaskCommand command = UpdateTaskCommand.builder()

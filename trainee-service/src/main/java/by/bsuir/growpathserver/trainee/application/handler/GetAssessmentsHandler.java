@@ -26,18 +26,30 @@ public class GetAssessmentsHandler {
         Specification<AssessmentEntity> spec = (root, criteriaQuery, cb) -> cb.conjunction();
 
         if (query.internId() != null && !query.internId().isBlank()) {
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                                    criteriaBuilder.equal(root.get("internId"), query.internId()));
+            try {
+                Long internId = Long.parseLong(query.internId());
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                        criteriaBuilder.equal(root.get("internId"), internId));
+            } catch (NumberFormatException e) {
+            }
         }
 
         if (query.mentorId() != null && !query.mentorId().isBlank()) {
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                                    criteriaBuilder.equal(root.get("mentorId"), query.mentorId()));
+            try {
+                Long mentorId = Long.parseLong(query.mentorId());
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                        criteriaBuilder.equal(root.get("mentorId"), mentorId));
+            } catch (NumberFormatException e) {
+            }
         }
 
         if (query.internshipId() != null && !query.internshipId().isBlank()) {
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                                    criteriaBuilder.equal(root.get("internshipId"), query.internshipId()));
+            try {
+                Long internshipId = Long.parseLong(query.internshipId());
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                        criteriaBuilder.equal(root.get("internshipId"), internshipId));
+            } catch (NumberFormatException e) {
+            }
         }
 
         Page<AssessmentEntity> entityPage = assessmentRepository.findAll(spec, pageable);

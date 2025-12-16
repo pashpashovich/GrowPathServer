@@ -21,16 +21,16 @@
       <column name="priority" type="VARCHAR(50)">
         <constraints nullable="false"/>
       </column>
-      <column name="assignee_id" type="VARCHAR(255)">
+      <column name="assignee_id" type="BIGINT">
         <constraints nullable="true"/>
       </column>
-      <column name="mentor_id" type="VARCHAR(255)">
+      <column name="mentor_id" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="internship_id" type="VARCHAR(255)">
+      <column name="internship_id" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="stage_id" type="VARCHAR(255)">
+      <column name="stage_id" type="BIGINT">
         <constraints nullable="true"/>
       </column>
       <column name="due_date" type="TIMESTAMP">

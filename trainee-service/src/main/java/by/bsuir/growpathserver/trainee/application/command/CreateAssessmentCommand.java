@@ -4,9 +4,9 @@ import lombok.Builder;
 
 @Builder
 public record CreateAssessmentCommand(
-        String internId,
-        String mentorId,
-        String internshipId,
+        Long internId,
+        Long mentorId,
+        Long internshipId,
         Double overallRating,
         Double qualityRating,
         Double speedRating,

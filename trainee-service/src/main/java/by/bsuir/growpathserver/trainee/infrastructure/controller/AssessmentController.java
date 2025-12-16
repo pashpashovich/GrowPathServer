@@ -58,10 +58,14 @@ public class AssessmentController implements AssessmentsApi {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
+            Long internId = Long.parseLong(createAssessmentRequest.getInternId());
+            Long mentorIdLong = Long.parseLong(mentorId);
+            Long internshipId = Long.parseLong(createAssessmentRequest.getInternshipId());
+
             CreateAssessmentCommand command = CreateAssessmentCommand.builder()
-                    .internId(createAssessmentRequest.getInternId())
-                    .mentorId(mentorId)
-                    .internshipId(createAssessmentRequest.getInternshipId())
+                    .internId(internId)
+                    .mentorId(mentorIdLong)
+                    .internshipId(internshipId)
                     .overallRating(createAssessmentRequest.getOverallRating())
                     .qualityRating(createAssessmentRequest.getQualityRating())
                     .speedRating(createAssessmentRequest.getSpeedRating())

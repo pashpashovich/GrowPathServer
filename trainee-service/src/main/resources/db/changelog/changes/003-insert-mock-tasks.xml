@@ -11,10 +11,10 @@
       <column name="description" value="Изучить основные концепции Spring Boot, включая dependency injection, autoconfiguration и starter dependencies"/>
       <column name="status" value="PENDING"/>
       <column name="priority" value="HIGH"/>
-      <column name="assignee_id" value="user-001"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-001"/>
-      <column name="stage_id" value="stage-001"/>
+      <column name="assignee_id" value="7"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="1"/>
+      <column name="stage_id" value="1"/>
       <column name="due_date" value="2024-12-31 23:59:59"/>
       <column name="created_at" value="2024-12-01 10:00:00"/>
       <column name="updated_at" value="2024-12-01 10:00:00"/>
@@ -25,10 +25,10 @@
       <column name="description" value="Создать REST API с CRUD операциями для управления задачами, включая создание, обновление, удаление и получение списка задач"/>
       <column name="status" value="IN_PROGRESS"/>
       <column name="priority" value="HIGH"/>
-      <column name="assignee_id" value="user-002"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-001"/>
-      <column name="stage_id" value="stage-002"/>
+      <column name="assignee_id" value="8"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="1"/>
+      <column name="stage_id" value="2"/>
       <column name="due_date" value="2025-01-15 18:00:00"/>
       <column name="taken_at" value="2024-12-05 09:30:00"/>
       <column name="created_at" value="2024-12-01 10:00:00"/>
@@ -40,10 +40,10 @@
       <column name="description" value="Создать unit-тесты для всех методов сервисного слоя, используя JUnit и Mockito"/>
       <column name="status" value="SUBMITTED"/>
       <column name="priority" value="MEDIUM"/>
-      <column name="assignee_id" value="user-001"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-001"/>
-      <column name="stage_id" value="stage-003"/>
+      <column name="assignee_id" value="7"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="1"/>
+      <column name="stage_id" value="3"/>
       <column name="due_date" value="2024-12-20 17:00:00"/>
       <column name="taken_at" value="2024-12-10 14:00:00"/>
       <column name="submitted_at" value="2024-12-18 16:45:00"/>
@@ -57,10 +57,10 @@
       <column name="description" value="Изучить основы Docker, создать Dockerfile для приложения и настроить docker-compose"/>
       <column name="status" value="COMPLETED"/>
       <column name="priority" value="MEDIUM"/>
-      <column name="assignee_id" value="user-003"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-002"/>
-      <column name="stage_id" value="stage-001"/>
+      <column name="assignee_id" value="9"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="2"/>
+      <column name="stage_id" value="1"/>
       <column name="due_date" value="2024-12-10 20:00:00"/>
       <column name="taken_at" value="2024-11-25 11:00:00"/>
       <column name="submitted_at" value="2024-12-08 15:30:00"/>
@@ -77,10 +77,10 @@
       <column name="description" value="Настроить непрерывную интеграцию и развертывание с использованием GitHub Actions или GitLab CI"/>
       <column name="status" value="PENDING"/>
       <column name="priority" value="LOW"/>
-      <column name="assignee_id" value="user-002"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-002"/>
-      <column name="stage_id" value="stage-004"/>
+      <column name="assignee_id" value="8"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="2"/>
+      <column name="stage_id" value="4"/>
       <column name="due_date" value="2025-01-30 23:59:59"/>
       <column name="created_at" value="2024-12-01 10:00:00"/>
       <column name="updated_at" value="2024-12-01 10:00:00"/>
@@ -91,10 +91,10 @@
       <column name="description" value="Интегрировать Keycloak для аутентификации и авторизации пользователей в приложении"/>
       <column name="status" value="IN_PROGRESS"/>
       <column name="priority" value="HIGH"/>
-      <column name="assignee_id" value="user-001"/>
-      <column name="mentor_id" value="mentor-001"/>
-      <column name="internship_id" value="internship-001"/>
-      <column name="stage_id" value="stage-002"/>
+      <column name="assignee_id" value="7"/>
+      <column name="mentor_id" value="4"/>
+      <column name="internship_id" value="1"/>
+      <column name="stage_id" value="2"/>
       <column name="due_date" value="2024-12-25 18:00:00"/>
       <column name="taken_at" value="2024-12-12 08:00:00"/>
       <column name="created_at" value="2024-12-01 10:00:00"/>
@@ -106,10 +106,10 @@
       <column name="description" value="Проанализировать и оптимизировать медленные SQL запросы, добавить необходимые индексы"/>
       <column name="status" value="REJECTED"/>
       <column name="priority" value="MEDIUM"/>
-      <column name="assignee_id" value="user-003"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-002"/>
-      <column name="stage_id" value="stage-003"/>
+      <column name="assignee_id" value="9"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="2"/>
+      <column name="stage_id" value="3"/>
       <column name="due_date" value="2024-12-15 17:00:00"/>
       <column name="taken_at" value="2024-12-05 10:00:00"/>
       <column name="submitted_at" value="2024-12-14 16:00:00"/>
@@ -124,10 +124,10 @@
       <column name="description" value="Написать документацию для всех REST API endpoints с примерами запросов и ответов"/>
       <column name="status" value="PENDING"/>
       <column name="priority" value="LOW"/>
-      <column name="assignee_id" value="user-002"/>
-      <column name="mentor_id" value="mentor-002"/>
-      <column name="internship_id" value="internship-001"/>
-      <column name="stage_id" value="stage-005"/>
+      <column name="assignee_id" value="8"/>
+      <column name="mentor_id" value="5"/>
+      <column name="internship_id" value="1"/>
+      <column name="stage_id" value="5"/>
       <column name="due_date" value="2025-02-10 20:00:00"/>
       <column name="created_at" value="2024-12-01 10:00:00"/>
       <column name="updated_at" value="2024-12-01 10:00:00"/>

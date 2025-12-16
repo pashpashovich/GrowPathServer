@@ -9,13 +9,13 @@
       <column name="id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="intern_id" type="VARCHAR(255)">
+      <column name="intern_id" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="mentor_id" type="VARCHAR(255)">
+      <column name="mentor_id" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="internship_id" type="VARCHAR(255)">
+      <column name="internship_id" type="BIGINT">
         <constraints nullable="false"/>
       </column>
       <column name="overall_rating" type="DOUBLE PRECISION">

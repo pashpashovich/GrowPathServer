@@ -8,9 +8,9 @@ import lombok.Getter;
 @Getter
 public class Assessment {
     private final Long id;
-    private final String internId;
-    private final String mentorId;
-    private final String internshipId;
+    private final Long internId;
+    private final Long mentorId;
+    private final Long internshipId;
     private final Double overallRating;
     private final Double qualityRating;
     private final Double speedRating;
@@ -53,7 +53,7 @@ public class Assessment {
         return entity;
     }
 
-    public static Assessment create(String internId, String mentorId, String internshipId,
+    public static Assessment create(Long internId, Long mentorId, Long internshipId,
                                     Double overallRating, Double qualityRating,
                                     Double speedRating, Double communicationRating, String comment) {
         AssessmentEntity entity = new AssessmentEntity();
