@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+  <changeSet id="011-insert-mock-internship-programs" author="growpath">
+    <insert tableName="internship_programs">
+      <column name="title" value="Java Backend Development"/>
+      <column name="description" value="Комплексная программа стажировки по разработке backend-приложений на Java"/>
+      <column name="start_date" value="2024-09-01"/>
+      <column name="duration" value="6"/>
+      <column name="max_places" value="20"/>
+      <column name="requirements" value="['Знание Java Core', 'Базовые знания Spring Framework', 'Опыт работы с Git']"/>
+      <column name="goals" value="[{'title': 'Изучить Spring Boot', 'description': 'Освоить создание REST API с использованием Spring Boot'}, {'title': 'Изучить базы данных', 'description': 'Научиться работать с PostgreSQL и JPA'}]"/>
+      <column name="competencies" value="['Java', 'Spring Boot', 'PostgreSQL', 'REST API', 'JPA/Hibernate']"/>
+      <column name="selection_stages" value="[{'name': 'Техническое интервью', 'description': 'Проверка базовых знаний Java', 'order': 1}, {'name': 'Практическое задание', 'description': 'Разработка небольшого REST API', 'order': 2}]"/>
+      <column name="status" value="active"/>
+      <column name="created_by" value="1"/>
+      <column name="created_at" value="2024-08-01 10:00:00"/>
+      <column name="updated_at" value="2024-08-01 10:00:00"/>
+      <column name="internships" value="['1', '2']"/>
+    </insert>
+
+    <insert tableName="internship_programs">
+      <column name="title" value="Frontend Development"/>
+      <column name="description" value="Стажировка по разработке пользовательских интерфейсов"/>
+      <column name="start_date" value="2024-10-01"/>
+      <column name="duration" value="4"/>
+      <column name="max_places" value="15"/>
+      <column name="requirements" value="['Знание JavaScript', 'Базовые знания HTML/CSS', 'Опыт работы с React']"/>
+      <column name="goals" value="[{'title': 'Изучить React', 'description': 'Освоить создание компонентов и управление состоянием'}, {'title': 'Изучить TypeScript', 'description': 'Научиться писать типизированный код'}]"/>
+      <column name="competencies" value="['JavaScript', 'React', 'TypeScript', 'HTML/CSS', 'Redux']"/>
+      <column name="selection_stages" value="[{'name': 'Техническое интервью', 'description': 'Проверка знаний JavaScript и React', 'order': 1}]"/>
+      <column name="status" value="draft"/>
+      <column name="created_by" value="2"/>
+      <column name="created_at" value="2024-09-01 10:00:00"/>
+      <column name="updated_at" value="2024-09-01 10:00:00"/>
+      <column name="internships" value=""/>
+    </insert>
+
+    <insert tableName="internship_programs">
+      <column name="title" value="DevOps Engineering"/>
+      <column name="description" value="Программа по изучению DevOps практик и инструментов"/>
+      <column name="start_date" value="2024-07-01"/>
+      <column name="duration" value="3"/>
+      <column name="max_places" value="10"/>
+      <column name="requirements" value="['Знание Linux', 'Базовые знания Docker', 'Опыт работы с CI/CD']"/>
+      <column name="goals" value="[{'title': 'Изучить Docker и Kubernetes', 'description': 'Освоить контейнеризацию и оркестрацию'}, {'title': 'Изучить CI/CD', 'description': 'Научиться настраивать пайплайны'}]"/>
+      <column name="competencies" value="['Docker', 'Kubernetes', 'Jenkins', 'GitLab CI', 'Terraform']"/>
+      <column name="selection_stages" value="[{'name': 'Техническое интервью', 'description': 'Проверка знаний Linux и Docker', 'order': 1}, {'name': 'Практическое задание', 'description': 'Настройка CI/CD пайплайна', 'order': 2}]"/>
+      <column name="status" value="completed"/>
+      <column name="created_by" value="1"/>
+      <column name="created_at" value="2024-06-01 10:00:00"/>
+      <column name="updated_at" value="2024-10-01 10:00:00"/>
+      <column name="internships" value="['3']"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
+
