@@ -14,5 +14,7 @@
   <include file="db/changelog/changes/007-insert-mock-assessments.xml"/>
   <include file="db/changelog/changes/008-create-departments-table.xml"/>
   <include file="db/changelog/changes/009-insert-mock-departments.xml"/>
+  <include file="db/changelog/changes/010-create-internship-programs-table.xml"/>
+  <include file="db/changelog/changes/011-insert-mock-internship-programs.xml"/>
 
 </databaseChangeLog>
