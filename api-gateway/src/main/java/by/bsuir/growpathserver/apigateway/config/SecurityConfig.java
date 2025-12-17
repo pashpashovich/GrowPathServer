@@ -14,11 +14,13 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(ServerHttpSecurity.CorsSpec::disable) // Отключаем встроенный CORS, используем CorsWebFilter
+                .cors(ServerHttpSecurity.CorsSpec::disable) // Используем CorsWebFilter вместо встроенного
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**", "/health").permitAll()
-                        .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html", "/webjars/**").permitAll()
+                        .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html",
+                                      "/webjars/**").permitAll()
                         .pathMatchers("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/refresh").permitAll()
+                        .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/api/v1/auth/user", "/api/v1/auth/validate").authenticated()
                         .anyExchange().authenticated()
                 )

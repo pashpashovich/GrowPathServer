@@ -1,14 +1,14 @@
 package by.bsuir.growpathserver.apigateway.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -19,7 +19,7 @@ public class CorsConfig {
     @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS,PATCH}")
     private String allowedMethods;
 
-    @Value("${cors.allowed-headers:Content-Type,Authorization,Accept,X-Requested-With}")
+    @Value("${cors.allowed-headers:Content-Type,Authorization,Accept,X-Requested-With,Origin,Access-Control-Request-Method,Access-Control-Request-Headers}")
     private String allowedHeaders;
 
     @Value("${cors.allow-credentials:true}")
@@ -28,20 +28,20 @@ public class CorsConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        
+
         List<String> origins = Arrays.asList(allowedOrigins.split(","));
         corsConfiguration.setAllowedOrigins(origins);
-        
+
         List<String> methods = Arrays.asList(allowedMethods.split(","));
         corsConfiguration.setAllowedMethods(methods);
-        
+
         List<String> headers = Arrays.asList(allowedHeaders.split(","));
         corsConfiguration.setAllowedHeaders(headers);
-        
+
         corsConfiguration.setAllowCredentials(allowCredentials);
-        
+
         corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        
+
         corsConfiguration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
