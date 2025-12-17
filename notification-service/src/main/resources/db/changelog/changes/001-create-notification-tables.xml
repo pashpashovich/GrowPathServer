@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="001-create-email-templates-table" author="growpath">
+    <createTable tableName="email_template">
+      <column name="email_template_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="email_template_name" type="VARCHAR(512)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email_template_subject" type="VARCHAR(512)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email_template_body" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-email-template-attachments-table" author="growpath">
+    <createTable tableName="email_template_attachment">
+      <column name="email_template_attachment_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="email_template_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_attachment_template"
+                     references="email_template(email_template_id)"/>
+      </column>
+      <column name="email_template_attachment_name" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email_template_attachment_token" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-distribution-groups-table" author="growpath">
+    <createTable tableName="distribution_group">
+      <column name="distribution_group_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="distribution_group_name" type="VARCHAR(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="distribution_group_description" type="VARCHAR(256)">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-recipients-table" author="growpath">
+    <createTable tableName="recipient">
+      <column name="recipient_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="recipient_email" type="VARCHAR(250)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="recipient_full_name" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="recipient_type" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-recipient-distribution-groups-table" author="growpath">
+    <createTable tableName="recipient_distribution_group">
+      <column name="recipient_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_rdg_recipient" references="recipient(recipient_id)"/>
+      </column>
+      <column name="distribution_group_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_rdg_group"
+                     references="distribution_group(distribution_group_id)"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="recipient_distribution_group" columnNames="recipient_id,distribution_group_id"/>
+  </changeSet>
+
+  <changeSet id="001-create-mailings-table" author="growpath">
+    <createTable tableName="mailing">
+      <column name="mailing_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="mailing_name" type="VARCHAR(512)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mailing_type" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mailing_status" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email_template_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_mailing_template"
+                     references="email_template(email_template_id)"/>
+      </column>
+      <column name="mailing_execute_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+      <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-mailing-schedules-table" author="growpath">
+    <createTable tableName="mailing_schedule">
+      <column name="schedule_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="mailing_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_schedule_mailing" references="mailing(mailing_id)"/>
+      </column>
+      <column name="week_day" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="execute_time" type="TIME">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-mailing-history-table" author="growpath">
+    <createTable tableName="mailing_history">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="mailing_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_history_mailing" references="mailing(mailing_id)"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="template_name" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="mailing_type" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="sent_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-mailing-recipient-groups-table" author="growpath">
+    <createTable tableName="mailing_recipient_group">
+      <column name="mailing_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_mrg_mailing" references="mailing(mailing_id)"/>
+      </column>
+      <column name="distribution_group_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_mrg_group"
+                     references="distribution_group(distribution_group_id)"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="mailing_recipient_group" columnNames="mailing_id,distribution_group_id"/>
+  </changeSet>
+
+  <changeSet id="001-create-password-expiry-notices-table" author="growpath">
+    <createTable tableName="password_expiry_notice">
+      <column name="password_expiry_notice_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="user_email" type="VARCHAR(512)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="interval_days" type="INTEGER">
+        <constraints nullable="false"/>
+      </column>
+      <column name="sent_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-in-app-notifications-table" author="growpath">
+    <createTable tableName="in_app_notifications">
+      <column name="notification_id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="message" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+      <column name="read_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="001-create-indexes" author="growpath">
+    <createIndex indexName="idx_email_template_name" tableName="email_template">
+      <column name="email_template_name"/>
+    </createIndex>
+    <createIndex indexName="idx_recipient_email" tableName="recipient">
+      <column name="recipient_email"/>
+    </createIndex>
+    <createIndex indexName="idx_recipient_user_id" tableName="recipient">
+      <column name="user_id"/>
+    </createIndex>
+    <createIndex indexName="idx_mailing_status" tableName="mailing">
+      <column name="mailing_status"/>
+    </createIndex>
+    <createIndex indexName="idx_mailing_type" tableName="mailing">
+      <column name="mailing_type"/>
+    </createIndex>
+    <createIndex indexName="idx_in_app_notifications_user_id" tableName="in_app_notifications">
+      <column name="user_id"/>
+    </createIndex>
+    <createIndex indexName="idx_in_app_notifications_status" tableName="in_app_notifications">
+      <column name="status"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>
