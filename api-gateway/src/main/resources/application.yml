@@ -42,86 +42,86 @@ spring:
               filters:
                 - KeycloakValidate
             - id: users-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/users/**
                 - Method=GET,POST,PUT,PATCH,DELETE
             - id: interns-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/interns/**
             - id: mentors-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/mentors/**
             - id: departments-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/departments/**
             - id: tasks-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/tasks/**
             - id: assessments-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/assessments/**
             - id: ratings-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/ratings/**
             - id: internship-programs-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/internship-programs/**
             - id: roadmaps-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/roadmaps/**
             - id: reports-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/reports/**
             - id: dashboard-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/dashboard/**
             - id: trainee-service
-              uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/trainee/**
             - id: notification-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/notification/**
               filters:
                 - StripPrefix=2
             - id: mailings-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/mailings/**
               filters:
                 - StripPrefix=2
             - id: recipients-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/recipients/**
               filters:
                 - StripPrefix=2
             - id: email-templates-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/email-templates/**
               filters:
                 - StripPrefix=2
             - id: distribution-groups-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/distribution-groups/**
               filters:
                 - StripPrefix=2
             - id: in-app-notifications-service
-              uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/in-app-notifications/**
               filters:
