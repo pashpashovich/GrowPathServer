@@ -45,74 +45,51 @@ spring:
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/users/**
-              filters:
-                - StripPrefix=2
+                - Method=GET,POST,PUT,PATCH,DELETE
             - id: interns-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/interns/**
-              filters:
-                - StripPrefix=2
             - id: mentors-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/mentors/**
-              filters:
-                - StripPrefix=2
             - id: departments-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/departments/**
-              filters:
-                - StripPrefix=2
             - id: tasks-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/tasks/**
-              filters:
-                - StripPrefix=2
             - id: assessments-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/assessments/**
-              filters:
-                - StripPrefix=2
             - id: ratings-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/ratings/**
-              filters:
-                - StripPrefix=2
             - id: internship-programs-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/internship-programs/**
-              filters:
-                - StripPrefix=2
             - id: roadmaps-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/roadmaps/**
-              filters:
-                - StripPrefix=2
             - id: reports-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/reports/**
-              filters:
-                - StripPrefix=2
             - id: dashboard-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/dashboard/**
-              filters:
-                - StripPrefix=2
             - id: trainee-service
               uri: http://localhost:${TRAINEE_SERVICE_PORT:8081}
               predicates:
                 - Path=/api/v1/trainee/**
-              filters:
-                - StripPrefix=2
             - id: notification-service
               uri: http://localhost:${NOTIFICATION_SERVICE_PORT:8082}
               predicates:
@@ -169,7 +146,7 @@ keycloak:
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:8081,http://localhost:8080}
   allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS,PATCH}
-  allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization,Accept,X-Requested-With}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization,Accept,X-Requested-With,Origin,Access-Control-Request-Method,Access-Control-Request-Headers}
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
 
 server:
