@@ -17,8 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import by.bsuir.growpathserver.trainee.application.command.InviteUserCommand;
+import by.bsuir.growpathserver.trainee.application.service.RegistrationTokenService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
@@ -30,6 +32,12 @@ class InviteUserHandlerTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Mock
+    private RegistrationTokenService registrationTokenService;
 
     @InjectMocks
     private InviteUserHandler inviteUserHandler;
@@ -58,6 +66,7 @@ class InviteUserHandlerTest {
             UserEntity entity = invocation.getArgument(0);
             return entity;
         });
+        when(registrationTokenService.createToken(1L)).thenReturn("test-token");
 
         // When
         User result = inviteUserHandler.handle(command);

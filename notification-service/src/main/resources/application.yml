@@ -14,6 +14,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: ${JPA_FORMAT_SQL:true}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
   kafka:
@@ -24,17 +35,6 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-  mail:
-    host: ${MAIL_HOST:smtp.mailersend.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAILERSEND_USERNAME:}
-    password: ${MAILERSEND_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: ${MAIL_SMTP_AUTH:false}
-          starttls:
-            enable: ${MAIL_SMTP_STARTTLS:true}
   security:
     oauth2:
       resourceserver:
@@ -56,10 +56,6 @@ management:
       exposure:
         include: health,info
 
-mailersend:
-  api-key: ${MAILERSEND_API_KEY:}
-  from-email: ${MAILERSEND_FROM_EMAIL:noreply@growpath.local}
-
 logging:
   level:
     org.springframework.kafka: DEBUG
@@ -75,3 +71,15 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     tryItOutEnabled: true
+
+mailersend:
+  from-email: pavel.kosovich2004@gmail.com
+
+app:
+  registration-base-url: ${REGISTRATION_BASE_URL:http://localhost:3000}
+
+kafka:
+  topic:
+    user-invited: ${KAFKA_TOPIC_USER_INVITED:USERINVITED}
+    application-created: ${KAFKA_TOPIC_APPLICATION_CREATED:APPLICATIONCREATED}
+    task-completed: ${KAFKA_TOPIC_TASK_COMPLETED:TASKCOMPLETED}

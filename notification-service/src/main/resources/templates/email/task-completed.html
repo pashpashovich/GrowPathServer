@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Задача выполнена</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.5; color: #333; max-width: 560px; margin: 0 auto; padding: 24px; }
+    .greeting { font-size: 18px; margin-bottom: 16px; }
+    .text { margin-bottom: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <p class="greeting">Здравствуйте!</p>
+  <p class="text">Задача «<strong th:text="${taskName}">—</strong>» отмечена как выполненная.</p>
+  <p class="footer">Это письмо отправлено автоматически платформой GrowPath.</p>
+</body>
+</html>

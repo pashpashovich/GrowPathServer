@@ -24,7 +24,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/trainee/health").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/trainee/**", "/api/users/**", "/tasks/**").authenticated()
+                        .requestMatchers("/api/v1/auth/complete-registration").permitAll()
+                        .requestMatchers("/trainee/**", "/api/users/**", "/api/v1/**", "/tasks/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {

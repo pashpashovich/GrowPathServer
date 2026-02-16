@@ -36,10 +36,15 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # Если Keycloak в Docker, используйте http://keycloak:8080
-          # Если Keycloak на localhost, используйте http://localhost:8080
-          issuer-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:growpath}
-          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:growpath}/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:growpath}
+          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:growpath}/protocol/openid-connect/certs
+
+keycloak:
+  url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: ${KEYCLOAK_REALM:growpath}
+  client:
+    id: ${KEYCLOAK_CLIENT_ID:trainee-service}
+    secret: ${KEYCLOAK_CLIENT_SECRET:trainee-service-secret}
 
 server:
   port: ${TRAINEE_SERVICE_PORT:8081}
@@ -59,6 +64,13 @@ springdoc:
     try-it-out-enabled: true
     persist-authorization: true
     filter: true
+
+app:
+  registration-token-validity-days: ${REGISTRATION_TOKEN_VALIDITY_DAYS:7}
+
+kafka:
+  topic:
+    user-invited: ${KAFKA_TOPIC_USER_INVITED:USERINVITED}
 
 logging:
   level:

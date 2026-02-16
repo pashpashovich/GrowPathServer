@@ -41,6 +41,11 @@ spring:
                 - Method=GET
               filters:
                 - KeycloakValidate
+            - id: complete-registration
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/auth/complete-registration
+                - Method=POST
             - id: users-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

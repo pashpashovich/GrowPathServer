@@ -19,7 +19,7 @@ public class SecurityConfig {
                         .pathMatchers("/actuator/**", "/health").permitAll()
                         .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html",
                                       "/webjars/**").permitAll()
-                        .pathMatchers("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/refresh").permitAll()
+                        .pathMatchers("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/refresh", "/api/v1/auth/complete-registration").permitAll()
                         .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/api/v1/auth/user", "/api/v1/auth/validate").authenticated()
                         .anyExchange().authenticated()
