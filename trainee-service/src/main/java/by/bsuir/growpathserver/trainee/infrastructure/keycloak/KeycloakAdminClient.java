@@ -133,8 +133,36 @@ public class KeycloakAdminClient implements IdentityProviderPort {
     }
 
     @Override
+    public void setUserEnabled(String keycloakUserId, String email, boolean enabled) {
+        String id = resolveRealmUserId(keycloakUserId, email);
+        if (StringUtils.isBlank(id)) {
+            log.warn("No Keycloak user for email={}, skipping enabled={}", email, enabled);
+            return;
+        }
+
+        String url = baseUrl() + "/admin/realms/" + realm + "/users/" + id;
+        Map<String, Object> body = Map.of("enabled", enabled);
+        try {
+            ResponseEntity<Void> response = exchangeAdminJson(url, HttpMethod.PUT, body, Void.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new IdentityProviderException(
+                        "Failed to set enabled=" + enabled + " in Keycloak: " + response.getStatusCode());
+            }
+            log.info("Keycloak user id={} enabled={}", id, enabled);
+        }
+        catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 404) {
+                log.warn("Keycloak user missing id={}, skipping enabled={}", id, enabled);
+                return;
+            }
+            log.error("Keycloak set enabled failed: {}", e.getResponseBodyAsString());
+            throw new IdentityProviderException("Failed to update user in Keycloak: " + e.getStatusCode(), e);
+        }
+    }
+
+    @Override
     public void deleteUser(String keycloakUserId, String email) {
-        String id = StringUtils.isNotBlank(keycloakUserId) ? keycloakUserId.trim() : findUserByUsername(email);
+        String id = resolveRealmUserId(keycloakUserId, email);
         if (StringUtils.isBlank(id)) {
             log.warn("No Keycloak user to delete for email={}", email);
             return;
@@ -156,6 +184,13 @@ public class KeycloakAdminClient implements IdentityProviderPort {
             log.error("Keycloak delete user failed: {}", e.getResponseBodyAsString());
             throw new IdentityProviderException("Failed to delete user in Keycloak: " + e.getStatusCode(), e);
         }
+    }
+
+    private String resolveRealmUserId(String keycloakUserId, String email) {
+        if (StringUtils.isNotBlank(keycloakUserId)) {
+            return keycloakUserId.trim();
+        }
+        return findUserByUsername(email);
     }
 
     private ResponseEntity<Void> exchangeAdmin(String url, HttpMethod method) {

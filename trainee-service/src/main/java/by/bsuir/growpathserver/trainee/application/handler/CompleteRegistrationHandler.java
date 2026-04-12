@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.command.CompleteRegistrationCommand;
 import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
 import by.bsuir.growpathserver.trainee.application.service.RegistrationTokenService;
+import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
+import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -25,11 +27,12 @@ public class CompleteRegistrationHandler {
         String token = Objects.nonNull(command.token()) ? command.token().trim() : "";
         if (StringUtils.isNoneEmpty(token)) {
             Long userId = registrationTokenService.validateAndConsumeToken(token);
-            String email = userRepository.findById(userId)
-                    .orElseThrow()
-                    .getEmail();
+            UserEntity user = userRepository.findById(userId).orElseThrow();
 
-            identityProviderPort.setPassword(email, command.newPassword());
+            identityProviderPort.setPassword(user.getEmail(), command.newPassword());
+
+            user.setStatus(UserStatus.ACTIVE);
+            userRepository.save(user);
         }
     }
 }

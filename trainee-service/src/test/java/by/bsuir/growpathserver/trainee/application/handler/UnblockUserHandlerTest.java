@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import by.bsuir.growpathserver.trainee.application.command.UnblockUserCommand;
+import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
@@ -31,6 +34,9 @@ class UnblockUserHandlerTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private IdentityProviderPort identityProviderPort;
 
     @InjectMocks
     private UnblockUserHandler unblockUserHandler;
@@ -47,6 +53,7 @@ class UnblockUserHandlerTest {
         blockedUser.setRole(UserRole.INTERN);
         blockedUser.setStatus(UserStatus.BLOCKED);
         blockedUser.setCreatedAt(LocalDateTime.now());
+        blockedUser.setKeycloakUserId("kc-user-1");
     }
 
     @Test
@@ -67,6 +74,7 @@ class UnblockUserHandlerTest {
         assertNotNull(result);
         assertEquals(UserStatus.ACTIVE, result.getStatus());
         assertEquals(1L, result.getId());
+        verify(identityProviderPort).setUserEnabled(eq("kc-user-1"), eq("user@example.com"), eq(true));
         verify(userRepository).findById(1L);
         verify(userRepository).save(any(UserEntity.class));
     }
@@ -81,6 +89,7 @@ class UnblockUserHandlerTest {
         // When & Then
         assertThrows(NoSuchElementException.class, () -> unblockUserHandler.handle(command));
         verify(userRepository, never()).save(any());
+        verify(identityProviderPort, never()).setUserEnabled(any(), any(), anyBoolean());
     }
 }
 
