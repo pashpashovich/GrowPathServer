@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.command.CreateDepartmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteDepartmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateDepartmentCommand;
+import by.bsuir.growpathserver.trainee.application.service.DepartmentService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Department;
 import by.bsuir.growpathserver.trainee.domain.entity.DepartmentEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.DepartmentRepository;

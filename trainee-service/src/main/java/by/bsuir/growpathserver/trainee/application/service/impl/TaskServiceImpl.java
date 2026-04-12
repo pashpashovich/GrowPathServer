@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -10,6 +10,7 @@ import by.bsuir.growpathserver.trainee.application.command.CompleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.CreateTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateTaskCommand;
+import by.bsuir.growpathserver.trainee.application.service.TaskService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;

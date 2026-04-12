@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import by.bsuir.growpathserver.trainee.application.query.GetInternRatingQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetRatingsQuery;
+import by.bsuir.growpathserver.trainee.application.service.impl.RatingServiceImpl;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Rating;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;

@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import by.bsuir.growpathserver.trainee.domain.exception.DuplicateInternshipProgramTitleException;
+import by.bsuir.growpathserver.trainee.domain.exception.InternshipProgramLockedException;
+
 @RestControllerAdvice
 public class RestExceptionHandler {
 
@@ -28,5 +31,15 @@ public class RestExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Void> responseStatus(ResponseStatusException ex) {
         return ResponseEntity.status(ex.getStatusCode()).build();
+    }
+
+    @ExceptionHandler(DuplicateInternshipProgramTitleException.class)
+    public ResponseEntity<Void> duplicateInternshipProgramTitle() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(InternshipProgramLockedException.class)
+    public ResponseEntity<Void> internshipProgramLocked() {
+        return ResponseEntity.badRequest().build();
     }
 }

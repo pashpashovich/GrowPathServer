@@ -16,7 +16,7 @@
 <body>
   <p class="greeting" th:text="${greeting}">Здравствуйте!</p>
   <p class="text">Вас пригласили присоединиться к платформе GrowPath. Нажмите кнопку ниже, чтобы задать пароль и завершить регистрацию.</p>
-  <p> В качестве логина используйте адрес электронной почты: <p class="text" th:text="${email}"/>
+  <p class="text">В качестве логина используйте адрес электронной почты: <span th:text="${email}"></span></p>
   <p><a th:href="${registrationLink}" class="button" th:text="'Завершить регистрацию'">Завершить регистрацию</a></p>
   <p class="text" th:if="${registrationLink}">Если кнопка не работает, скопируйте ссылку в браузер: <span class="link" th:text="${registrationLink}"></span></p>
   <p class="footer">Это письмо отправлено автоматически. Если вы не запрашивали приглашение, проигнорируйте его.</p>

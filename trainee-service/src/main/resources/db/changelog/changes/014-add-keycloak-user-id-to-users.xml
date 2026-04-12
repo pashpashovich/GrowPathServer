@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
-  <changeSet id="014-add-keycloak-user-id-to-users" author="growpath">
+  <changeSet id="014-add-keycloak-user-id-to-users" author="Kasovich Pavel">
     <addColumn tableName="users">
       <column name="keycloak_user_id" type="VARCHAR(64)">
         <constraints nullable="true" unique="true" uniqueConstraintName="uq_users_keycloak_user_id"/>

@@ -14,9 +14,10 @@ public record UpdateInternshipProgramCommand(
         LocalDate startDate,
         Integer duration,
         Integer maxPlaces,
+        String itDirection,
+        List<Long> competencyIds,
         List<String> requirements,
         List<ProgramGoal> goals,
-        List<String> competencies,
         List<SelectionStage> selectionStages,
         InternshipProgramStatus status
 ) {

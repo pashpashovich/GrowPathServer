@@ -9,7 +9,8 @@ public enum InternshipProgramStatus {
     ACTIVE("active"),
     DRAFT("draft"),
     COMPLETED("completed"),
-    CANCELLED("cancelled");
+    CANCELLED("cancelled"),
+    ARCHIVED("archived");
 
     private final String value;
 

@@ -41,6 +41,11 @@ class UpdateInternshipProgramHandlerTest {
                 .description("Updated Description")
                 .duration(8)
                 .maxPlaces(25)
+                .itDirection(null)
+                .competencyIds(null)
+                .requirements(null)
+                .goals(null)
+                .selectionStages(null)
                 .status(InternshipProgramStatus.COMPLETED)
                 .build();
 

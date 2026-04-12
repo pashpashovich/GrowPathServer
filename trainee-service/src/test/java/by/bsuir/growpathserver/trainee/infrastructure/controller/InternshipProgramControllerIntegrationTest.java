@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,23 +21,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import by.bsuir.growpathserver.dto.model.CreateInternshipProgramRequest;
-import by.bsuir.growpathserver.dto.model.ProgramGoal;
 import by.bsuir.growpathserver.dto.model.UpdateInternshipProgramRequest;
+import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
+import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.CompetencyRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@WithMockUser(roles = "HR_MANAGER")
 class InternshipProgramControllerIntegrationTest {
 
     @Autowired
@@ -45,30 +52,45 @@ class InternshipProgramControllerIntegrationTest {
     private InternshipProgramRepository repository;
 
     @Autowired
+    private CompetencyRepository competencyRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
+    @MockitoBean
+    private CurrentApplicationUserResolver currentApplicationUserResolver;
+
     private InternshipProgramEntity testProgram;
+    private Long competencyId;
 
     @BeforeEach
     void setUp() {
+        when(currentApplicationUserResolver.resolveCurrentUserDatabaseId()).thenReturn(Optional.of(1L));
+
         repository.deleteAll();
+        competencyRepository.deleteAll();
+
+        CompetencyEntity competency = new CompetencyEntity();
+        competency.setName("Java");
+        competency = competencyRepository.saveAndFlush(competency);
+        competencyId = competency.getId();
 
         testProgram = new InternshipProgramEntity();
         testProgram.setTitle("Test Program");
         testProgram.setDescription("Test Description");
-        testProgram.setStartDate(LocalDate.of(2024, 9, 1));
+        testProgram.setStartDate(LocalDate.now().plusMonths(2));
         testProgram.setDuration(6);
         testProgram.setMaxPlaces(20);
         testProgram.setStatus(InternshipProgramStatus.ACTIVE);
         testProgram.setCreatedBy(1L);
         testProgram.setCreatedAt(LocalDateTime.now());
         testProgram.setUpdatedAt(LocalDateTime.now());
+        testProgram.getCompetencies().add(competency);
         testProgram = repository.saveAndFlush(testProgram);
     }
 
     @Test
     void shouldGetInternshipProgramsSuccessfully() throws Exception {
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs")
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -81,12 +103,11 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldGetInternshipProgramsWithPagination() throws Exception {
-        // Given - create more programs
         for (int i = 2; i <= 5; i++) {
             InternshipProgramEntity program = new InternshipProgramEntity();
             program.setTitle("Program " + i);
             program.setDescription("Description " + i);
-            program.setStartDate(LocalDate.of(2024, 9, 1));
+            program.setStartDate(LocalDate.now().plusMonths(2));
             program.setDuration(6);
             program.setMaxPlaces(20);
             program.setStatus(InternshipProgramStatus.ACTIVE);
@@ -96,7 +117,6 @@ class InternshipProgramControllerIntegrationTest {
             repository.saveAndFlush(program);
         }
 
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("page", "1")
                                 .param("limit", "2")
@@ -110,7 +130,6 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldFilterInternshipProgramsByStatus() throws Exception {
-        // Given
         InternshipProgramEntity draftProgram = new InternshipProgramEntity();
         draftProgram.setTitle("Draft Program");
         draftProgram.setDescription("Draft Description");
@@ -123,7 +142,6 @@ class InternshipProgramControllerIntegrationTest {
         draftProgram.setUpdatedAt(LocalDateTime.now());
         repository.saveAndFlush(draftProgram);
 
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("status", "draft")
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -135,7 +153,6 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldSearchInternshipPrograms() throws Exception {
-        // Given
         InternshipProgramEntity program2 = new InternshipProgramEntity();
         program2.setTitle("Java Development");
         program2.setDescription("Java Backend Development Program");
@@ -148,7 +165,6 @@ class InternshipProgramControllerIntegrationTest {
         program2.setUpdatedAt(LocalDateTime.now());
         repository.saveAndFlush(program2);
 
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("search", "Java")
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -160,19 +176,18 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldGetInternshipProgramByIdSuccessfully() throws Exception {
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testProgram.getId().intValue()))
                 .andExpect(jsonPath("$.title").value("Test Program"))
-                .andExpect(jsonPath("$.description").value("Test Description"));
+                .andExpect(jsonPath("$.description").value("Test Description"))
+                .andExpect(jsonPath("$.competencyRefs[0].name").value("Java"));
     }
 
     @Test
     void shouldReturnNotFoundWhenProgramDoesNotExist() throws Exception {
-        // When & Then
         mockMvc.perform(get("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -180,7 +195,6 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldCreateInternshipProgramSuccessfully() throws Exception {
-        // Given
         CreateInternshipProgramRequest request = new CreateInternshipProgramRequest();
         request.setTitle("New Program");
         request.setDescription("New Description");
@@ -188,19 +202,19 @@ class InternshipProgramControllerIntegrationTest {
         request.setDuration(6);
         request.setMaxPlaces(20);
         request.setStatus(CreateInternshipProgramRequest.StatusEnum.ACTIVE);
+        request.setCompetencyIds(List.of(competencyId));
 
         List<String> requirements = new ArrayList<>();
         requirements.add("Java knowledge");
         request.setRequirements(requirements);
 
         List<Object> goals = new ArrayList<>();
-        ProgramGoal goal = new ProgramGoal();
+        by.bsuir.growpathserver.dto.model.ProgramGoal goal = new by.bsuir.growpathserver.dto.model.ProgramGoal();
         goal.setTitle("Learn Spring Boot");
         goal.setDescription("Master Spring Boot framework");
         goals.add(goal);
         request.setGoals(goals);
 
-        // When & Then
         mockMvc.perform(post("/api/v1/internship-programs")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -213,13 +227,11 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldUpdateInternshipProgramSuccessfully() throws Exception {
-        // Given
         UpdateInternshipProgramRequest request = new UpdateInternshipProgramRequest();
         request.setTitle("Updated Program");
         request.setDescription("Updated Description");
         request.setStatus(UpdateInternshipProgramRequest.StatusEnum.COMPLETED);
 
-        // When & Then
         mockMvc.perform(put("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -231,11 +243,9 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldReturnNotFoundWhenUpdatingNonExistentProgram() throws Exception {
-        // Given
         UpdateInternshipProgramRequest request = new UpdateInternshipProgramRequest();
         request.setTitle("Updated Program");
 
-        // When & Then
         mockMvc.perform(put("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -244,7 +254,6 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldDeleteInternshipProgramSuccessfully() throws Exception {
-        // When & Then
         mockMvc.perform(delete("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -253,9 +262,17 @@ class InternshipProgramControllerIntegrationTest {
 
     @Test
     void shouldReturnNotFoundWhenDeletingNonExistentProgram() throws Exception {
-        // When & Then
         mockMvc.perform(delete("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldListCompetenciesCatalog() throws Exception {
+        mockMvc.perform(get("/api/v1/competencies")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0].name").value("Java"));
     }
 }

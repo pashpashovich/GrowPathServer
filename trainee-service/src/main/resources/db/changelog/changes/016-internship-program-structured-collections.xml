@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="016-01-requirements-table" author="Kasovich Pavel">
+    <createTable tableName="internship_program_requirements">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="requirement_text" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="internship_program_requirements"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipr_program"
+                             onDelete="CASCADE"/>
+    <createIndex indexName="idx_ipr_program" tableName="internship_program_requirements">
+      <column name="internship_program_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="016-02-goals-table" author="Kasovich Pavel">
+    <createTable tableName="internship_program_goals">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(500)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="internship_program_goals"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipg_program"
+                             onDelete="CASCADE"/>
+    <createIndex indexName="idx_ipg_program" tableName="internship_program_goals">
+      <column name="internship_program_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="016-03-selection-stages-table" author="Kasovich Pavel">
+    <createTable tableName="internship_program_selection_stages">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="internship_program_selection_stages"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipss_program"
+                             onDelete="CASCADE"/>
+    <createIndex indexName="idx_ipss_program" tableName="internship_program_selection_stages">
+      <column name="internship_program_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="016-04-seed-program-1-collections" author="Kasovich Pavel">
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="requirement_text" value="Знание Java Core"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="requirement_text" value="Базовые знания Spring Framework"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="requirement_text" value="Опыт работы с Git"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="title" value="Изучить Spring Boot"/>
+      <column name="description" value="Освоить создание REST API с использованием Spring Boot"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="title" value="Изучить базы данных"/>
+      <column name="description" value="Научиться работать с PostgreSQL и JPA"/>
+    </insert>
+    <insert tableName="internship_program_selection_stages">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="name" value="Техническое интервью"/>
+      <column name="description" value="Проверка базовых знаний Java"/>
+      <column name="is_active" valueBoolean="true"/>
+    </insert>
+    <insert tableName="internship_program_selection_stages">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="name" value="Практическое задание"/>
+      <column name="description" value="Разработка небольшого REST API"/>
+      <column name="is_active" valueBoolean="true"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="016-05-seed-program-2-collections" author="Kasovich Pavel">
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="requirement_text" value="Знание JavaScript"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="requirement_text" value="Базовые знания HTML/CSS"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="requirement_text" value="Опыт работы с React"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="title" value="Изучить React"/>
+      <column name="description" value="Освоить создание компонентов и управление состоянием"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="title" value="Изучить TypeScript"/>
+      <column name="description" value="Научиться писать типизированный код"/>
+    </insert>
+    <insert tableName="internship_program_selection_stages">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="name" value="Техническое интервью"/>
+      <column name="description" value="Проверка знаний JavaScript и React"/>
+      <column name="is_active" valueBoolean="true"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="016-06-seed-program-3-collections" author="Kasovich Pavel">
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="requirement_text" value="Знание Linux"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="requirement_text" value="Базовые знания Docker"/>
+    </insert>
+    <insert tableName="internship_program_requirements">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="requirement_text" value="Опыт работы с CI/CD"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="title" value="Изучить Docker и Kubernetes"/>
+      <column name="description" value="Освоить контейнеризацию и оркестрацию"/>
+    </insert>
+    <insert tableName="internship_program_goals">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="title" value="Изучить CI/CD"/>
+      <column name="description" value="Научиться настраивать пайплайны"/>
+    </insert>
+    <insert tableName="internship_program_selection_stages">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="name" value="Техническое интервью"/>
+      <column name="description" value="Проверка знаний Linux и Docker"/>
+      <column name="is_active" valueBoolean="true"/>
+    </insert>
+    <insert tableName="internship_program_selection_stages">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="name" value="Практическое задание"/>
+      <column name="description" value="Настройка CI/CD пайплайна"/>
+      <column name="is_active" valueBoolean="true"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="016-07-drop-legacy-json-columns" author="Kasovich Pavel">
+    <dropColumn tableName="internship_programs" columnName="requirements"/>
+    <dropColumn tableName="internship_programs" columnName="goals"/>
+    <dropColumn tableName="internship_programs" columnName="selection_stages"/>
+  </changeSet>
+
+  <changeSet id="016-08-sync-sequences-postgresql" author="Kasovich Pavel">
+    <preConditions onFail="MARK_RAN">
+      <dbms type="postgresql"/>
+    </preConditions>
+    <sql>
+      SELECT setval(pg_get_serial_sequence('internship_program_requirements', 'id'),
+                    COALESCE((SELECT MAX(id) FROM internship_program_requirements), 1));
+      SELECT setval(pg_get_serial_sequence('internship_program_goals', 'id'),
+                    COALESCE((SELECT MAX(id) FROM internship_program_goals), 1));
+      SELECT setval(pg_get_serial_sequence('internship_program_selection_stages', 'id'),
+                    COALESCE((SELECT MAX(id) FROM internship_program_selection_stages), 1));
+    </sql>
+  </changeSet>
+</databaseChangeLog>

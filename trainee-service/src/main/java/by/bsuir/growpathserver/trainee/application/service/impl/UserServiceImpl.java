@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.command.CreateUserCommand;
 import by.bsuir.growpathserver.trainee.application.exception.IdentityProviderException;
 import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
+import by.bsuir.growpathserver.trainee.application.service.UserService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.events.UserCreatedEvent;

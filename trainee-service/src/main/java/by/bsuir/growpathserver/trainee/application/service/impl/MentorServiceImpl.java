@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorInternsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorsQuery;
+import by.bsuir.growpathserver.trainee.application.service.MentorService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;

@@ -29,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorInternsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorsQuery;
+import by.bsuir.growpathserver.trainee.application.service.impl.MentorServiceImpl;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;

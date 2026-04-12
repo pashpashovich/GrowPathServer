@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.util.NoSuchElementException;
 
@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.command.CreateAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateAssessmentCommand;
+import by.bsuir.growpathserver.trainee.application.service.AssessmentService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;

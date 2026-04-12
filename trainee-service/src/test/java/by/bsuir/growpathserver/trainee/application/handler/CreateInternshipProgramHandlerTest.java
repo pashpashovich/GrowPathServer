@@ -46,9 +46,10 @@ class CreateInternshipProgramHandlerTest {
                 .startDate(LocalDate.of(2024, 9, 1))
                 .duration(6)
                 .maxPlaces(20)
+                .itDirection("BACKEND")
+                .competencyIds(null)
                 .requirements(new ArrayList<>())
                 .goals(goals)
-                .competencies(new ArrayList<>())
                 .selectionStages(new ArrayList<>())
                 .status(InternshipProgramStatus.ACTIVE)
                 .createdBy(1L)
@@ -61,6 +62,7 @@ class CreateInternshipProgramHandlerTest {
         entity.setStartDate(LocalDate.of(2024, 9, 1));
         entity.setDuration(6);
         entity.setMaxPlaces(20);
+        entity.setItDirection("BACKEND");
         entity.setStatus(InternshipProgramStatus.ACTIVE);
         entity.setCreatedBy(1L);
 

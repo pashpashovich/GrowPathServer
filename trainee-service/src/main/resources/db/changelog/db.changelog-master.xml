@@ -19,5 +19,7 @@
   <include file="db/changelog/changes/012-create-user-registration-token-table.xml"/>
   <include file="db/changelog/changes/013-split-user-name-columns.xml"/>
   <include file="db/changelog/changes/014-add-keycloak-user-id-to-users.xml"/>
+  <include file="/db/changelog/changes/015-internship-program-competencies.xml"/>
+  <include file="/db/changelog/changes/016-internship-program-structured-collections.xml"/>
 
 </databaseChangeLog>

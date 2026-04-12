@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import by.bsuir.growpathserver.trainee.application.command.CreateUserCommand;
 import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
+import by.bsuir.growpathserver.trainee.application.service.impl.UserServiceImpl;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.events.UserCreatedEvent;

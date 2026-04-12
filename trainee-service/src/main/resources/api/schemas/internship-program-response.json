@@ -16,10 +16,15 @@
       "format": "date"
     },
     "duration": {
-      "type": "integer"
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
     },
     "maxPlaces": {
       "type": "integer"
+    },
+    "itDirection": {
+      "type": "string"
     },
     "requirements": {
       "type": "array",
@@ -33,10 +38,10 @@
         "$ref": "./program-goal.json"
       }
     },
-    "competencies": {
+    "competencyRefs": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "./competency-ref.json"
       }
     },
     "selectionStages": {
@@ -51,7 +56,8 @@
         "active",
         "draft",
         "completed",
-        "cancelled"
+        "cancelled",
+        "archived"
       ]
     },
     "createdBy": {

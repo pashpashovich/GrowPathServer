@@ -1,4 +1,4 @@
-package by.bsuir.growpathserver.trainee.application.service;
+package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.time.Duration;
 import java.util.Comparator;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import by.bsuir.growpathserver.trainee.application.query.GetInternRatingQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetRatingsQuery;
+import by.bsuir.growpathserver.trainee.application.service.RatingService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Rating;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;

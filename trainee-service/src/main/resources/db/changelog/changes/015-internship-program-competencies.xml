@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="015-01-create-competencies" author="Kasovich Pavel">
+    <createTable tableName="competencies">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="015-02-create-internship-program-competencies" author="Kasovich Pavel">
+    <createTable tableName="internship_program_competencies">
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="competency_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="internship_program_competencies"
+                   columnNames="internship_program_id, competency_id"
+                   constraintName="pk_internship_program_competencies"/>
+    <addForeignKeyConstraint baseTableName="internship_program_competencies"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipc_program"
+                             onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="internship_program_competencies"
+                             baseColumnNames="competency_id"
+                             referencedTableName="competencies"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipc_competency"
+                             onDelete="CASCADE"/>
+  </changeSet>
+
+  <changeSet id="015-03-add-it-direction" author="Kasovich Pavel">
+    <addColumn tableName="internship_programs">
+      <column name="it_direction" type="VARCHAR(100)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="015-04-seed-competencies" author="Kasovich Pavel">
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="1"/>
+      <column name="name" value="Java"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="2"/>
+      <column name="name" value="Spring Boot"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="3"/>
+      <column name="name" value="PostgreSQL"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="4"/>
+      <column name="name" value="REST API"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="5"/>
+      <column name="name" value="JPA/Hibernate"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="6"/>
+      <column name="name" value="JavaScript"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="7"/>
+      <column name="name" value="React"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="8"/>
+      <column name="name" value="TypeScript"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="9"/>
+      <column name="name" value="HTML/CSS"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="10"/>
+      <column name="name" value="Redux"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="11"/>
+      <column name="name" value="Docker"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="12"/>
+      <column name="name" value="Kubernetes"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="13"/>
+      <column name="name" value="Jenkins"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="14"/>
+      <column name="name" value="GitLab CI"/>
+    </insert>
+    <insert tableName="competencies">
+      <column name="id" valueNumeric="15"/>
+      <column name="name" value="Terraform"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="015-05-migrate-program-competency-links" author="Kasovich Pavel">
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="competency_id" valueNumeric="1"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="competency_id" valueNumeric="2"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="competency_id" valueNumeric="3"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="competency_id" valueNumeric="4"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="1"/>
+      <column name="competency_id" valueNumeric="5"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="competency_id" valueNumeric="6"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="competency_id" valueNumeric="7"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="competency_id" valueNumeric="8"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="competency_id" valueNumeric="9"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="2"/>
+      <column name="competency_id" valueNumeric="10"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="competency_id" valueNumeric="11"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="competency_id" valueNumeric="12"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="competency_id" valueNumeric="13"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="competency_id" valueNumeric="14"/>
+    </insert>
+    <insert tableName="internship_program_competencies">
+      <column name="internship_program_id" valueNumeric="3"/>
+      <column name="competency_id" valueNumeric="15"/>
+    </insert>
+  </changeSet>
+
+  <changeSet id="015-06-set-it-direction" author="Kasovich Pavel">
+    <update tableName="internship_programs">
+      <column name="it_direction" value="BACKEND"/>
+      <where>id = 1</where>
+    </update>
+    <update tableName="internship_programs">
+      <column name="it_direction" value="FRONTEND"/>
+      <where>id = 2</where>
+    </update>
+    <update tableName="internship_programs">
+      <column name="it_direction" value="DEVOPS"/>
+      <where>id = 3</where>
+    </update>
+  </changeSet>
+
+  <changeSet id="015-07-drop-legacy-competencies-column" author="Kasovich Pavel">
+    <dropColumn tableName="internship_programs" columnName="competencies"/>
+  </changeSet>
+
+  <changeSet id="015-08-unique-title-lower-postgresql" author="Kasovich Pavel">
+    <preConditions onFail="MARK_RAN">
+      <dbms type="postgresql"/>
+    </preConditions>
+    <sql>
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_internship_programs_title_lower ON internship_programs (LOWER(title));
+    </sql>
+  </changeSet>
+
+  <changeSet id="015-09-competencies-sequence-sync-postgresql" author="Kasovich Pavel">
+    <preConditions onFail="MARK_RAN">
+      <dbms type="postgresql"/>
+    </preConditions>
+    <sql>
+      SELECT setval(
+        pg_get_serial_sequence('competencies', 'id'),
+        COALESCE((SELECT MAX(id) FROM competencies), 1)
+      );
+    </sql>
+  </changeSet>
+</databaseChangeLog>

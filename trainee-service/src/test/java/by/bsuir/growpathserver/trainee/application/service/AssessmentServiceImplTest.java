@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import by.bsuir.growpathserver.trainee.application.command.CreateAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateAssessmentCommand;
+import by.bsuir.growpathserver.trainee.application.service.impl.AssessmentServiceImpl;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
