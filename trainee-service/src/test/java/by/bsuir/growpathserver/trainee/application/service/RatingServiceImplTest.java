@@ -60,14 +60,16 @@ class RatingServiceImplTest {
         internEntity = new UserEntity();
         internEntity.setId(10L);
         internEntity.setEmail("intern@example.com");
-        internEntity.setName("Intern Name");
+        internEntity.setFirstName("Intern");
+        internEntity.setLastName("Name");
         internEntity.setRole(UserRole.INTERN);
         internEntity.setStatus(UserStatus.ACTIVE);
 
         mentorEntity = new UserEntity();
         mentorEntity.setId(20L);
         mentorEntity.setEmail("mentor@example.com");
-        mentorEntity.setName("Mentor Name");
+        mentorEntity.setFirstName("Mentor");
+        mentorEntity.setLastName("Name");
         mentorEntity.setRole(UserRole.MENTOR);
         mentorEntity.setStatus(UserStatus.ACTIVE);
 
@@ -320,7 +322,8 @@ class RatingServiceImplTest {
 
         UserEntity intern2 = new UserEntity();
         intern2.setId(11L);
-        intern2.setName("Intern Two");
+        intern2.setFirstName("Intern");
+        intern2.setLastName("Two");
         intern2.setRole(UserRole.INTERN);
 
         when(assessmentRepository.findAll()).thenReturn(List.of(assessment1, assessment2));
@@ -409,7 +412,8 @@ class RatingServiceImplTest {
 
         UserEntity intern2 = new UserEntity();
         intern2.setId(11L);
-        intern2.setName("Intern Two");
+        intern2.setFirstName("Intern");
+        intern2.setLastName("Two");
         intern2.setRole(UserRole.INTERN);
 
         when(assessmentRepository.findAll()).thenReturn(List.of(assessment1, assessment2));

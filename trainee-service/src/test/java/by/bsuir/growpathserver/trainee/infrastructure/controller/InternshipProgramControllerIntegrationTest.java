@@ -69,12 +69,12 @@ class InternshipProgramControllerIntegrationTest {
     @Test
     void shouldGetInternshipProgramsSuccessfully() throws Exception {
         // When & Then
-        mockMvc.perform(get("/internship-programs")
+        mockMvc.perform(get("/api/v1/internship-programs")
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].id").value(String.valueOf(testProgram.getId())))
+                .andExpect(jsonPath("$.data[0].id").value(testProgram.getId().intValue()))
                 .andExpect(jsonPath("$.data[0].title").value("Test Program"))
                 .andExpect(jsonPath("$.pagination").exists());
     }
@@ -97,7 +97,7 @@ class InternshipProgramControllerIntegrationTest {
         }
 
         // When & Then
-        mockMvc.perform(get("/internship-programs")
+        mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("page", "1")
                                 .param("limit", "2")
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -124,7 +124,7 @@ class InternshipProgramControllerIntegrationTest {
         repository.saveAndFlush(draftProgram);
 
         // When & Then
-        mockMvc.perform(get("/internship-programs")
+        mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("status", "draft")
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -149,7 +149,7 @@ class InternshipProgramControllerIntegrationTest {
         repository.saveAndFlush(program2);
 
         // When & Then
-        mockMvc.perform(get("/internship-programs")
+        mockMvc.perform(get("/api/v1/internship-programs")
                                 .param("search", "Java")
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -161,11 +161,11 @@ class InternshipProgramControllerIntegrationTest {
     @Test
     void shouldGetInternshipProgramByIdSuccessfully() throws Exception {
         // When & Then
-        mockMvc.perform(get("/internship-programs/{id}", testProgram.getId())
+        mockMvc.perform(get("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(String.valueOf(testProgram.getId())))
+                .andExpect(jsonPath("$.id").value(testProgram.getId().intValue()))
                 .andExpect(jsonPath("$.title").value("Test Program"))
                 .andExpect(jsonPath("$.description").value("Test Description"));
     }
@@ -173,7 +173,7 @@ class InternshipProgramControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenProgramDoesNotExist() throws Exception {
         // When & Then
-        mockMvc.perform(get("/internship-programs/{id}", 0L)
+        mockMvc.perform(get("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -201,7 +201,7 @@ class InternshipProgramControllerIntegrationTest {
         request.setGoals(goals);
 
         // When & Then
-        mockMvc.perform(post("/internship-programs")
+        mockMvc.perform(post("/api/v1/internship-programs")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -220,7 +220,7 @@ class InternshipProgramControllerIntegrationTest {
         request.setStatus(UpdateInternshipProgramRequest.StatusEnum.COMPLETED);
 
         // When & Then
-        mockMvc.perform(put("/internship-programs/{id}", testProgram.getId())
+        mockMvc.perform(put("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -236,7 +236,7 @@ class InternshipProgramControllerIntegrationTest {
         request.setTitle("Updated Program");
 
         // When & Then
-        mockMvc.perform(put("/internship-programs/{id}", 0L)
+        mockMvc.perform(put("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -245,7 +245,7 @@ class InternshipProgramControllerIntegrationTest {
     @Test
     void shouldDeleteInternshipProgramSuccessfully() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/internship-programs/{id}", testProgram.getId())
+        mockMvc.perform(delete("/api/v1/internship-programs/{id}", testProgram.getId())
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Internship program deleted successfully"));
@@ -254,7 +254,7 @@ class InternshipProgramControllerIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenDeletingNonExistentProgram() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/internship-programs/{id}", 0L)
+        mockMvc.perform(delete("/api/v1/internship-programs/{id}", 0L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

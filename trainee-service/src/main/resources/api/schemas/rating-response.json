@@ -2,10 +2,12 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "internId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "internName": {
       "type": "string"
@@ -66,7 +68,8 @@
       "type": "integer"
     },
     "internshipId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     }
   },
   "required": [

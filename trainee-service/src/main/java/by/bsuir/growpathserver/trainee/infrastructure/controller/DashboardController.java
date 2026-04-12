@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class DashboardController implements DashboardApi {
+public class DashboardController extends BaseController implements DashboardApi {
 
     @Override
     public ResponseEntity<DashboardResponse> getDashboard(String role) {

@@ -2,10 +2,12 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "roadmapId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "title": {
       "type": "string"
@@ -48,7 +50,8 @@
       "type": "integer"
     },
     "createdBy": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "createdAt": {
       "type": "string",

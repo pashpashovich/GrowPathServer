@@ -1,110 +1,103 @@
 @echo off
-REM
-REM
+setlocal EnableDelayedExpansion
 
-setlocal enabledelayedexpansion
-
-set SCRIPT_DIR=%~dp0
-set PROJECT_ROOT=%SCRIPT_DIR%..
+set "SCRIPT_DIR=%~dp0"
+set "PROJECT_ROOT=%SCRIPT_DIR%.."
 
 echo ==========================================
-echo GrowPath Server Deployment Script
-echo Local Development Environment
+echo GrowPath Server — развертывание (Windows)
 echo ==========================================
 echo.
 
-REM
 where docker >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Docker не установлен. Установите Docker и повторите попытку.
+if errorlevel 1 (
+    echo [ERROR] Docker не установлен.
     exit /b 1
 )
 
-REM
 docker compose version >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
+if errorlevel 1 (
     docker-compose version >nul 2>&1
-    if %ERRORLEVEL% NEQ 0 (
-        echo [ERROR] Docker Compose не установлен. Установите Docker Compose и повторите попытку.
+    if errorlevel 1 (
+        echo [ERROR] Docker Compose не найден.
         exit /b 1
     )
-    set DOCKER_COMPOSE=docker-compose
+    set "DOCKER_COMPOSE=docker-compose"
 ) else (
-    set DOCKER_COMPOSE=docker compose
+    set "DOCKER_COMPOSE=docker compose"
 )
 
-REM
 if not exist "%PROJECT_ROOT%\.env" (
-    echo [WARNING] Файл .env не найден. Создаю из .env.example...
+    echo [WARNING] Нет .env — копирую из .env.example...
     if exist "%PROJECT_ROOT%\.env.example" (
-        copy "%PROJECT_ROOT%\.env.example" "%PROJECT_ROOT%\.env" >nul
-        echo [OK] Файл .env создан. Пожалуйста, отредактируйте его перед продолжением.
+        copy /Y "%PROJECT_ROOT%\.env.example" "%PROJECT_ROOT%\.env" >nul
+        echo [OK] Создан .env — проверьте настройки.
         pause
     ) else (
-        echo [ERROR] Файл .env.example не найден. Создайте .env файл вручную.
+        echo [ERROR] Нет .env.example
         exit /b 1
     )
 )
 
 cd /d "%PROJECT_ROOT%"
+set "COMPOSE_FILE=docker-compose.yml"
 
-set COMPOSE_FILE=docker-compose.yml
+set "DO_CLEAN=0"
+set "DO_REBUILD=0"
+set "DO_WAIT=1"
+for %%A in (%*) do (
+    if /I "%%~A"=="clean" set "DO_CLEAN=1"
+    if /I "%%~A"=="rebuild" set "DO_REBUILD=1"
+    if /I "%%~A"=="no-wait" set "DO_WAIT=0"
+)
 
-REM
-echo [INFO] Остановка существующих контейнеров...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" down
+if "!DO_CLEAN!"=="1" (
+    echo [INFO] Остановка контейнеров ^(clean^)...
+    %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" down
+)
 
-REM
-echo [INFO] Сборка Docker образов для микросервисов...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" build --no-cache
-
-REM
-echo [INFO] Запуск инфраструктуры (базы данных, Kafka, MinIO)...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d trainee-db notification-db keycloak-db zookeeper kafka minio
-
-REM
-echo [INFO] Ожидание готовности баз данных...
-timeout /t 15 /nobreak >nul
-
-REM
-echo [INFO] Запуск Keycloak...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d keycloak
-
-REM
-echo [INFO] Ожидание готовности Keycloak...
-timeout /t 30 /nobreak >nul
-
-REM
-echo [INFO] Запуск микросервисов...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d trainee-service notification-service
-
-REM
-echo [INFO] Ожидание готовности микросервисов...
-timeout /t 20 /nobreak >nul
-
-REM
-echo [INFO] Запуск API Gateway...
-%DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d api-gateway
-
-REM
-echo [INFO] Ожидание готовности всех сервисов...
-timeout /t 20 /nobreak >nul
+if "!DO_REBUILD!"=="1" (
+    echo [INFO] Сборка без кэша ^(rebuild — долго^)...
+    %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" build --no-cache
+    echo [INFO] Запуск контейнеров из свежих образов...
+    if "!DO_WAIT!"=="1" (
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --wait
+        if errorlevel 1 (
+            echo [WARN] --wait не поддерживается. Запуск без ожидания...
+            %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d
+        )
+    ) else (
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d
+    )
+) else (
+    echo [INFO] Сборка с кэшем + запуск ^(быстрый режим^). Полная пересборка: deploy.bat rebuild
+    if "!DO_WAIT!"=="1" (
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build --wait
+        if errorlevel 1 (
+            echo [WARN] --wait не поддерживается. Запуск без ожидания...
+            %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build
+        )
+    ) else (
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build
+    )
+)
 
 echo.
 echo ==========================================
-echo [OK] Развертывание завершено!
+echo [OK] Готово
 echo ==========================================
+echo   API Gateway:   http://localhost:8080
+echo   Trainee:       http://localhost:8081
+echo   Notification:  http://localhost:8082
+echo   Keycloak:      http://localhost:8090
 echo.
-echo Доступные сервисы:
-echo   - API Gateway:      http://localhost:8080
-echo   - Trainee Service:  http://localhost:8081
-echo   - Notification:     http://localhost:8082
-echo   - Keycloak:         http://localhost:8090
-echo   - MinIO Console:    http://localhost:9001
-echo.
-echo Проверка статуса: %DOCKER_COMPOSE% -f %COMPOSE_FILE% ps
-echo Просмотр логов:   %DOCKER_COMPOSE% -f %COMPOSE_FILE% logs -f [service-name]
-echo Остановка:         %DOCKER_COMPOSE% -f %COMPOSE_FILE% down
+echo Подсказки:
+echo   Быстрый цикл:     scripts\deploy.bat
+echo   С нуля контейнеры: scripts\deploy.bat clean
+echo   Полная пересборка: scripts\deploy.bat rebuild
+echo   Старый Compose:    scripts\deploy.bat no-wait
+echo   Статус:  %DOCKER_COMPOSE% -f %COMPOSE_FILE% ps
 echo.
 
 endlocal
+exit /b 0

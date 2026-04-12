@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class RatingController implements RatingsApi {
+public class RatingController extends BaseController implements RatingsApi {
 
     private final GetInternRatingHandler getInternRatingHandler;
     private final GetRatingsHandler getRatingsHandler;

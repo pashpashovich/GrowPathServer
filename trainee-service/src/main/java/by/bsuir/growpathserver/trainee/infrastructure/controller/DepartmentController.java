@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class DepartmentController implements DepartmentsApi {
+public class DepartmentController extends BaseController implements DepartmentsApi {
 
     private final CreateDepartmentHandler createDepartmentHandler;
     private final GetDepartmentsHandler getDepartmentsHandler;

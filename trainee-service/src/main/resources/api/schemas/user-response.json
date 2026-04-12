@@ -2,17 +2,26 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "description": "User unique identifier"
+      "description": "User unique identifier",
+      "type": "integer",
+      "format": "int64"
     },
     "email": {
       "type": "string",
       "format": "email",
       "description": "User email address"
     },
-    "name": {
+    "firstName": {
       "type": "string",
-      "description": "User full name"
+      "description": "Given name"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Family name"
+    },
+    "patronymicName": {
+      "type": "string",
+      "description": "Patronymic (optional)"
     },
     "role": {
       "type": "string",
@@ -44,8 +53,9 @@
       "description": "Last login timestamp"
     },
     "invitedBy": {
-      "type": "string",
-      "description": "ID of user who invited this user"
+      "description": "ID of user who invited this user",
+      "type": "integer",
+      "format": "int64"
     },
     "invitationSentAt": {
       "type": "string",
@@ -56,7 +66,8 @@
   "required": [
     "id",
     "email",
-    "name",
+    "firstName",
+    "lastName",
     "role",
     "status",
     "createdAt"

@@ -16,8 +16,9 @@
       ]
     },
     "assigneeId": {
-      "type": "string",
-      "nullable": true
+      "nullable": true,
+      "type": "integer",
+      "format": "int64"
     },
     "dueDate": {
       "type": "string",

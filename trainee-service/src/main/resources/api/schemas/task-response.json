@@ -2,7 +2,8 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "title": {
       "type": "string"
@@ -29,25 +30,29 @@
       ]
     },
     "assigneeId": {
-      "type": "string",
-      "nullable": true
+      "nullable": true,
+      "type": "integer",
+      "format": "int64"
     },
     "assigneeName": {
       "type": "string",
       "nullable": true
     },
     "mentorId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "mentorName": {
       "type": "string"
     },
     "internshipId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "stageId": {
-      "type": "string",
-      "nullable": true
+      "nullable": true,
+      "type": "integer",
+      "format": "int64"
     },
     "dueDate": {
       "type": "string",

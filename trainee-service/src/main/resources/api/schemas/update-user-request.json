@@ -1,9 +1,17 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "firstName": {
       "type": "string",
-      "description": "User full name"
+      "description": "Given name (must be sent together with lastName when updating)"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Family name (must be sent together with firstName when updating)"
+    },
+    "patronymicName": {
+      "type": "string",
+      "description": "Patronymic; omit to leave unchanged, empty string clears"
     },
     "email": {
       "type": "string",

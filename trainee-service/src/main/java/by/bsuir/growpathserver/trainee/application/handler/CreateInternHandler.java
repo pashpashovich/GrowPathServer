@@ -17,22 +17,17 @@ public class CreateInternHandler {
     private final ChangeUserRoleHandler changeUserRoleHandler;
 
     public User handle(CreateInternCommand command) {
-        try {
-            Long userId = Long.parseLong(command.userId());
-            GetUserByIdQuery getUserQuery = new GetUserByIdQuery(userId);
-            User existingUser = getUserByIdHandler.handle(getUserQuery);
+        GetUserByIdQuery getUserQuery = new GetUserByIdQuery(command.userId());
+        User existingUser = getUserByIdHandler.handle(getUserQuery);
 
-            if (existingUser.getRole() != UserRole.INTERN) {
-                ChangeUserRoleCommand changeRoleCommand = ChangeUserRoleCommand.builder()
-                        .userId(userId)
-                        .role(UserRole.INTERN)
-                        .build();
-                return changeUserRoleHandler.handle(changeRoleCommand);
-            }
-
-            return existingUser;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid user ID format: " + command.userId());
+        if (existingUser.getRole() != UserRole.INTERN) {
+            ChangeUserRoleCommand changeRoleCommand = ChangeUserRoleCommand.builder()
+                    .userId(command.userId())
+                    .role(UserRole.INTERN)
+                    .build();
+            return changeUserRoleHandler.handle(changeRoleCommand);
         }
+
+        return existingUser;
     }
 }

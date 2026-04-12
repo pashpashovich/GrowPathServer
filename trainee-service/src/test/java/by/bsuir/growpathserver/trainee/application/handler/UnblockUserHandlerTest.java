@@ -42,7 +42,8 @@ class UnblockUserHandlerTest {
         blockedUser = new UserEntity();
         blockedUser.setId(1L);
         blockedUser.setEmail("user@example.com");
-        blockedUser.setName("Test User");
+        blockedUser.setFirstName("Test");
+        blockedUser.setLastName("User");
         blockedUser.setRole(UserRole.INTERN);
         blockedUser.setStatus(UserStatus.BLOCKED);
         blockedUser.setCreatedAt(LocalDateTime.now());

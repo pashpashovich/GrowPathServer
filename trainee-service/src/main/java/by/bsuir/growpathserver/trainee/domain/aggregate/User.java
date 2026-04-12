@@ -1,6 +1,10 @@
 package by.bsuir.growpathserver.trainee.domain.aggregate;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.Email;
@@ -12,7 +16,9 @@ import lombok.Getter;
 public class User {
     private final Long id;
     private final Email email;
-    private final String name;
+    private final String firstName;
+    private final String lastName;
+    private final String patronymicName;
     private final UserRole role;
     private final UserStatus status;
     private final LocalDateTime createdAt;
@@ -23,13 +29,15 @@ public class User {
     private User(UserEntity entity) {
         this.id = entity.getId();
         this.email = new Email(entity.getEmail());
-        this.name = entity.getName();
         this.role = entity.getRole();
         this.status = entity.getStatus();
         this.createdAt = entity.getCreatedAt();
         this.lastLogin = entity.getLastLogin();
         this.invitedBy = entity.getInvitedBy();
         this.invitationSentAt = entity.getInvitationSentAt();
+        this.firstName = entity.getFirstName();
+        this.lastName = entity.getLastName();
+        this.patronymicName = entity.getPatronymicName();
     }
 
     public static User fromEntity(UserEntity entity) {
@@ -40,7 +48,9 @@ public class User {
         UserEntity entity = new UserEntity();
         entity.setId(this.id);
         entity.setEmail(this.email.value());
-        entity.setName(this.name);
+        entity.setFirstName(this.firstName);
+        entity.setLastName(this.lastName);
+        entity.setPatronymicName(this.patronymicName);
         entity.setRole(this.role);
         entity.setStatus(this.status);
         entity.setCreatedAt(this.createdAt);
@@ -50,10 +60,17 @@ public class User {
         return entity;
     }
 
-    public static User create(String email, String name, UserRole role, Long invitedBy) {
+    public static User create(String email,
+                              String firstName,
+                              String lastName,
+                              String patronymicName,
+                              UserRole role,
+                              Long invitedBy) {
         UserEntity entity = new UserEntity();
         entity.setEmail(email);
-        entity.setName(name);
+        entity.setFirstName(firstName);
+        entity.setLastName(lastName);
+        entity.setPatronymicName(patronymicName);
         entity.setRole(role);
         entity.setStatus(UserStatus.PENDING);
         entity.setInvitedBy(invitedBy);
@@ -63,5 +80,14 @@ public class User {
 
     public void updateLastLogin() {
         this.lastLogin = LocalDateTime.now();
+    }
+
+    /**
+     * Single-line display for lists, ratings, and legacy API fields that still expose {@code name}.
+     */
+    public String getDisplayName() {
+        return Stream.of(firstName, lastName, patronymicName)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "));
     }
 }

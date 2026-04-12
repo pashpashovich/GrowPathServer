@@ -2,7 +2,8 @@
   "type": "object",
   "properties": {
     "mentorId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "mentorName": {
       "type": "string"

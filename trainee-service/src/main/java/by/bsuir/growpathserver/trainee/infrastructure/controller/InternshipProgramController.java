@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class InternshipProgramController implements InternshipProgramsApi {
+public class InternshipProgramController extends BaseController implements InternshipProgramsApi {
 
     private final CreateInternshipProgramHandler createInternshipProgramHandler;
     private final GetInternshipProgramByIdHandler getInternshipProgramByIdHandler;

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class ReportController implements ReportsApi {
+public class ReportController extends BaseController implements ReportsApi {
 
     @Override
     public ResponseEntity<MentorWorkloadResponse> getMentorWorkload(String mentorId) {

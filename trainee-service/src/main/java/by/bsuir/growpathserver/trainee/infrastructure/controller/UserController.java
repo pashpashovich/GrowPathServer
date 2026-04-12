@@ -1,12 +1,7 @@
 package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.UsersApi;
@@ -14,51 +9,19 @@ import by.bsuir.growpathserver.dto.model.ChangeRoleRequest;
 import by.bsuir.growpathserver.dto.model.CreateUserRequest;
 import by.bsuir.growpathserver.dto.model.InvitationResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
-import by.bsuir.growpathserver.dto.model.PaginationResponse;
 import by.bsuir.growpathserver.dto.model.UpdateUserRequest;
 import by.bsuir.growpathserver.dto.model.UserListResponse;
 import by.bsuir.growpathserver.dto.model.UserResponse;
 import by.bsuir.growpathserver.dto.model.UserRoleResponse;
 import by.bsuir.growpathserver.dto.model.UserStatusResponse;
-import by.bsuir.growpathserver.trainee.application.command.BlockUserCommand;
-import by.bsuir.growpathserver.trainee.application.command.ChangeUserRoleCommand;
-import by.bsuir.growpathserver.trainee.application.command.CreateUserCommand;
-import by.bsuir.growpathserver.trainee.application.command.DeleteUserCommand;
-import by.bsuir.growpathserver.trainee.application.command.InviteUserCommand;
-import by.bsuir.growpathserver.trainee.application.command.UnblockUserCommand;
-import by.bsuir.growpathserver.trainee.application.command.UpdateUserCommand;
-import by.bsuir.growpathserver.trainee.application.handler.BlockUserHandler;
-import by.bsuir.growpathserver.trainee.application.handler.ChangeUserRoleHandler;
-import by.bsuir.growpathserver.trainee.application.handler.CreateUserHandler;
-import by.bsuir.growpathserver.trainee.application.handler.DeleteUserHandler;
-import by.bsuir.growpathserver.trainee.application.handler.GetUserByIdHandler;
-import by.bsuir.growpathserver.trainee.application.handler.GetUsersHandler;
-import by.bsuir.growpathserver.trainee.application.handler.InviteUserHandler;
-import by.bsuir.growpathserver.trainee.application.handler.UnblockUserHandler;
-import by.bsuir.growpathserver.trainee.application.handler.UpdateUserHandler;
-import by.bsuir.growpathserver.trainee.application.query.GetUserByIdQuery;
-import by.bsuir.growpathserver.trainee.application.query.GetUsersQuery;
-import by.bsuir.growpathserver.trainee.domain.aggregate.User;
-import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
-import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
-import by.bsuir.growpathserver.trainee.infrastructure.mapper.UserMapper;
+import by.bsuir.growpathserver.trainee.application.service.UsersApplicationFacade;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class UserController implements UsersApi {
+public class UserController extends BaseController implements UsersApi {
 
-    private final GetUsersHandler getUsersHandler;
-    private final GetUserByIdHandler getUserByIdHandler;
-    private final CreateUserHandler createUserHandler;
-    private final UpdateUserHandler updateUserHandler;
-    private final DeleteUserHandler deleteUserHandler;
-    private final BlockUserHandler blockUserHandler;
-    private final UnblockUserHandler unblockUserHandler;
-    private final ChangeUserRoleHandler changeUserRoleHandler;
-    private final InviteUserHandler inviteUserHandler;
-    private final UserMapper userMapper;
+    private final UsersApplicationFacade usersApplicationFacade;
 
     @Override
     public ResponseEntity<UserListResponse> getUsers(Integer page,
@@ -66,195 +29,47 @@ public class UserController implements UsersApi {
                                                      String role,
                                                      String status,
                                                      String search) {
-        try {
-            GetUsersQuery query = GetUsersQuery.builder()
-                    .page(page)
-                    .limit(limit)
-                    .role(role != null ? UserRole.fromString(role) : null)
-                    .status(status != null ? UserStatus.fromString(status) : null)
-                    .search(search)
-                    .build();
-
-            Page<User> usersPage = getUsersHandler.handle(query);
-
-            UserListResponse response = new UserListResponse();
-            response.setData(usersPage.getContent().stream()
-                                     .map(userMapper::toUserResponse)
-                                     .toList());
-
-            PaginationResponse pagination = new PaginationResponse();
-            pagination.setPage(usersPage.getNumber() + 1);
-            pagination.setLimit(usersPage.getSize());
-            pagination.setTotal((int) usersPage.getTotalElements());
-            pagination.setTotalPages(usersPage.getTotalPages());
-            response.setPagination(pagination);
-
-            return ResponseEntity.ok(response);
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.listUsers(page, limit, role, status, search));
     }
 
     @Override
     public ResponseEntity<UserResponse> getUserById(String id) {
-        try {
-            Long userId = Long.parseLong(id);
-            GetUserByIdQuery query = new GetUserByIdQuery(userId);
-            User user = getUserByIdHandler.handle(query);
-            UserResponse response = userMapper.toUserResponse(user);
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.getUserById(id));
     }
 
     @Override
     public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
-        try {
-            // TODO: Get invitedBy from JWT token when authentication is properly configured
-            Long invitedBy = null; // Should be extracted from JWT
-
-            CreateUserCommand command = CreateUserCommand.builder()
-                    .email(createUserRequest.getEmail())
-                    .name(createUserRequest.getName())
-                    .role(UserRole.fromString(createUserRequest.getRole().getValue()))
-                    .invitedBy(invitedBy)
-                    .build();
-
-            User user = createUserHandler.handle(command);
-            UserResponse response = userMapper.toUserResponse(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(usersApplicationFacade.createUser(createUserRequest));
     }
 
     @Override
     public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest updateUserRequest) {
-        try {
-            Long userId = Long.parseLong(id);
-            UpdateUserCommand command = UpdateUserCommand.builder()
-                    .userId(userId)
-                    .email(updateUserRequest.getEmail())
-                    .name(updateUserRequest.getName())
-                    .role(updateUserRequest.getRole() != null ?
-                                  UserRole.fromString(updateUserRequest.getRole().getValue()) : null)
-                    .build();
-
-            User user = updateUserHandler.handle(command);
-            UserResponse response = userMapper.toUserResponse(user);
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.updateUser(id, updateUserRequest));
     }
 
     @Override
     public ResponseEntity<MessageResponse> deleteUser(String id) {
-        try {
-            Long userId = Long.parseLong(id);
-            DeleteUserCommand command = new DeleteUserCommand(userId);
-            deleteUserHandler.handle(command);
-
-            MessageResponse response = new MessageResponse();
-            response.setMessage("User deleted successfully");
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.deleteUser(id));
     }
 
     @Override
     public ResponseEntity<UserStatusResponse> blockUser(String id) {
-        try {
-            Long userId = Long.parseLong(id);
-            BlockUserCommand command = new BlockUserCommand(userId);
-            User user = blockUserHandler.handle(command);
-
-            UserStatusResponse response = new UserStatusResponse();
-            response.setId(String.valueOf(user.getId()));
-            response.setStatus(UserStatusResponse.StatusEnum.fromValue(user.getStatus().getValue()));
-            response.setUpdatedAt(LocalDateTime.now());
-
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.blockUser(id));
     }
 
     @Override
     public ResponseEntity<UserStatusResponse> unblockUser(String id) {
-        try {
-            Long userId = Long.parseLong(id);
-            UnblockUserCommand command = new UnblockUserCommand(userId);
-            User user = unblockUserHandler.handle(command);
-
-            UserStatusResponse response = new UserStatusResponse();
-            response.setId(String.valueOf(user.getId()));
-            response.setStatus(UserStatusResponse.StatusEnum.fromValue(user.getStatus().getValue()));
-            response.setUpdatedAt(LocalDateTime.now());
-
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.unblockUser(id));
     }
 
     @Override
     public ResponseEntity<UserRoleResponse> changeUserRole(String id, ChangeRoleRequest changeRoleRequest) {
-        try {
-            Long userId = Long.parseLong(id);
-            ChangeUserRoleCommand command = ChangeUserRoleCommand.builder()
-                    .userId(userId)
-                    .role(UserRole.fromString(changeRoleRequest.getRole().getValue()))
-                    .build();
-
-            User user = changeUserRoleHandler.handle(command);
-
-            UserRoleResponse response = new UserRoleResponse();
-            response.setId(String.valueOf(user.getId()));
-            response.setRole(UserRoleResponse.RoleEnum.fromValue(user.getRole().getValue()));
-            response.setUpdatedAt(LocalDateTime.now());
-
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.changeUserRole(id, changeRoleRequest));
     }
 
     @Override
     public ResponseEntity<InvitationResponse> inviteUser(String id) {
-        try {
-            Long userId = Long.parseLong(id);
-            InviteUserCommand command = new InviteUserCommand(userId);
-            User user = inviteUserHandler.handle(command);
-
-            InvitationResponse response = new InvitationResponse();
-            response.setId(String.valueOf(user.getId()));
-            if (user.getInvitationSentAt() != null) {
-                response.setInvitationSentAt(user.getInvitationSentAt());
-            }
-            response.setStatus(InvitationResponse.StatusEnum.PENDING);
-            response.setMessage("Invitation sent successfully");
-
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usersApplicationFacade.inviteUser(id));
     }
 }

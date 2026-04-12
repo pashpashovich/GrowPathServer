@@ -42,7 +42,8 @@ class BlockUserHandlerTest {
         activeUser = new UserEntity();
         activeUser.setId(1L);
         activeUser.setEmail("user@example.com");
-        activeUser.setName("Test User");
+        activeUser.setFirstName("Test");
+        activeUser.setLastName("User");
         activeUser.setRole(UserRole.INTERN);
         activeUser.setStatus(UserStatus.ACTIVE);
         activeUser.setCreatedAt(LocalDateTime.now());

@@ -16,7 +16,7 @@ import by.bsuir.growpathserver.common.util.JwtUtils;
 
 @RestController
 @RequestMapping("/trainee")
-public class TraineeController {
+public class TraineeController extends BaseController {
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {

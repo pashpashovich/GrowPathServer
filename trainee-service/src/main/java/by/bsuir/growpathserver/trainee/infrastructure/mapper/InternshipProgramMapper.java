@@ -4,7 +4,9 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,11 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import by.bsuir.growpathserver.dto.model.InternshipProgramResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface InternshipProgramMapper {
 
-    @Mapping(target = "id", expression = "java(String.valueOf(program.getId()))")
-    @Mapping(target = "createdBy", expression = "java(program.getCreatedBy() != null ? String.valueOf(program.getCreatedBy()) : null)")
     @Mapping(target = "requirements", ignore = true)
     @Mapping(target = "goals", ignore = true)
     @Mapping(target = "competencies", ignore = true)

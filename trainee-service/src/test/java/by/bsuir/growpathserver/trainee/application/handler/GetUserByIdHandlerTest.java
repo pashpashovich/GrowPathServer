@@ -40,7 +40,8 @@ class GetUserByIdHandlerTest {
         testUser = new UserEntity();
         testUser.setId(1L);
         testUser.setEmail("user@example.com");
-        testUser.setName("Test User");
+        testUser.setFirstName("Test");
+        testUser.setLastName("User");
         testUser.setRole(UserRole.INTERN);
         testUser.setStatus(UserStatus.ACTIVE);
         testUser.setCreatedAt(LocalDateTime.now());
@@ -60,7 +61,7 @@ class GetUserByIdHandlerTest {
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("user@example.com", result.getEmail().value());
-        assertEquals("Test User", result.getName());
+        assertEquals("Test User", result.getDisplayName());
         assertEquals(UserRole.INTERN, result.getRole());
         assertEquals(UserStatus.ACTIVE, result.getStatus());
         verify(userRepository).findById(1L);

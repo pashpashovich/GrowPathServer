@@ -81,12 +81,12 @@ public class RatingServiceImpl implements RatingService {
         User mentor = userRepository.findById(assessment.getMentorId())
                 .map(User::fromEntity)
                 .orElse(null);
-        String mentorName = mentor != null ? mentor.getName() : null;
+        String mentorName = mentor != null ? mentor.getDisplayName() : null;
 
         return Rating.builder()
                 .id(assessment.getId())
                 .internId(assessment.getInternId())
-                .internName(intern.getName())
+                .internName(intern.getDisplayName())
                 .position(null)
                 .mentorName(mentorName)
                 .overallRating(assessment.getOverallRating())

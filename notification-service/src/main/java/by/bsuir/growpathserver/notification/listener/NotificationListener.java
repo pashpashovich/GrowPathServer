@@ -1,7 +1,10 @@
 package by.bsuir.growpathserver.notification.listener;
 
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -33,17 +36,18 @@ public class NotificationListener {
         if (event.getEmail() == null) {
             return;
         }
-        String registrationLink = registrationBaseUrl.endsWith("/") ?
-                registrationBaseUrl + "register" :
-                registrationBaseUrl + "/register";
-        if (event.getRegistrationToken() != null && !event.getRegistrationToken().isBlank()) {
+        String registrationLink = registrationBaseUrl + "/register";
+        if (StringUtils.isNotEmpty(event.getRegistrationToken())) {
             registrationLink += "?token=" + event.getRegistrationToken();
         }
-        String greeting = (event.getUserName() != null && !event.getUserName().isBlank())
-                ? "Здравствуйте, " + event.getUserName() + "!"
-                : "Здравствуйте!";
+        String fullName = Stream.of(event.getLastName(), event.getFirstName(), event.getPatronymicName())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "))
+                .trim();
+        String greeting =  "Здравствуйте, " + fullName + "!";
         Map<String, Object> variables = Map.of(
                 "greeting", greeting,
+                "email", event.getEmail(),
                 "registrationLink", registrationLink
         );
         notificationService.sendEmail(

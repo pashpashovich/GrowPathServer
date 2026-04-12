@@ -186,9 +186,21 @@
   ],
   "users": [
     {
+      "username": "service-account-trainee-service",
+      "enabled": true,
+      "serviceAccountClientId": "trainee-service",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users"
+        ]
+      }
+    },
+    {
       "username": "admin",
       "enabled": true,
-      "email": "admin@growpath.local",
+      "email": "admin@growpath.com",
       "firstName": "Admin",
       "lastName": "User",
       "emailVerified": true,
@@ -204,7 +216,7 @@
     {
       "username": "hr_manager",
       "enabled": true,
-      "email": "hr@growpath.local",
+      "email": "hr@growpath.com",
       "firstName": "HR",
       "lastName": "Manager",
       "emailVerified": true,
@@ -220,7 +232,7 @@
     {
       "username": "intern",
       "enabled": true,
-      "email": "intern@growpath.local",
+      "email": "intern@growpath.com",
       "firstName": "Intern",
       "lastName": "User",
       "emailVerified": true,
@@ -236,7 +248,7 @@
     {
       "username": "mentor",
       "enabled": true,
-      "email": "mentor@growpath.local",
+      "email": "mentor@growpath.com",
       "firstName": "Mentor",
       "lastName": "User",
       "emailVerified": true,

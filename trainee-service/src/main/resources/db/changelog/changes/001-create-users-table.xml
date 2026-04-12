@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
-  <changeSet id="001-create-users-table" author="growpath">
+  <changeSet id="001-create-users-table" author="Kasovich Pavel">
     <createTable tableName="users">
       <column name="id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>

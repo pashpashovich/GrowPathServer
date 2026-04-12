@@ -12,6 +12,47 @@ servers:
     description: Local development server
 
 paths:
+  /auth/complete-registration:
+    post:
+      tags:
+        - Auth
+      summary: Complete registration using invitation token
+      description: |
+        Validates the one-time token and sets the user's permanent password in Keycloak.
+        Public endpoint (no JWT required).
+      operationId: completeRegistration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/complete-registration-request'
+      responses:
+        '200':
+          description: Registration completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '422':
+          description: Invalid or expired registration token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '503':
+          description: Keycloak integration error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /users:
     get:
       tags:
@@ -2545,6 +2586,8 @@ components:
       $ref: './schemas/message-response.json'
     error-response:
       $ref: './schemas/error-response.json'
+    complete-registration-request:
+      $ref: './schemas/complete-registration-request.json'
 
     # User schemas
     user-response:

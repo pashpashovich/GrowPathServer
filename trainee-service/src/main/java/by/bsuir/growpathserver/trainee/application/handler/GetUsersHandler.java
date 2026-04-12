@@ -39,8 +39,15 @@ public class GetUsersHandler {
             String searchPattern = "%" + query.search().toLowerCase() + "%";
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                                     criteriaBuilder.or(
-                                            criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+                                            criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
                                                                  searchPattern),
+                                            criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")),
+                                                                 searchPattern),
+                                            criteriaBuilder.like(
+                                                    criteriaBuilder.lower(
+                                                            criteriaBuilder.coalesce(root.get("patronymicName"),
+                                                                                     criteriaBuilder.literal(""))),
+                                                    searchPattern),
                                             criteriaBuilder.like(criteriaBuilder.lower(root.get("email")),
                                                                  searchPattern)
                                     ));

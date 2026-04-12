@@ -42,9 +42,9 @@ spring:
 keycloak:
   url: ${KEYCLOAK_URL:http://localhost:8090}
   realm: ${KEYCLOAK_REALM:growpath}
-  client:
-    id: ${KEYCLOAK_CLIENT_ID:trainee-service}
-    secret: ${KEYCLOAK_CLIENT_SECRET:trainee-service-secret}
+  admin:
+    username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
 
 server:
   port: ${TRAINEE_SERVICE_PORT:8081}
@@ -56,6 +56,8 @@ minio:
   bucket-name: ${MINIO_BUCKET_NAME:growpath-storage}
 
 springdoc:
+  override-with-generic-response: false
+  packages-to-scan: by.bsuir.growpathserver.trainee
   api-docs:
     path: /v3/api-docs
   swagger-ui:
@@ -71,6 +73,10 @@ app:
 kafka:
   topic:
     user-invited: ${KAFKA_TOPIC_USER_INVITED:USERINVITED}
+
+growpath:
+  security:
+    last-login-interval-minutes: ${LAST_LOGIN_INTERVAL_MINUTES:5}
 
 logging:
   level:

@@ -28,10 +28,11 @@ class CreateUserHandlerTest {
 
     @Test
     void shouldDelegateToUserService() {
-        // Given
         CreateUserCommand command = CreateUserCommand.builder()
                 .email("user@example.com")
-                .name("Test User")
+                .firstName("Test")
+                .lastName("User")
+                .patronymicName(null)
                 .role(UserRole.INTERN)
                 .invitedBy(1L)
                 .build();
@@ -39,21 +40,19 @@ class CreateUserHandlerTest {
         UserEntity entity = new UserEntity();
         entity.setId(1L);
         entity.setEmail("user@example.com");
-        entity.setName("Test User");
+        entity.setFirstName("Test");
+        entity.setLastName("User");
         entity.setRole(UserRole.INTERN);
 
         User expectedUser = User.fromEntity(entity);
 
         when(userService.createUser(command)).thenReturn(expectedUser);
 
-        // When
         User result = createUserHandler.handle(command);
 
-        // Then
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("user@example.com", result.getEmail().value());
         verify(userService).createUser(command);
     }
 }
-

@@ -63,21 +63,24 @@ class MentorServiceImplTest {
         mentorEntity = new UserEntity();
         mentorEntity.setId(1L);
         mentorEntity.setEmail("mentor@example.com");
-        mentorEntity.setName("Mentor Name");
+        mentorEntity.setFirstName("Mentor");
+        mentorEntity.setLastName("Name");
         mentorEntity.setRole(UserRole.MENTOR);
         mentorEntity.setStatus(UserStatus.ACTIVE);
 
         internEntity1 = new UserEntity();
         internEntity1.setId(10L);
         internEntity1.setEmail("intern1@example.com");
-        internEntity1.setName("Intern One");
+        internEntity1.setFirstName("Intern");
+        internEntity1.setLastName("One");
         internEntity1.setRole(UserRole.INTERN);
         internEntity1.setStatus(UserStatus.ACTIVE);
 
         internEntity2 = new UserEntity();
         internEntity2.setId(11L);
         internEntity2.setEmail("intern2@example.com");
-        internEntity2.setName("Intern Two");
+        internEntity2.setFirstName("Intern");
+        internEntity2.setLastName("Two");
         internEntity2.setRole(UserRole.INTERN);
         internEntity2.setStatus(UserStatus.ACTIVE);
     }
@@ -97,7 +100,7 @@ class MentorServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("Mentor Name", result.getContent().get(0).getName());
+        assertEquals("Mentor Name", result.getContent().get(0).getDisplayName());
         assertEquals(UserRole.MENTOR, result.getContent().get(0).getRole());
         verify(userRepository).findAll(any(Specification.class), any(Pageable.class));
     }
@@ -150,7 +153,7 @@ class MentorServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("Mentor Name", result.getName());
+        assertEquals("Mentor Name", result.getDisplayName());
         assertEquals(UserRole.MENTOR, result.getRole());
         verify(userRepository).findById(1L);
     }

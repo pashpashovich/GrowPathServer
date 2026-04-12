@@ -1,5 +1,7 @@
 package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import by.bsuir.growpathserver.dto.model.ChangeRoleRequest;
 import by.bsuir.growpathserver.dto.model.CreateUserRequest;
 import by.bsuir.growpathserver.dto.model.UpdateUserRequest;
+import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
@@ -46,15 +50,22 @@ class UserControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private IdentityProviderPort identityProviderPort;
+
     private UserEntity testUser;
 
     @BeforeEach
     void setUp() {
+        when(identityProviderPort.createUser(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn("00000000-0000-0000-0000-000000000099");
+
         userRepository.deleteAll();
 
         testUser = new UserEntity();
         testUser.setEmail("test@example.com");
-        testUser.setName("Test User");
+        testUser.setFirstName("Test");
+        testUser.setLastName("User");
         testUser.setRole(UserRole.INTERN);
         testUser.setStatus(UserStatus.ACTIVE);
         testUser.setCreatedAt(LocalDateTime.now());
@@ -80,7 +91,8 @@ class UserControllerIntegrationTest {
         for (int i = 2; i <= 5; i++) {
             UserEntity user = new UserEntity();
             user.setEmail("user" + i + "@example.com");
-            user.setName("User " + i);
+            user.setFirstName("User");
+            user.setLastName(String.valueOf(i));
             user.setRole(UserRole.INTERN);
             user.setStatus(UserStatus.ACTIVE);
             user.setCreatedAt(LocalDateTime.now());
@@ -104,7 +116,8 @@ class UserControllerIntegrationTest {
         // Given
         UserEntity mentor = new UserEntity();
         mentor.setEmail("mentor@example.com");
-        mentor.setName("Mentor User");
+        mentor.setFirstName("Mentor");
+        mentor.setLastName("User");
         mentor.setRole(UserRole.MENTOR);
         mentor.setStatus(UserStatus.ACTIVE);
         mentor.setCreatedAt(LocalDateTime.now());
@@ -125,7 +138,8 @@ class UserControllerIntegrationTest {
         // Given
         UserEntity blockedUser = new UserEntity();
         blockedUser.setEmail("blocked@example.com");
-        blockedUser.setName("Blocked User");
+        blockedUser.setFirstName("Blocked");
+        blockedUser.setLastName("User");
         blockedUser.setRole(UserRole.INTERN);
         blockedUser.setStatus(UserStatus.BLOCKED);
         blockedUser.setCreatedAt(LocalDateTime.now());
@@ -146,7 +160,8 @@ class UserControllerIntegrationTest {
         // Given
         UserEntity user2 = new UserEntity();
         user2.setEmail("john@example.com");
-        user2.setName("John Doe");
+        user2.setFirstName("John");
+        user2.setLastName("Doe");
         user2.setRole(UserRole.INTERN);
         user2.setStatus(UserStatus.ACTIVE);
         user2.setCreatedAt(LocalDateTime.now());
@@ -159,7 +174,8 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].name").value("John Doe"));
+                .andExpect(jsonPath("$.data[0].firstName").value("John"))
+                .andExpect(jsonPath("$.data[0].lastName").value("Doe"));
     }
 
     @Test
@@ -171,7 +187,8 @@ class UserControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testUser.getId()))
                 .andExpect(jsonPath("$.email").value("test@example.com"))
-                .andExpect(jsonPath("$.name").value("Test User"));
+                .andExpect(jsonPath("$.firstName").value("Test"))
+                .andExpect(jsonPath("$.lastName").value("User"));
     }
 
     @Test
@@ -187,7 +204,8 @@ class UserControllerIntegrationTest {
         // Given
         CreateUserRequest request = new CreateUserRequest();
         request.setEmail("newuser@example.com");
-        request.setName("New User");
+        request.setFirstName("New");
+        request.setLastName("User");
         request.setRole(CreateUserRequest.RoleEnum.INTERN);
 
         // When & Then
@@ -197,7 +215,8 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.email").value("newuser@example.com"))
-                .andExpect(jsonPath("$.name").value("New User"))
+                .andExpect(jsonPath("$.firstName").value("New"))
+                .andExpect(jsonPath("$.lastName").value("User"))
                 .andExpect(jsonPath("$.role").value("intern"));
     }
 
@@ -205,7 +224,8 @@ class UserControllerIntegrationTest {
     void shouldUpdateUserSuccessfully() throws Exception {
         // Given
         UpdateUserRequest request = new UpdateUserRequest();
-        request.setName("Updated Name");
+        request.setFirstName("Updated");
+        request.setLastName("Name");
         request.setEmail("updated@example.com");
         request.setRole(UpdateUserRequest.RoleEnum.MENTOR);
 
@@ -214,7 +234,8 @@ class UserControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Name"))
+                .andExpect(jsonPath("$.firstName").value("Updated"))
+                .andExpect(jsonPath("$.lastName").value("Name"))
                 .andExpect(jsonPath("$.email").value("updated@example.com"))
                 .andExpect(jsonPath("$.role").value("mentor"));
     }
@@ -223,7 +244,8 @@ class UserControllerIntegrationTest {
     void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
         // Given
         UpdateUserRequest request = new UpdateUserRequest();
-        request.setName("Updated Name");
+        request.setFirstName("Updated");
+        request.setLastName("Name");
 
         // When & Then
         mockMvc.perform(put("/api/v1/users/{id}", 0L)

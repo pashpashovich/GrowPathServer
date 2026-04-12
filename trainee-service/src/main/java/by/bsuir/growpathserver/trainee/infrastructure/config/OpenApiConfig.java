@@ -21,9 +21,9 @@ public class OpenApiConfig {
                               .title("GrowPath Trainee Service API")
                               .version("1.0.0")
                               .description(
-                                      "Для авторизации: 1) Получите токен через POST /api/v1/auth/login в API Gateway (http://localhost:8080), "
+                                      "Authentication: 1) Obtain a token via POST /api/v1/auth/login on the API Gateway (http://localhost:8080), "
                                               +
-                                              "2) Нажмите кнопку 'Authorize' выше, 3) Введите токен в формате: Bearer <token> или просто <token>"))
+                                              "2) Click Authorize above, 3) Enter the token as Bearer <token> or just <token>"))
                 .components(new Components()
                                     .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                             .name(securitySchemeName)
@@ -31,7 +31,7 @@ public class OpenApiConfig {
                                             .scheme("bearer")
                                             .bearerFormat("JWT")
                                             .description(
-                                                    "JWT токен из Keycloak. Получите через POST /api/v1/auth/login в API Gateway")))
+                                                    "JWT from Keycloak. Obtain via POST /api/v1/auth/login on the API Gateway")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
     }
 }

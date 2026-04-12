@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-  <changeSet id="003-insert-mock-tasks" author="growpath">
+  <changeSet id="003-insert-mock-tasks" author="Kasovich Pavel">
     <insert tableName="tasks">
       <column name="title" value="Изучить основы Spring Boot"/>
       <column name="description" value="Изучить основные концепции Spring Boot, включая dependency injection, autoconfiguration и starter dependencies"/>

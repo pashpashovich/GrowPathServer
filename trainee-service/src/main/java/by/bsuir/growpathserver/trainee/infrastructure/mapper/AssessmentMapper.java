@@ -2,16 +2,15 @@ package by.bsuir.growpathserver.trainee.infrastructure.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import by.bsuir.growpathserver.dto.model.AssessmentResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AssessmentMapper {
-    @Mapping(target = "id", expression = "java(String.valueOf(assessment.getId()))")
-    @Mapping(target = "internId", expression = "java(String.valueOf(assessment.getInternId()))")
-    @Mapping(target = "mentorId", expression = "java(String.valueOf(assessment.getMentorId()))")
-    @Mapping(target = "internshipId", expression = "java(String.valueOf(assessment.getInternshipId()))")
     @Mapping(target = "internName", ignore = true)
     @Mapping(target = "mentorName", ignore = true)
     AssessmentResponse toAssessmentResponse(Assessment assessment);

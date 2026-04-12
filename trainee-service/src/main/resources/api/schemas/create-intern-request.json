@@ -8,7 +8,8 @@
   ],
   "properties": {
     "userId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "department": {
       "type": "string"
@@ -17,10 +18,12 @@
       "type": "string"
     },
     "internshipProgramId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "mentorId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     }
   }
 }

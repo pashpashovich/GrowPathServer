@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required": ["token", "newPassword"],
+  "properties": {
+    "token": {
+      "type": "string",
+      "description": "One-time token from the invitation link"
+    },
+    "newPassword": {
+      "type": "string",
+      "format": "password",
+      "minLength": 8,
+      "description": "New permanent password for Keycloak login"
+    }
+  }
+}

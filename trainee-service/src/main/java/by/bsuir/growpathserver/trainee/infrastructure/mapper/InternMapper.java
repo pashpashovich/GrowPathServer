@@ -2,16 +2,19 @@ package by.bsuir.growpathserver.trainee.infrastructure.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import by.bsuir.growpathserver.dto.model.InternResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface InternMapper {
-    @Mapping(target = "id", expression = "java(String.valueOf(user.getId()))")
-    @Mapping(target = "userId", expression = "java(String.valueOf(user.getId()))")
+    @Mapping(source = "id", target = "userId")
+    @Mapping(target = "name", expression = "java(user.getDisplayName())")
     @Mapping(source = "email.value", target = "email")
     @Mapping(source = "status", target = "status", qualifiedByName = "userStatusToInternStatus")
     @Mapping(target = "department", ignore = true)

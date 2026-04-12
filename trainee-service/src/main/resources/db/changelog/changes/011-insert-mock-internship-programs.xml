@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
-  <changeSet id="011-insert-mock-internship-programs" author="growpath">
+  <changeSet id="011-insert-mock-internship-programs" author="Kasovich Pavel">
     <insert tableName="internship_programs">
       <column name="title" value="Java Backend Development"/>
       <column name="description" value="Комплексная программа стажировки по разработке backend-приложений на Java"/>

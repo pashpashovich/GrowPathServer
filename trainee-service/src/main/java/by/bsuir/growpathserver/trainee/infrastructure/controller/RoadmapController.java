@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class RoadmapController implements RoadmapsApi {
+public class RoadmapController extends BaseController implements RoadmapsApi {
 
     @Override
     public ResponseEntity<StageResponse> changeStageStatus(String roadmapId,

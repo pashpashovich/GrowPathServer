@@ -44,7 +44,8 @@ class GetUsersHandlerTest {
         UserEntity user1 = new UserEntity();
         user1.setId(1L);
         user1.setEmail("user1@example.com");
-        user1.setName("User One");
+        user1.setFirstName("User");
+        user1.setLastName("One");
         user1.setRole(UserRole.INTERN);
         user1.setStatus(UserStatus.ACTIVE);
         user1.setCreatedAt(LocalDateTime.now());
@@ -52,7 +53,8 @@ class GetUsersHandlerTest {
         UserEntity user2 = new UserEntity();
         user2.setId(2L);
         user2.setEmail("user2@example.com");
-        user2.setName("User Two");
+        user2.setFirstName("User");
+        user2.setLastName("Two");
         user2.setRole(UserRole.MENTOR);
         user2.setStatus(UserStatus.ACTIVE);
         user2.setCreatedAt(LocalDateTime.now());

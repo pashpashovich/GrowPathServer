@@ -10,7 +10,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
+import com.fasterxml.jackson.databind.type.LogicalType;
 
 @Configuration
 public class JacksonConfig {
@@ -27,9 +30,13 @@ public class JacksonConfig {
                 .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
                 .build();
 
-        // Разрешить использование конструкторов через рефлексию
+        // Allow constructor usage via reflection for creators
         mapper.setVisibility(new VisibilityChecker.Std(JsonAutoDetect.Visibility.DEFAULT)
                                      .withCreatorVisibility(JsonAutoDetect.Visibility.ANY));
+
+        // Embedded JSON in DB may still use quoted numeric ids ("id": "1") while DTOs use Long.
+        mapper.coercionConfigFor(LogicalType.Integer)
+                .setCoercion(CoercionInputShape.String, CoercionAction.TryConvert);
 
         return mapper;
     }

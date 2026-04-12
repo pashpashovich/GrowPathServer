@@ -2,7 +2,8 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "invitationSentAt": {
       "type": "string",
@@ -18,7 +19,7 @@
     },
     "message": {
       "type": "string",
-      "example": "Приглашение отправлено"
+      "example": "Invitation sent successfully"
     }
   },
   "required": [

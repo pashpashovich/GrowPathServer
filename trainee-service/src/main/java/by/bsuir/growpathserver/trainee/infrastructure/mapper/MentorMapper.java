@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import by.bsuir.growpathserver.dto.model.MentorInternsResponse;
 import by.bsuir.growpathserver.dto.model.MentorInternsResponseDataInner;
@@ -13,16 +15,17 @@ import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MentorMapper {
 
     default MentorResponse toMentorResponse(User user,
                                             TaskRepository taskRepository,
                                             AssessmentRepository assessmentRepository) {
         MentorResponse response = new MentorResponse();
-        response.setId(String.valueOf(user.getId()));
-        response.setUserId(String.valueOf(user.getId()));
-        response.setName(user.getName());
+        response.setId(user.getId());
+        response.setUserId(user.getId());
+        response.setName(user.getDisplayName());
         response.setEmail(user.getEmail().value());
         response.setDepartment(null);
         response.setCreatedAt(user.getCreatedAt());
@@ -48,8 +51,8 @@ public interface MentorMapper {
         response.setData(interns.stream()
                                  .map(intern -> {
                                      MentorInternsResponseDataInner internData = new MentorInternsResponseDataInner();
-                                     internData.setId(String.valueOf(intern.getId()));
-                                     internData.setName(intern.getName());
+                                     internData.setId(intern.getId());
+                                     internData.setName(intern.getDisplayName());
                                      internData.setEmail(intern.getEmail().value());
                                      internData.setDepartment(null);
                                      internData.setPosition(null);

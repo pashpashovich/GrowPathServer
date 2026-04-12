@@ -1,7 +1,6 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import by.bsuir.growpathserver.trainee.application.exception.InvalidRegistrationTokenException;
 import by.bsuir.growpathserver.trainee.domain.entity.UserRegistrationTokenEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRegistrationTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +40,11 @@ public class RegistrationTokenService {
     public Long validateAndConsumeToken(String token) {
         Optional<UserRegistrationTokenEntity> opt = tokenRepository
                 .findByTokenAndExpiresAtAfter(token, LocalDateTime.now());
-        UserRegistrationTokenEntity entity = opt
-                .orElseThrow(() -> new NoSuchElementException("Invalid or expired registration token"));
+        if (opt.isEmpty()) {
+            log.warn("Invalid or expired registration token");
+            throw new InvalidRegistrationTokenException();
+        }
+        UserRegistrationTokenEntity entity = opt.get();
         tokenRepository.deleteByToken(token);
         return entity.getUserId();
     }

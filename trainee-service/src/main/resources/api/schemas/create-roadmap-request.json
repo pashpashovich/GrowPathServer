@@ -8,7 +8,8 @@
   ],
   "properties": {
     "programId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "title": {
       "type": "string"
@@ -25,7 +26,8 @@
       "format": "date"
     },
     "mentorId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "internIds": {
       "type": "array",

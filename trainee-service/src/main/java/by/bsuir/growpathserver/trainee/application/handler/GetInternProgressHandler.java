@@ -21,15 +21,17 @@ public class GetInternProgressHandler {
     private final GetTasksHandler getTasksHandler;
 
     public InternProgressResponse handle(GetInternProgressQuery query) {
+        final Long userId;
         try {
-            Long userId = Long.parseLong(query.internId());
-            GetUserByIdQuery getUserQuery = new GetUserByIdQuery(userId);
-            User user = getUserByIdHandler.handle(getUserQuery);
-            if (user.getRole() != UserRole.INTERN) {
-                throw new IllegalArgumentException("User is not an intern");
-            }
+            userId = Long.parseLong(query.internId());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid intern ID format: " + query.internId());
+        }
+
+        GetUserByIdQuery getUserQuery = new GetUserByIdQuery(userId);
+        User user = getUserByIdHandler.handle(getUserQuery);
+        if (user.getRole() != UserRole.INTERN) {
+            throw new IllegalArgumentException("User is not an intern");
         }
 
         GetTasksQuery getTasksQuery = GetTasksQuery.builder()
@@ -51,7 +53,7 @@ public class GetInternProgressHandler {
         double completionRate = totalTasks > 0 ? (double) completedTasks / totalTasks * 100.0 : 0.0;
 
         InternProgressResponse response = new InternProgressResponse();
-        response.setInternId(query.internId());
+        response.setInternId(userId);
         response.setTotalTasks((int) totalTasks);
         response.setCompletedTasks((int) completedTasks);
         response.setInProgressTasks((int) inProgressTasks);

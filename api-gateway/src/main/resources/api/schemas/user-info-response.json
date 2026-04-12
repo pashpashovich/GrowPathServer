@@ -27,10 +27,9 @@
       "items": {
         "type": "string"
       },
-      "description": "User roles",
+      "description": "Application realm roles only (Keycloak composite roles are omitted)",
       "example": [
-        "ROLE_ADMIN",
-        "ROLE_USER"
+        "ROLE_INTERN"
       ]
     },
     "sub": {

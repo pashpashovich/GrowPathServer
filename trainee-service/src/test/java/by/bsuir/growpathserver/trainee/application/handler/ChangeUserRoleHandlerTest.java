@@ -42,7 +42,8 @@ class ChangeUserRoleHandlerTest {
         internUser = new UserEntity();
         internUser.setId(1L);
         internUser.setEmail("user@example.com");
-        internUser.setName("Test User");
+        internUser.setFirstName("Test");
+        internUser.setLastName("User");
         internUser.setRole(UserRole.INTERN);
         internUser.setStatus(UserStatus.ACTIVE);
         internUser.setCreatedAt(LocalDateTime.now());

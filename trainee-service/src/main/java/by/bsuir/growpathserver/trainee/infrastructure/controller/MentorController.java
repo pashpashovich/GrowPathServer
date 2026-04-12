@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class MentorController implements MentorsApi {
+public class MentorController extends BaseController implements MentorsApi {
 
     private final GetMentorsHandler getMentorsHandler;
     private final GetMentorByIdHandler getMentorByIdHandler;

@@ -8,6 +8,6 @@ public record UpdateInternCommand(
         String department,
         String position,
         String status,
-        String mentorId
+        Long mentorId
 ) {
 }

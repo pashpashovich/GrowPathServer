@@ -7,10 +7,12 @@
   ],
   "properties": {
     "internId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "internshipId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "overallRating": {
       "type": "number",

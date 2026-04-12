@@ -22,15 +22,18 @@
       ]
     },
     "assigneeId": {
-      "type": "string",
-      "nullable": true
+      "nullable": true,
+      "type": "integer",
+      "format": "int64"
     },
     "internshipId": {
-      "type": "string"
+      "type": "integer",
+      "format": "int64"
     },
     "stageId": {
-      "type": "string",
-      "nullable": true
+      "nullable": true,
+      "type": "integer",
+      "format": "int64"
     },
     "dueDate": {
       "type": "string",

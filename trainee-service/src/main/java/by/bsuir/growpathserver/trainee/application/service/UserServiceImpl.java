@@ -1,16 +1,15 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
-import java.util.UUID;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import by.bsuir.growpathserver.trainee.application.command.CreateUserCommand;
+import by.bsuir.growpathserver.trainee.application.exception.IdentityProviderException;
+import by.bsuir.growpathserver.trainee.application.port.IdentityProviderPort;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.events.UserCreatedEvent;
-import by.bsuir.growpathserver.trainee.infrastructure.keycloak.KeycloakAdminClient;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final KeycloakAdminClient keycloakAdminClient;
+    private final IdentityProviderPort identityProviderPort;
 
     @Override
     @Transactional
@@ -33,7 +32,9 @@ public class UserServiceImpl implements UserService {
 
         User user = User.create(
                 command.email(),
-                command.name(),
+                command.firstName(),
+                command.lastName(),
+                command.patronymicName(),
                 command.role(),
                 command.invitedBy()
         );
@@ -42,28 +43,43 @@ public class UserServiceImpl implements UserService {
         UserEntity savedEntity = userRepository.save(entity);
         User savedUser = User.fromEntity(savedEntity);
 
-        String temporaryPassword = UUID.randomUUID().toString().replace("-", "") + "A1a!";
+        String keycloakUserId;
         try {
-            keycloakAdminClient.createUser(
+            keycloakUserId = identityProviderPort.createUser(
                     savedUser.getEmail().value(),
-                    savedUser.getName(),
-                    temporaryPassword
+                    savedUser.getFirstName(),
+                    savedUser.getLastName(),
+                    String.valueOf(savedUser.getRole())
             );
-        } catch (Exception e) {
-            log.warn("Failed to create user in Keycloak (user created in DB): {}", e.getMessage());
+        }
+        catch (IdentityProviderException e) {
+            log.warn("Failed to create user in identity provider — transaction will roll back DB user: {}",
+                     e.getMessage());
+            throw new IllegalArgumentException("Failed to create user in Keycloak: " + e.getMessage(), e);
+        }
+        catch (RuntimeException e) {
+            log.warn("Failed to create user in identity provider — transaction will roll back DB user: {}",
+                     e.getMessage());
             throw new IllegalArgumentException("Failed to create user in Keycloak: " + e.getMessage(), e);
         }
 
+        UserEntity linked = userRepository.findById(savedUser.getId()).orElseThrow();
+        linked.setKeycloakUserId(keycloakUserId);
+        UserEntity persisted = userRepository.save(linked);
+        User result = User.fromEntity(persisted);
+
         UserCreatedEvent event = new UserCreatedEvent(
-                savedUser.getId(),
-                savedUser.getEmail().value(),
-                savedUser.getName(),
-                savedUser.getRole(),
-                savedUser.getInvitedBy(),
-                savedUser.getCreatedAt()
+                result.getId(),
+                result.getEmail().value(),
+                result.getFirstName(),
+                result.getLastName(),
+                result.getPatronymicName(),
+                result.getRole(),
+                result.getInvitedBy(),
+                result.getCreatedAt()
         );
         eventPublisher.publishEvent(event);
 
-        return savedUser;
+        return result;
     }
 }

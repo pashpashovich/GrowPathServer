@@ -48,7 +48,9 @@ public class InviteUserHandler {
             UserInvitedEvent event = new UserInvitedEvent(
                     String.valueOf(user.getId()),
                     user.getEmail().value(),
-                    user.getName(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getPatronymicName(),
                     registrationToken
             );
             kafkaTemplate.send(topicUserInvited, user.getId().toString(), event);

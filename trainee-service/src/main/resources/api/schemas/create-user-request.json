@@ -6,15 +6,33 @@
       "format": "email",
       "description": "User email address"
     },
-    "name": {
+    "lastName": {
       "type": "string",
-      "description": "User full name"
+      "description": "User last name"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "User first name"
+    },
+    "patronymicName": {
+      "type": "string",
+      "description": "User patronymic name"
     },
     "role": {
       "type": "string",
-      "enum": ["admin", "hr", "mentor", "intern"],
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ],
       "description": "User role"
     }
   },
-  "required": ["email", "name", "role"]
+  "required": [
+    "email",
+    "lastName",
+    "firstName",
+    "role"
+  ]
 }

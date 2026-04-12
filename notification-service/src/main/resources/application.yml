@@ -63,6 +63,8 @@ logging:
     org.springframework.security: DEBUG
 
 springdoc:
+  override-with-generic-response: false
+  packages-to-scan: by.bsuir.growpathserver.notification
   api-docs:
     path: /v3/api-docs
   swagger-ui:

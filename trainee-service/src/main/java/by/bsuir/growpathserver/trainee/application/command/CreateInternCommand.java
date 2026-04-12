@@ -4,10 +4,10 @@ import lombok.Builder;
 
 @Builder
 public record CreateInternCommand(
-        String userId,
+        Long userId,
         String department,
         String position,
-        String internshipProgramId,
-        String mentorId
+        Long internshipProgramId,
+        Long mentorId
 ) {
 }

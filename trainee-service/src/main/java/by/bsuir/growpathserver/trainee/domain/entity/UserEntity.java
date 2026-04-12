@@ -32,7 +32,12 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = false)
-    private String name;
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    private String patronymicName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -50,6 +55,9 @@ public class UserEntity {
 
     @Column(name = "invited_by")
     private Long invitedBy;
+
+    @Column(name = "keycloak_user_id", length = 64, unique = true)
+    private String keycloakUserId;
 
     @Column(name = "invitation_sent_at")
     private LocalDateTime invitationSentAt;

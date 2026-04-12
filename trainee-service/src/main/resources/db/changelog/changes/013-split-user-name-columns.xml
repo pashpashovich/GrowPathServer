@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="013-split-user-name-columns" author="growpath">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="users"/>
+        <columnExists tableName="users" columnName="name"/>
+        <not>
+          <columnExists tableName="users" columnName="first_name"/>
+        </not>
+      </and>
+    </preConditions>
+
+    <addColumn tableName="users">
+      <column name="first_name" type="VARCHAR(255)"/>
+      <column name="last_name" type="VARCHAR(255)"/>
+      <column name="patronymic_name" type="VARCHAR(255)"/>
+    </addColumn>
+
+    <sql dbms="postgresql">
+      UPDATE users u SET
+        first_name = CASE
+          WHEN cardinality(x.parts) = 1 THEN x.parts[1]
+          WHEN cardinality(x.parts) = 2 THEN x.parts[1]
+          ELSE x.parts[2]
+        END,
+        last_name = CASE
+          WHEN cardinality(x.parts) = 1 THEN x.parts[1]
+          WHEN cardinality(x.parts) = 2 THEN x.parts[2]
+          ELSE x.parts[1]
+        END,
+        patronymic_name = CASE
+          WHEN cardinality(x.parts) &gt; 2 THEN
+            array_to_string(x.parts[3:array_upper(x.parts, 1)], ' ')
+          ELSE NULL
+        END
+      FROM (
+        SELECT id, regexp_split_to_array(btrim(name), '\s+') AS parts
+        FROM users
+        WHERE name IS NOT NULL AND btrim(name) &lt;&gt; ''
+      ) x
+      WHERE u.id = x.id;
+    </sql>
+
+    <sql dbms="postgresql">
+      UPDATE users SET first_name = split_part(email, '@', 1) WHERE first_name IS NULL;
+      UPDATE users SET last_name = 'User' WHERE last_name IS NULL;
+    </sql>
+
+    <addNotNullConstraint tableName="users" columnName="first_name" columnDataType="VARCHAR(255)"/>
+    <addNotNullConstraint tableName="users" columnName="last_name" columnDataType="VARCHAR(255)"/>
+
+    <dropColumn tableName="users" columnName="name"/>
+  </changeSet>
+
+</databaseChangeLog>

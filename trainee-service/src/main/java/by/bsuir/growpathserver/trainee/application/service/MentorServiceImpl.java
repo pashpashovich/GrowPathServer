@@ -42,11 +42,18 @@ public class MentorServiceImpl implements MentorService {
 
             if (query.search() != null && !query.search().isBlank()) {
                 String searchPattern = "%" + query.search().toLowerCase() + "%";
-                Predicate namePredicate = criteriaBuilder.like(
-                        criteriaBuilder.lower(root.get("name")), searchPattern);
+                Predicate firstPredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("firstName")), searchPattern);
+                Predicate lastPredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("lastName")), searchPattern);
+                Predicate patronymicPredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(criteriaBuilder.coalesce(
+                                root.get("patronymicName"), criteriaBuilder.literal(""))),
+                        searchPattern);
                 Predicate emailPredicate = criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("email")), searchPattern);
-                Predicate searchPredicate = criteriaBuilder.or(namePredicate, emailPredicate);
+                Predicate searchPredicate = criteriaBuilder.or(
+                        firstPredicate, lastPredicate, patronymicPredicate, emailPredicate);
                 finalPredicate = criteriaBuilder.and(rolePredicate, searchPredicate);
             }
 

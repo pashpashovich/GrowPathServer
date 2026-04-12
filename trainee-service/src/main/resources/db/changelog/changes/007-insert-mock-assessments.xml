@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-  <changeSet id="007-insert-mock-assessments" author="growpath">
+  <changeSet id="007-insert-mock-assessments" author="Kasovich Pavel">
     <insert tableName="assessments">
       <column name="intern_id" value="7"/>
       <column name="mentor_id" value="4"/>

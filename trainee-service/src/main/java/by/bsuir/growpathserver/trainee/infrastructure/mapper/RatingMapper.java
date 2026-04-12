@@ -4,18 +4,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import by.bsuir.growpathserver.dto.model.RatingListResponse;
 import by.bsuir.growpathserver.dto.model.RatingResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Rating;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RatingMapper {
 
     default RatingResponse toRatingResponse(Rating rating) {
         RatingResponse response = new RatingResponse();
-        response.setId(rating.getId() != null ? String.valueOf(rating.getId()) : null);
-        response.setInternId(String.valueOf(rating.getInternId()));
+        response.setId(rating.getId());
+        response.setInternId(rating.getInternId());
         response.setInternName(rating.getInternName());
         response.setPosition(rating.getPosition());
         response.setMentorName(rating.getMentorName());
@@ -31,7 +34,7 @@ public interface RatingMapper {
         response.setTrend(convertTrend(rating.getTrend()));
         response.setPreviousRating(rating.getPreviousRating());
         response.setRank(rating.getRank());
-        response.setInternshipId(rating.getInternshipId() != null ? String.valueOf(rating.getInternshipId()) : null);
+        response.setInternshipId(rating.getInternshipId());
         return response;
     }
 

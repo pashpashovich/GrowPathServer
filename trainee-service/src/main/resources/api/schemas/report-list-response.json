@@ -7,7 +7,8 @@
         "type": "object",
         "properties": {
           "programId": {
-            "type": "string"
+            "type": "integer",
+            "format": "int64"
           },
           "programTitle": {
             "type": "string"

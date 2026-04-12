@@ -49,7 +49,8 @@ class InviteUserHandlerTest {
         pendingUser = new UserEntity();
         pendingUser.setId(1L);
         pendingUser.setEmail("user@example.com");
-        pendingUser.setName("Test User");
+        pendingUser.setFirstName("Test");
+        pendingUser.setLastName("User");
         pendingUser.setRole(UserRole.INTERN);
         pendingUser.setStatus(UserStatus.PENDING);
         pendingUser.setCreatedAt(LocalDateTime.now());

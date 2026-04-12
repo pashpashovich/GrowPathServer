@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-  <changeSet id="005-fix-user-enum-values" author="growpath">
+  <changeSet id="005-fix-user-enum-values" author="Kasovich Pavel">
     <update tableName="users">
       <column name="role" value="ADMIN"/>
       <where>role = 'admin'</where>

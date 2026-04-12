@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class UserInvitedEvent {
     private String userId;
     private String email;
-    private String userName;
+    private String firstName;
+    private String lastName;
+    private String patronymicName;
     private String registrationToken;
 }

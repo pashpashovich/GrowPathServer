@@ -17,5 +17,7 @@
   <include file="db/changelog/changes/010-create-internship-programs-table.xml"/>
   <include file="db/changelog/changes/011-insert-mock-internship-programs.xml"/>
   <include file="db/changelog/changes/012-create-user-registration-token-table.xml"/>
+  <include file="db/changelog/changes/013-split-user-name-columns.xml"/>
+  <include file="db/changelog/changes/014-add-keycloak-user-id-to-users.xml"/>
 
 </databaseChangeLog>

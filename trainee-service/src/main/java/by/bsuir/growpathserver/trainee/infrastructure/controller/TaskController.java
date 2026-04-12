@@ -61,7 +61,7 @@ public class TaskController implements TasksApi {
             Task task = completeTaskHandler.handle(command);
 
             TaskStatusResponse response = new TaskStatusResponse();
-            response.setId(String.valueOf(task.getId()));
+            response.setId(task.getId());
             response.setStatus(TaskStatusResponse.StatusEnum.fromValue(task.getStatus().getValue()));
             response.setCompletedAt(task.getCompletedAt());
 
@@ -80,9 +80,9 @@ public class TaskController implements TasksApi {
         try {
             // TODO: Get mentorId from JWT token when authentication is properly configured
             Long mentorId = 1L; // Should be extracted from JWT
-            Long assigneeId = createTaskRequest.getAssigneeId() != null ? Long.parseLong(createTaskRequest.getAssigneeId()) : null;
-            Long stageId = createTaskRequest.getStageId() != null ? Long.parseLong(createTaskRequest.getStageId()) : null;
-            Long internshipId = Long.parseLong(createTaskRequest.getInternshipId());
+            Long assigneeId = createTaskRequest.getAssigneeId();
+            Long stageId = createTaskRequest.getStageId();
+            Long internshipId = createTaskRequest.getInternshipId();
             java.time.LocalDateTime dueDate = createTaskRequest.getDueDate();
 
             CreateTaskCommand command = CreateTaskCommand.builder()
@@ -179,7 +179,7 @@ public class TaskController implements TasksApi {
     public ResponseEntity<TaskResponse> updateTask(String id, UpdateTaskRequest updateTaskRequest) {
         try {
             Long taskId = Long.parseLong(id);
-            Long assigneeId = updateTaskRequest.getAssigneeId() != null ? Long.parseLong(updateTaskRequest.getAssigneeId()) : null;
+            Long assigneeId = updateTaskRequest.getAssigneeId();
             java.time.LocalDateTime dueDate = updateTaskRequest.getDueDate();
 
             UpdateTaskCommand command = UpdateTaskCommand.builder()
