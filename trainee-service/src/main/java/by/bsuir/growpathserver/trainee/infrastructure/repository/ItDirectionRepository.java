@@ -12,4 +12,7 @@ public interface ItDirectionRepository extends JpaRepository<ItDirectionEntity, 
 
     List<ItDirectionEntity> findAllByOrderByCodeAsc();
 
+    boolean existsByCodeIgnoreCase(String code);
+
+    boolean existsByCodeIgnoreCaseAndIdNot(String code, Long id);
 }

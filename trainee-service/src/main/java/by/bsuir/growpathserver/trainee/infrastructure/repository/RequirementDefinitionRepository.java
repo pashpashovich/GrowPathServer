@@ -14,4 +14,8 @@ public interface RequirementDefinitionRepository extends JpaRepository<Requireme
     List<RequirementDefinitionEntity> findAllByOrderByRequirementTextAsc();
 
     long countByIdIn(Collection<Long> ids);
+
+    boolean existsByRequirementText(String requirementText);
+
+    boolean existsByRequirementTextAndIdNot(String requirementText, Long id);
 }

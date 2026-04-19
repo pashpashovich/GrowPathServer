@@ -1404,7 +1404,7 @@ paths:
   /competencies:
     get:
       tags:
-        - Competencies
+        - Competencies Catalog
       summary: List catalog competencies for internship programs
       operationId: getCompetenciesCatalog
       security:
@@ -1422,11 +1422,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Competencies Catalog
+      summary: Create competency
+      operationId: createCompetency
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-competency-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/competency-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /competencies/{id}:
+    get:
+      tags:
+        - Competencies Catalog
+      summary: Get competency by id
+      operationId: getCompetencyById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/competency-ref'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Competencies Catalog
+      summary: Update competency
+      operationId: updateCompetency
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-competency-request'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/competency-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - Competencies Catalog
+      summary: Delete competency
+      operationId: deleteCompetency
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
 
   /it-directions:
     get:
       tags:
-        - Internship Program Catalogs
+        - IT Directions Catalog
       summary: List IT directions for internship programs
       operationId: getItDirectionsCatalog
       security:
@@ -1444,11 +1598,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - IT Directions Catalog
+      summary: Create IT direction
+      operationId: createItDirection
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-it-direction-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/it-direction-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /it-directions/{id}:
+    get:
+      tags:
+        - IT Directions Catalog
+      summary: Get IT direction by id
+      operationId: getItDirectionById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/it-direction-ref'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - IT Directions Catalog
+      summary: Update IT direction
+      operationId: updateItDirection
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-it-direction-request'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/it-direction-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - IT Directions Catalog
+      summary: Delete IT direction
+      operationId: deleteItDirection
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
 
   /program-requirement-definitions:
     get:
       tags:
-        - Internship Program Catalogs
+        - Program Requirement Definitions Catalog
       summary: List requirement definitions for internship programs
       operationId: getProgramRequirementDefinitionsCatalog
       security:
@@ -1466,11 +1774,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Program Requirement Definitions Catalog
+      summary: Create requirement definition
+      operationId: createProgramRequirementDefinition
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-requirement-definition-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/requirement-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate text
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /program-requirement-definitions/{id}:
+    get:
+      tags:
+        - Program Requirement Definitions Catalog
+      summary: Get requirement definition by id
+      operationId: getProgramRequirementDefinitionById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/requirement-definition-ref'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Program Requirement Definitions Catalog
+      summary: Update requirement definition
+      operationId: updateProgramRequirementDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-requirement-definition-request'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/requirement-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate text
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - Program Requirement Definitions Catalog
+      summary: Delete requirement definition
+      operationId: deleteProgramRequirementDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
 
   /program-goal-definitions:
     get:
       tags:
-        - Internship Program Catalogs
+        - Program Goal Definitions Catalog
       summary: List program goal definitions for internship programs
       operationId: getProgramGoalDefinitionsCatalog
       security:
@@ -1488,11 +1950,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Program Goal Definitions Catalog
+      summary: Create program goal definition
+      operationId: createProgramGoalDefinition
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-program-goal-definition-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-goal-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate title and description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /program-goal-definitions/{id}:
+    get:
+      tags:
+        - Program Goal Definitions Catalog
+      summary: Get program goal definition by id
+      operationId: getProgramGoalDefinitionById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-goal-definition-ref'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Program Goal Definitions Catalog
+      summary: Update program goal definition
+      operationId: updateProgramGoalDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-program-goal-definition-request'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-goal-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate title and description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - Program Goal Definitions Catalog
+      summary: Delete program goal definition
+      operationId: deleteProgramGoalDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
 
   /program-selection-stage-definitions:
     get:
       tags:
-        - Internship Program Catalogs
+        - Program Selection Stage Definitions Catalog
       summary: List selection stage definitions for internship programs
       operationId: getProgramSelectionStageDefinitionsCatalog
       security:
@@ -1506,6 +2122,160 @@ paths:
                 $ref: '#/components/schemas/selection-stage-definition-catalog-list-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Program Selection Stage Definitions Catalog
+      summary: Create selection stage definition
+      operationId: createProgramSelectionStageDefinition
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-selection-stage-definition-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/selection-stage-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate name, description and active flag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /program-selection-stage-definitions/{id}:
+    get:
+      tags:
+        - Program Selection Stage Definitions Catalog
+      summary: Get selection stage definition by id
+      operationId: getProgramSelectionStageDefinitionById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/selection-stage-definition-ref'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Program Selection Stage Definitions Catalog
+      summary: Update selection stage definition
+      operationId: updateProgramSelectionStageDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-selection-stage-definition-request'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/selection-stage-definition-ref'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Duplicate name, description and active flag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - Program Selection Stage Definitions Catalog
+      summary: Delete selection stage definition
+      operationId: deleteProgramSelectionStageDefinition
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Not found
           content:
             application/json:
               schema:
@@ -2814,6 +3584,10 @@ components:
       $ref: './schemas/competency-ref.json'
     competency-catalog-list-response:
       $ref: './schemas/competency-catalog-list-response.json'
+    create-competency-request:
+      $ref: './schemas/create-competency-request.json'
+    update-competency-request:
+      $ref: './schemas/update-competency-request.json'
     program-goal:
       $ref: './schemas/program-goal.json'
     selection-stage:
@@ -2834,6 +3608,22 @@ components:
       $ref: './schemas/program-goal-definition-catalog-list-response.json'
     selection-stage-definition-catalog-list-response:
       $ref: './schemas/selection-stage-definition-catalog-list-response.json'
+    create-it-direction-request:
+      $ref: './schemas/create-it-direction-request.json'
+    update-it-direction-request:
+      $ref: './schemas/update-it-direction-request.json'
+    create-requirement-definition-request:
+      $ref: './schemas/create-requirement-definition-request.json'
+    update-requirement-definition-request:
+      $ref: './schemas/update-requirement-definition-request.json'
+    create-program-goal-definition-request:
+      $ref: './schemas/create-program-goal-definition-request.json'
+    update-program-goal-definition-request:
+      $ref: './schemas/update-program-goal-definition-request.json'
+    create-selection-stage-definition-request:
+      $ref: './schemas/create-selection-stage-definition-request.json'
+    update-selection-stage-definition-request:
+      $ref: './schemas/update-selection-stage-definition-request.json'
 
     # Roadmap schemas
     roadmap-response:

@@ -14,4 +14,8 @@ public interface CompetencyRepository extends JpaRepository<CompetencyEntity, Lo
     List<CompetencyEntity> findAllByOrderByNameAsc();
 
     long countByIdIn(Collection<Long> ids);
+
+    boolean existsByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }

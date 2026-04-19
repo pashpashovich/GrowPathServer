@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "required": [
+    "code",
+    "displayName"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "displayName": {
+      "type": "string",
+      "maxLength": 200
+    }
+  }
+}
