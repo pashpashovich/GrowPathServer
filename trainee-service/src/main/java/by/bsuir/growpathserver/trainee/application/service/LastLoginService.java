@@ -32,7 +32,7 @@ public class LastLoginService {
                 user = userRepository.findByKeycloakUserId(keycloakSub);
             }
             if (user.isEmpty() && StringUtils.isNotBlank(loginEmail)) {
-                user = userRepository.findByEmail(loginEmail);
+                user = userRepository.findByEmailIgnoreCase(loginEmail.trim());
             }
             if (user.isEmpty()) {
                 return;

@@ -12,7 +12,7 @@ import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
     boolean existsByEmail(String email);
 
-    Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByEmailIgnoreCase(String email);
 
     Optional<UserEntity> findByKeycloakUserId(String keycloakUserId);
 }

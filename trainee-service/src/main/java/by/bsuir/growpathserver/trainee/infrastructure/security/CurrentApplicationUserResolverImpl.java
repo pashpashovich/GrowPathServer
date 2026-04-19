@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import by.bsuir.growpathserver.common.util.JwtUtils;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
@@ -22,21 +23,36 @@ public class CurrentApplicationUserResolverImpl implements CurrentApplicationUse
 
     @Override
     public Optional<Long> resolveCurrentUserDatabaseId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!(auth instanceof JwtAuthenticationToken jwtAuth)) {
+        Optional<Jwt> jwtOpt = extractJwt(SecurityContextHolder.getContext().getAuthentication());
+        if (jwtOpt.isEmpty()) {
             return Optional.empty();
         }
-        Jwt jwt = jwtAuth.getToken();
+        Jwt jwt = jwtOpt.get();
+
         String sub = jwt.getSubject();
         if (StringUtils.isNotBlank(sub)) {
-            Optional<Long> byKeycloak = userRepository.findByKeycloakUserId(sub).map(UserEntity::getId);
+            Optional<Long> byKeycloak = userRepository.findByKeycloakUserId(sub.trim()).map(UserEntity::getId);
             if (byKeycloak.isPresent()) {
                 return byKeycloak;
             }
         }
-        String email = firstNonBlank(jwt.getClaimAsString("email"), jwt.getClaimAsString("preferred_username"));
+
+        String email = firstNonBlank(JwtUtils.getEmail(jwt), JwtUtils.getUsername(jwt));
         if (StringUtils.isNotBlank(email)) {
-            return userRepository.findByEmail(email).map(UserEntity::getId);
+            return userRepository.findByEmailIgnoreCase(email.trim()).map(UserEntity::getId);
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<Jwt> extractJwt(Authentication auth) {
+        if (auth == null) {
+            return Optional.empty();
+        }
+        if (auth instanceof JwtAuthenticationToken jwtAuth) {
+            return Optional.of(jwtAuth.getToken());
+        }
+        if (auth.getPrincipal() instanceof Jwt jwt) {
+            return Optional.of(jwt);
         }
         return Optional.empty();
     }

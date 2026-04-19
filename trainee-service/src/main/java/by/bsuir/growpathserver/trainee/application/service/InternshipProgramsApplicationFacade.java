@@ -6,9 +6,7 @@ import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,9 +46,7 @@ public class InternshipProgramsApplicationFacade {
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
 
     public InternshipProgramResponse createInternshipProgram(CreateInternshipProgramRequest request) {
-        Long createdBy = currentApplicationUserResolver.resolveCurrentUserDatabaseId()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                                                               "Authenticated user is not linked to an application account"));
+        Long createdBy = currentApplicationUserResolver.resolveCurrentUserDatabaseId().orElse(null);
 
         CreateInternshipProgramCommand command = CreateInternshipProgramCommand.builder()
                 .title(request.getTitle())
