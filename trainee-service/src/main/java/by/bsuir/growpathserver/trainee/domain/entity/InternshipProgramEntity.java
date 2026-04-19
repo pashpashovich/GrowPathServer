@@ -2,8 +2,9 @@ package by.bsuir.growpathserver.trainee.domain.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
@@ -19,8 +20,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -53,20 +54,36 @@ public class InternshipProgramEntity {
     @Column(name = "max_places", nullable = false)
     private Integer maxPlaces;
 
-    @Column(name = "it_direction")
-    private String itDirection;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "it_direction_id")
+    private ItDirectionEntity itDirection;
 
-    @OneToMany(mappedBy = "internshipProgram", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
-    private Set<InternshipProgramRequirementEntity> requirementItems = new LinkedHashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "internship_program_requirements",
+            joinColumns = @JoinColumn(name = "internship_program_id"),
+            inverseJoinColumns = @JoinColumn(name = "requirement_definition_id")
+    )
+    @OrderColumn(name = "requirement_ord")
+    private List<RequirementDefinitionEntity> requirementDefinitions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "internshipProgram", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
-    private Set<InternshipProgramGoalEntity> goalItems = new LinkedHashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "internship_program_goals",
+            joinColumns = @JoinColumn(name = "internship_program_id"),
+            inverseJoinColumns = @JoinColumn(name = "program_goal_definition_id")
+    )
+    @OrderColumn(name = "goal_ord")
+    private List<ProgramGoalDefinitionEntity> goalDefinitions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "internshipProgram", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
-    private Set<InternshipProgramSelectionStageEntity> selectionStageItems = new LinkedHashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "internship_program_selection_stages",
+            joinColumns = @JoinColumn(name = "internship_program_id"),
+            inverseJoinColumns = @JoinColumn(name = "selection_stage_definition_id")
+    )
+    @OrderColumn(name = "stage_ord")
+    private List<SelectionStageDefinitionEntity> selectionStageDefinitions = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

@@ -9,10 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,13 +26,18 @@ import by.bsuir.growpathserver.trainee.application.service.impl.InternshipProgra
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramRequirementEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.RequirementDefinitionEntity;
 import by.bsuir.growpathserver.trainee.domain.exception.DuplicateInternshipProgramTitleException;
 import by.bsuir.growpathserver.trainee.domain.exception.InternshipProgramLockedException;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternshipProgramEntityMapperImpl;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.CompetencyRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ItDirectionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ProgramGoalDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.RequirementDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.SelectionStageDefinitionRepository;
 
 @ExtendWith(MockitoExtension.class)
 class InternshipProgramServiceImplTest {
@@ -43,23 +48,46 @@ class InternshipProgramServiceImplTest {
     @Mock
     private CompetencyRepository competencyRepository;
 
+    @Mock
+    private RequirementDefinitionRepository requirementDefinitionRepository;
+
+    @Mock
+    private ProgramGoalDefinitionRepository programGoalDefinitionRepository;
+
+    @Mock
+    private SelectionStageDefinitionRepository selectionStageDefinitionRepository;
+
+    @Mock
+    private ItDirectionRepository itDirectionRepository;
+
     private InternshipProgramServiceImpl internshipProgramService;
 
     private InternshipProgramEntity existingProgramEntity;
     private LocalDate startDate;
     private CompetencyEntity competency;
+    private ItDirectionEntity backendDirection;
 
     @BeforeEach
     void setUp() {
         internshipProgramService = new InternshipProgramServiceImpl(
                 repository,
                 competencyRepository,
-                new InternshipProgramEntityMapperImpl());
+                requirementDefinitionRepository,
+                programGoalDefinitionRepository,
+                selectionStageDefinitionRepository,
+                itDirectionRepository,
+                new InternshipProgramEntityMapperImpl()
+        );
 
         startDate = LocalDate.now().plusMonths(1);
         competency = new CompetencyEntity();
         competency.setId(10L);
         competency.setName("Java");
+
+        backendDirection = new ItDirectionEntity();
+        backendDirection.setId(1L);
+        backendDirection.setCode("BACKEND");
+        backendDirection.setDisplayName("Backend");
 
         existingProgramEntity = new InternshipProgramEntity();
         existingProgramEntity.setId(1L);
@@ -69,39 +97,30 @@ class InternshipProgramServiceImplTest {
         existingProgramEntity.setDuration(3);
         existingProgramEntity.setMaxPlaces(20);
         existingProgramEntity.setStatus(InternshipProgramStatus.ACTIVE);
-        addRequirement(existingProgramEntity, "Java");
-        addRequirement(existingProgramEntity, "Spring");
+        RequirementDefinitionEntity req1 = new RequirementDefinitionEntity();
+        req1.setId(20L);
+        req1.setRequirementText("Java");
+        RequirementDefinitionEntity req2 = new RequirementDefinitionEntity();
+        req2.setId(21L);
+        req2.setRequirementText("Spring");
+        existingProgramEntity.getRequirementDefinitions().add(req1);
+        existingProgramEntity.getRequirementDefinitions().add(req2);
         existingProgramEntity.getCompetencies().add(competency);
-    }
-
-    private static void addRequirement(InternshipProgramEntity program, String text) {
-        InternshipProgramRequirementEntity row = new InternshipProgramRequirementEntity();
-        row.setInternshipProgram(program);
-        row.setRequirementText(text);
-        program.getRequirementItems().add(row);
     }
 
     @Test
     void shouldCreateInternshipProgramSuccessfully() {
-        List<String> requirements = List.of("Java", "Spring Boot");
-        CreateInternshipProgramCommand.ProgramGoal goal = new CreateInternshipProgramCommand.ProgramGoal(
-                "Learn Spring", "Master Spring Framework");
-        List<CreateInternshipProgramCommand.ProgramGoal> goals = List.of(goal);
-        CreateInternshipProgramCommand.SelectionStage stage = new CreateInternshipProgramCommand.SelectionStage(
-                "Interview", "Technical interview", 1);
-        List<CreateInternshipProgramCommand.SelectionStage> stages = List.of(stage);
-
         CreateInternshipProgramCommand command = CreateInternshipProgramCommand.builder()
                 .title("New Internship")
                 .description("New Description")
                 .startDate(startDate)
                 .duration(6)
                 .maxPlaces(15)
-                .itDirection("BACKEND")
+                .itDirectionId(1L)
                 .competencyIds(List.of(10L))
-                .requirements(requirements)
-                .goals(goals)
-                .selectionStages(stages)
+                .requirementIds(List.of(20L, 21L))
+                .goalIds(null)
+                .selectionStageIds(null)
                 .status(InternshipProgramStatus.ACTIVE)
                 .createdBy(1L)
                 .build();
@@ -109,6 +128,15 @@ class InternshipProgramServiceImplTest {
         when(repository.existsByTitleIgnoreCase("New Internship")).thenReturn(false);
         when(competencyRepository.countByIdIn(List.of(10L))).thenReturn(1L);
         when(competencyRepository.findAllById(List.of(10L))).thenReturn(List.of(competency));
+        when(itDirectionRepository.findById(1L)).thenReturn(Optional.of(backendDirection));
+        RequirementDefinitionEntity r20 = new RequirementDefinitionEntity();
+        r20.setId(20L);
+        r20.setRequirementText("Java");
+        RequirementDefinitionEntity r21 = new RequirementDefinitionEntity();
+        r21.setId(21L);
+        r21.setRequirementText("Spring");
+        when(requirementDefinitionRepository.countByIdIn(List.of(20L, 21L))).thenReturn(2L);
+        when(requirementDefinitionRepository.findAllById(List.of(20L, 21L))).thenReturn(List.of(r20, r21));
         when(repository.save(any(InternshipProgramEntity.class))).thenAnswer(invocation -> {
             InternshipProgramEntity entity = invocation.getArgument(0);
             entity.setId(1L);
@@ -133,11 +161,11 @@ class InternshipProgramServiceImplTest {
                 .startDate(startDate)
                 .duration(3)
                 .maxPlaces(10)
-                .itDirection(null)
+                .itDirectionId(null)
                 .competencyIds(null)
-                .requirements(null)
-                .goals(null)
-                .selectionStages(null)
+                .requirementIds(null)
+                .goalIds(null)
+                .selectionStageIds(null)
                 .status(InternshipProgramStatus.ACTIVE)
                 .createdBy(1L)
                 .build();
@@ -165,9 +193,9 @@ class InternshipProgramServiceImplTest {
                 .duration(3)
                 .maxPlaces(10)
                 .competencyIds(null)
-                .requirements(null)
-                .goals(null)
-                .selectionStages(null)
+                .requirementIds(null)
+                .goalIds(null)
+                .selectionStageIds(null)
                 .status(InternshipProgramStatus.ACTIVE)
                 .createdBy(1L)
                 .build();
@@ -175,7 +203,7 @@ class InternshipProgramServiceImplTest {
         when(repository.existsByTitleIgnoreCase("Dup")).thenReturn(true);
 
         assertThrows(DuplicateInternshipProgramTitleException.class,
-                () -> internshipProgramService.createInternshipProgram(command));
+                     () -> internshipProgramService.createInternshipProgram(command));
         verify(repository, never()).save(any());
     }
 
@@ -189,10 +217,10 @@ class InternshipProgramServiceImplTest {
                 .duration(6)
                 .maxPlaces(25)
                 .status(InternshipProgramStatus.COMPLETED)
-                .requirements(null)
-                .goals(null)
+                .requirementIds(null)
+                .goalIds(null)
                 .competencyIds(null)
-                .selectionStages(null)
+                .selectionStageIds(null)
                 .build();
 
         when(repository.findWithCollectionsById(1L)).thenReturn(Optional.of(existingProgramEntity));
@@ -220,10 +248,10 @@ class InternshipProgramServiceImplTest {
                 .duration(null)
                 .maxPlaces(null)
                 .status(null)
-                .requirements(null)
-                .goals(null)
+                .requirementIds(null)
+                .goalIds(null)
                 .competencyIds(null)
-                .selectionStages(null)
+                .selectionStageIds(null)
                 .build();
 
         when(repository.findWithCollectionsById(1L)).thenReturn(Optional.of(existingProgramEntity));
@@ -239,8 +267,10 @@ class InternshipProgramServiceImplTest {
     }
 
     @Test
-    void shouldUpdateInternshipProgramWithStructuredRequirements() {
-        List<String> requirements = List.of("Updated Requirement");
+    void shouldUpdateInternshipProgramWithStructuredRequirementIds() {
+        RequirementDefinitionEntity updated = new RequirementDefinitionEntity();
+        updated.setId(99L);
+        updated.setRequirementText("Updated Requirement");
         UpdateInternshipProgramCommand command = UpdateInternshipProgramCommand.builder()
                 .id(1L)
                 .title(null)
@@ -249,23 +279,24 @@ class InternshipProgramServiceImplTest {
                 .duration(null)
                 .maxPlaces(null)
                 .status(null)
-                .requirements(requirements)
-                .goals(null)
+                .requirementIds(List.of(99L))
+                .goalIds(null)
                 .competencyIds(null)
-                .selectionStages(null)
+                .selectionStageIds(null)
                 .build();
 
         when(repository.findWithCollectionsById(1L)).thenReturn(Optional.of(existingProgramEntity));
+        when(requirementDefinitionRepository.countByIdIn(List.of(99L))).thenReturn(1L);
+        when(requirementDefinitionRepository.findAllById(List.of(99L))).thenReturn(List.of(updated));
         when(repository.save(any(InternshipProgramEntity.class))).thenReturn(existingProgramEntity);
 
         InternshipProgram result = internshipProgramService.updateInternshipProgram(command);
 
         assertNotNull(result);
-        List<String> texts = existingProgramEntity.getRequirementItems().stream()
-                .sorted(Comparator.comparingLong(InternshipProgramRequirementEntity::getId))
-                .map(InternshipProgramRequirementEntity::getRequirementText)
-                .toList();
-        assertEquals(List.of("Updated Requirement"), texts);
+        assertEquals(1, existingProgramEntity.getRequirementDefinitions().size());
+        assertEquals(99L, existingProgramEntity.getRequirementDefinitions().get(0).getId());
+        assertEquals("Updated Requirement",
+                     existingProgramEntity.getRequirementDefinitions().get(0).getRequirementText());
         verify(repository).findWithCollectionsById(1L);
         verify(repository).save(any(InternshipProgramEntity.class));
     }
@@ -281,7 +312,7 @@ class InternshipProgramServiceImplTest {
         when(repository.findWithCollectionsById(1L)).thenReturn(Optional.of(existingProgramEntity));
 
         assertThrows(InternshipProgramLockedException.class,
-                () -> internshipProgramService.updateInternshipProgram(command));
+                     () -> internshipProgramService.updateInternshipProgram(command));
         verify(repository, never()).save(any());
     }
 
@@ -312,7 +343,7 @@ class InternshipProgramServiceImplTest {
         when(repository.findWithCollectionsById(999L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class,
-                () -> internshipProgramService.updateInternshipProgram(command));
+                     () -> internshipProgramService.updateInternshipProgram(command));
         verify(repository).findWithCollectionsById(999L);
         verify(repository, never()).save(any());
     }
@@ -336,7 +367,7 @@ class InternshipProgramServiceImplTest {
         when(repository.existsById(999L)).thenReturn(false);
 
         assertThrows(NoSuchElementException.class,
-                () -> internshipProgramService.deleteInternshipProgram(command));
+                     () -> internshipProgramService.deleteInternshipProgram(command));
         verify(repository).existsById(999L);
         verify(repository, never()).deleteById(any());
     }
@@ -359,7 +390,7 @@ class InternshipProgramServiceImplTest {
         when(repository.findWithCollectionsById(999L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class,
-                () -> internshipProgramService.getInternshipProgramById(999L));
+                     () -> internshipProgramService.getInternshipProgramById(999L));
         verify(repository).findWithCollectionsById(999L);
     }
 }

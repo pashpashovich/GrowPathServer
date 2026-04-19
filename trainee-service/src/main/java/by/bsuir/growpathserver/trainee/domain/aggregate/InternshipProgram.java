@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramGoalEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramRequirementEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramSelectionStageEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.SelectionStageDefinitionEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 import lombok.Getter;
 
@@ -23,9 +23,9 @@ public class InternshipProgram {
     private final LocalDate startDate;
     private final Integer duration;
     private final Integer maxPlaces;
-    private final List<String> requirements;
+    private final List<ProgramRequirement> requirementRefs;
     private final List<InternshipProgramGoalItem> goals;
-    private final String itDirection;
+    private final ProgramItDirection itDirectionRef;
     private final List<ProgramCompetency> competencyRefs;
     private final List<InternshipProgramStageItem> selectionStages;
     private final InternshipProgramStatus status;
@@ -41,9 +41,9 @@ public class InternshipProgram {
         this.startDate = entity.getStartDate();
         this.duration = entity.getDuration();
         this.maxPlaces = entity.getMaxPlaces();
-        this.requirements = mapRequirements(entity);
+        this.requirementRefs = mapRequirementRefs(entity);
         this.goals = mapGoals(entity);
-        this.itDirection = entity.getItDirection();
+        this.itDirectionRef = mapItDirection(entity.getItDirection());
         this.competencyRefs = mapCompetencies(entity.getCompetencies());
         this.selectionStages = mapSelectionStages(entity);
         this.status = entity.getStatus();
@@ -53,27 +53,30 @@ public class InternshipProgram {
         this.internships = entity.getInternships();
     }
 
-    private static List<String> mapRequirements(InternshipProgramEntity entity) {
-        return entity.getRequirementItems().stream()
-                .sorted(Comparator.comparingLong(InternshipProgramRequirementEntity::getId))
-                .map(InternshipProgramRequirementEntity::getRequirementText)
+    private static List<ProgramRequirement> mapRequirementRefs(InternshipProgramEntity entity) {
+        return entity.getRequirementDefinitions().stream()
+                .map(r -> new ProgramRequirement(r.getId(), r.getRequirementText()))
                 .toList();
     }
 
     private static List<InternshipProgramGoalItem> mapGoals(InternshipProgramEntity entity) {
-        return entity.getGoalItems().stream()
-                .sorted(Comparator.comparingLong(InternshipProgramGoalEntity::getId))
+        return entity.getGoalDefinitions().stream()
                 .map(g -> new InternshipProgramGoalItem(g.getId(), g.getTitle(), g.getDescription()))
                 .toList();
     }
 
+    private static ProgramItDirection mapItDirection(ItDirectionEntity entity) {
+        if (Objects.isNull(entity)) {
+            return null;
+        }
+        return new ProgramItDirection(entity.getId(), entity.getCode(), entity.getDisplayName());
+    }
+
     private static List<InternshipProgramStageItem> mapSelectionStages(InternshipProgramEntity entity) {
-        List<InternshipProgramSelectionStageEntity> ordered = entity.getSelectionStageItems().stream()
-                .sorted(Comparator.comparingLong(InternshipProgramSelectionStageEntity::getId))
-                .toList();
+        List<SelectionStageDefinitionEntity> ordered = entity.getSelectionStageDefinitions();
         List<InternshipProgramStageItem> out = new ArrayList<>();
         for (int i = 0; i < ordered.size(); i++) {
-            InternshipProgramSelectionStageEntity s = ordered.get(i);
+            SelectionStageDefinitionEntity s = ordered.get(i);
             out.add(new InternshipProgramStageItem(
                     s.getId(),
                     s.getName(),

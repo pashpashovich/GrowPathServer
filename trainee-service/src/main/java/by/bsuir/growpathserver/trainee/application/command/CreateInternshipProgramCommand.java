@@ -13,17 +13,12 @@ public record CreateInternshipProgramCommand(
         LocalDate startDate,
         Integer duration,
         Integer maxPlaces,
-        String itDirection,
+        Long itDirectionId,
         List<Long> competencyIds,
-        List<String> requirements,
-        List<ProgramGoal> goals,
-        List<SelectionStage> selectionStages,
+        List<Long> requirementIds,
+        List<Long> goalIds,
+        List<Long> selectionStageIds,
         InternshipProgramStatus status,
         Long createdBy
 ) {
-    public record ProgramGoal(String title, String description) {
-    }
-
-    public record SelectionStage(String name, String description, Integer order) {
-    }
 }

@@ -83,6 +83,22 @@ spring:
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/competencies/**
+            - id: it-directions
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/it-directions/**
+            - id: program-requirement-definitions
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/program-requirement-definitions/**
+            - id: program-goal-definitions
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/program-goal-definitions/**
+            - id: program-selection-stage-definitions
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/program-selection-stage-definitions/**
             - id: roadmaps-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +33,13 @@ import by.bsuir.growpathserver.dto.model.UpdateInternshipProgramRequest;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.RequirementDefinitionEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.CompetencyRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ItDirectionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.RequirementDefinitionRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,6 +58,12 @@ class InternshipProgramControllerIntegrationTest {
     private CompetencyRepository competencyRepository;
 
     @Autowired
+    private RequirementDefinitionRepository requirementDefinitionRepository;
+
+    @Autowired
+    private ItDirectionRepository itDirectionRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @MockitoBean
@@ -62,6 +71,8 @@ class InternshipProgramControllerIntegrationTest {
 
     private InternshipProgramEntity testProgram;
     private Long competencyId;
+    private Long requirementDefinitionId;
+    private Long itDirectionId;
 
     @BeforeEach
     void setUp() {
@@ -69,11 +80,24 @@ class InternshipProgramControllerIntegrationTest {
 
         repository.deleteAll();
         competencyRepository.deleteAll();
+        requirementDefinitionRepository.deleteAll();
+        itDirectionRepository.deleteAll();
 
         CompetencyEntity competency = new CompetencyEntity();
         competency.setName("Java");
         competency = competencyRepository.saveAndFlush(competency);
         competencyId = competency.getId();
+
+        RequirementDefinitionEntity reqDef = new RequirementDefinitionEntity();
+        reqDef.setRequirementText("Java knowledge");
+        reqDef = requirementDefinitionRepository.saveAndFlush(reqDef);
+        requirementDefinitionId = reqDef.getId();
+
+        ItDirectionEntity direction = new ItDirectionEntity();
+        direction.setCode("BACKEND");
+        direction.setDisplayName("Backend");
+        direction = itDirectionRepository.saveAndFlush(direction);
+        itDirectionId = direction.getId();
 
         testProgram = new InternshipProgramEntity();
         testProgram.setTitle("Test Program");
@@ -85,6 +109,7 @@ class InternshipProgramControllerIntegrationTest {
         testProgram.setCreatedBy(1L);
         testProgram.setCreatedAt(LocalDateTime.now());
         testProgram.setUpdatedAt(LocalDateTime.now());
+        testProgram.setItDirection(direction);
         testProgram.getCompetencies().add(competency);
         testProgram = repository.saveAndFlush(testProgram);
     }
@@ -183,7 +208,8 @@ class InternshipProgramControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").value(testProgram.getId().intValue()))
                 .andExpect(jsonPath("$.title").value("Test Program"))
                 .andExpect(jsonPath("$.description").value("Test Description"))
-                .andExpect(jsonPath("$.competencyRefs[0].name").value("Java"));
+                .andExpect(jsonPath("$.competencyRefs[0].name").value("Java"))
+                .andExpect(jsonPath("$.itDirectionRef.code").value("BACKEND"));
     }
 
     @Test
@@ -203,17 +229,8 @@ class InternshipProgramControllerIntegrationTest {
         request.setMaxPlaces(20);
         request.setStatus(CreateInternshipProgramRequest.StatusEnum.ACTIVE);
         request.setCompetencyIds(List.of(competencyId));
-
-        List<String> requirements = new ArrayList<>();
-        requirements.add("Java knowledge");
-        request.setRequirements(requirements);
-
-        List<Object> goals = new ArrayList<>();
-        by.bsuir.growpathserver.dto.model.ProgramGoal goal = new by.bsuir.growpathserver.dto.model.ProgramGoal();
-        goal.setTitle("Learn Spring Boot");
-        goal.setDescription("Master Spring Boot framework");
-        goals.add(goal);
-        request.setGoals(goals);
+        request.setItDirectionId(itDirectionId);
+        request.setRequirementIds(List.of(requirementDefinitionId));
 
         mockMvc.perform(post("/api/v1/internship-programs")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -274,5 +291,14 @@ class InternshipProgramControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].name").value("Java"));
+    }
+
+    @Test
+    void shouldListItDirectionsCatalog() throws Exception {
+        mockMvc.perform(get("/api/v1/it-directions")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0].code").value("BACKEND"));
     }
 }

@@ -14,6 +14,7 @@ import by.bsuir.growpathserver.trainee.application.query.GetInternshipProgramsQu
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
 import jakarta.persistence.criteria.Join;
@@ -82,10 +83,11 @@ public class GetInternshipProgramsHandler {
                 .filter(d -> !d.isBlank())
                 .map(String::trim)
                 .map(String::toLowerCase)
-                .map(dir -> (Specification<InternshipProgramEntity>) (root, cq, cb) -> cb.and(
-                        cb.isNotNull(root.get("itDirection")),
-                        cb.equal(cb.lower(root.get("itDirection")), dir)
-                ));
+                .map(dir -> (Specification<InternshipProgramEntity>) (root, cq, cb) -> {
+                    Join<InternshipProgramEntity, ItDirectionEntity> join =
+                            root.join("itDirection", JoinType.INNER);
+                    return cb.equal(cb.lower(join.get("code")), dir);
+                });
     }
 
     private static Optional<Specification<InternshipProgramEntity>> startDateFromSpecification(

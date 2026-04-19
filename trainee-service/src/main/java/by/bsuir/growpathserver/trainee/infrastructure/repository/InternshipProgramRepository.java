@@ -22,17 +22,19 @@ public interface InternshipProgramRepository
 
     @EntityGraph(attributePaths = {
             "competencies",
-            "requirementItems",
-            "goalItems",
-            "selectionStageItems"
+            "requirementDefinitions",
+            "goalDefinitions",
+            "selectionStageDefinitions",
+            "itDirection"
     })
     Optional<InternshipProgramEntity> findWithCollectionsById(Long id);
 
     @EntityGraph(attributePaths = {
             "competencies",
-            "requirementItems",
-            "goalItems",
-            "selectionStageItems"
+            "requirementDefinitions",
+            "goalDefinitions",
+            "selectionStageDefinitions",
+            "itDirection"
     })
     Page<InternshipProgramEntity> findAll(Specification<InternshipProgramEntity> spec, Pageable pageable);
 }

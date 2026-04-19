@@ -19,8 +19,9 @@
     "maxPlaces": {
       "type": "integer"
     },
-    "itDirection": {
-      "type": "string"
+    "itDirectionId": {
+      "type": "integer",
+      "format": "int64"
     },
     "competencyIds": {
       "type": "array",
@@ -29,22 +30,25 @@
         "format": "int64"
       }
     },
-    "requirements": {
+    "requirementIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "integer",
+        "format": "int64"
       }
     },
-    "goals": {
+    "goalIds": {
       "type": "array",
       "items": {
-        "$ref": "./program-goal.json"
+        "type": "integer",
+        "format": "int64"
       }
     },
-    "selectionStages": {
+    "selectionStageIds": {
       "type": "array",
       "items": {
-        "$ref": "./selection-stage.json"
+        "type": "integer",
+        "format": "int64"
       }
     },
     "status": {

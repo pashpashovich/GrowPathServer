@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
@@ -18,18 +19,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import by.bsuir.growpathserver.dto.model.CompetencyRef;
 import by.bsuir.growpathserver.dto.model.InternshipProgramResponse;
+import by.bsuir.growpathserver.dto.model.ItDirectionRef;
 import by.bsuir.growpathserver.dto.model.ProgramGoal;
+import by.bsuir.growpathserver.dto.model.RequirementDefinitionRef;
 import by.bsuir.growpathserver.dto.model.SelectionStage;
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgramGoalItem;
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgramStageItem;
 import by.bsuir.growpathserver.trainee.domain.aggregate.ProgramCompetency;
+import by.bsuir.growpathserver.trainee.domain.aggregate.ProgramItDirection;
+import by.bsuir.growpathserver.trainee.domain.aggregate.ProgramRequirement;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface InternshipProgramMapper {
 
-    @Mapping(target = "requirements", ignore = true)
+    @Mapping(target = "requirementRefs", ignore = true)
+    @Mapping(target = "itDirectionRef", ignore = true)
     @Mapping(target = "goals", ignore = true)
     @Mapping(target = "competencyRefs", ignore = true)
     @Mapping(target = "selectionStages", ignore = true)
@@ -42,26 +48,45 @@ public interface InternshipProgramMapper {
     default void mapJsonFields(InternshipProgram program, @MappingTarget InternshipProgramResponse response,
                                @Context ObjectMapper objectMapper) {
         response.setStatus(InternshipProgramResponse.StatusEnum.fromValue(program.getStatus().getValue()));
-        response.setRequirements(program.getRequirements().isEmpty() ? null : new ArrayList<>(program.getRequirements()));
-        response.setGoals(toProgramGoalPayload(program.getGoals()));
-        response.setCompetencyRefs(toCompetencyRefPayload(program));
-        response.setSelectionStages(toSelectionStagePayload(program.getSelectionStages()));
+        response.setItDirectionRef(toItDirectionRef(program.getItDirectionRef()));
+        response.setRequirementRefs(toRequirementRefs(program.getRequirementRefs()));
+        response.setGoals(toProgramGoals(program.getGoals()));
+        response.setCompetencyRefs(toCompetencyRefs(program));
+        response.setSelectionStages(toSelectionStages(program.getSelectionStages()));
         response.setInternships(parseStringList(program.getInternships(), objectMapper));
     }
 
-    private static List<Object> toCompetencyRefPayload(InternshipProgram program) {
-        List<Object> refs = new ArrayList<>();
+    private static ItDirectionRef toItDirectionRef(ProgramItDirection ref) {
+        if (Objects.isNull(ref)) {
+            return null;
+        }
+        return new ItDirectionRef(ref.id(), ref.code(), ref.displayName());
+    }
+
+    private static List<RequirementDefinitionRef> toRequirementRefs(List<ProgramRequirement> refs) {
+        if (CollectionUtils.isEmpty(refs)) {
+            return null;
+        }
+        List<RequirementDefinitionRef> out = new ArrayList<>();
+        for (ProgramRequirement r : refs) {
+            out.add(new RequirementDefinitionRef(r.id(), r.requirementText()));
+        }
+        return out;
+    }
+
+    private static List<CompetencyRef> toCompetencyRefs(InternshipProgram program) {
+        List<CompetencyRef> refs = new ArrayList<>();
         for (ProgramCompetency c : program.getCompetencyRefs()) {
             refs.add(new CompetencyRef(c.id(), c.name()));
         }
         return refs;
     }
 
-    private static List<Object> toProgramGoalPayload(List<InternshipProgramGoalItem> goals) {
+    private static List<ProgramGoal> toProgramGoals(List<InternshipProgramGoalItem> goals) {
         if (Objects.isNull(goals) || goals.isEmpty()) {
             return null;
         }
-        List<Object> out = new ArrayList<>();
+        List<ProgramGoal> out = new ArrayList<>();
         for (InternshipProgramGoalItem g : goals) {
             ProgramGoal dto = new ProgramGoal();
             dto.setId(g.id());
@@ -72,11 +97,11 @@ public interface InternshipProgramMapper {
         return out;
     }
 
-    private static List<Object> toSelectionStagePayload(List<InternshipProgramStageItem> stages) {
+    private static List<SelectionStage> toSelectionStages(List<InternshipProgramStageItem> stages) {
         if (Objects.isNull(stages) || stages.isEmpty()) {
             return null;
         }
-        List<Object> out = new ArrayList<>();
+        List<SelectionStage> out = new ArrayList<>();
         for (InternshipProgramStageItem s : stages) {
             SelectionStage dto = new SelectionStage();
             dto.setId(s.id());

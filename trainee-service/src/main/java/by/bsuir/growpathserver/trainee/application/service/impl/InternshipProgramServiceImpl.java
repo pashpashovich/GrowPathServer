@@ -15,9 +15,14 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.exception.DuplicateInternshipProgramTitleException;
 import by.bsuir.growpathserver.trainee.domain.validator.InternshipProgramValidator;
+import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternshipProgramCatalogRepositories;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternshipProgramEntityMapper;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.CompetencyRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ItDirectionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ProgramGoalDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.RequirementDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.SelectionStageDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,7 +31,21 @@ public class InternshipProgramServiceImpl implements InternshipProgramService {
 
     private final InternshipProgramRepository repository;
     private final CompetencyRepository competencyRepository;
+    private final RequirementDefinitionRepository requirementDefinitionRepository;
+    private final ProgramGoalDefinitionRepository programGoalDefinitionRepository;
+    private final SelectionStageDefinitionRepository selectionStageDefinitionRepository;
+    private final ItDirectionRepository itDirectionRepository;
     private final InternshipProgramEntityMapper internshipProgramEntityMapper;
+
+    private InternshipProgramCatalogRepositories catalogRepositories() {
+        return new InternshipProgramCatalogRepositories(
+                competencyRepository,
+                requirementDefinitionRepository,
+                programGoalDefinitionRepository,
+                selectionStageDefinitionRepository,
+                itDirectionRepository
+        );
+    }
 
     @Transactional
     @Override
@@ -40,7 +59,8 @@ public class InternshipProgramServiceImpl implements InternshipProgramService {
             throw new DuplicateInternshipProgramTitleException();
         }
 
-        InternshipProgramEntity entity = internshipProgramEntityMapper.toNewEntity(command, title, competencyRepository);
+        InternshipProgramEntity entity = internshipProgramEntityMapper.toNewEntity(command, title,
+                                                                                   catalogRepositories());
         InternshipProgramEntity savedEntity = repository.save(entity);
         return InternshipProgram.fromEntity(savedEntity);
     }
@@ -70,7 +90,7 @@ public class InternshipProgramServiceImpl implements InternshipProgramService {
             }
         }
 
-        internshipProgramEntityMapper.applyUpdate(command, entity, competencyRepository);
+        internshipProgramEntityMapper.applyUpdate(command, entity, catalogRepositories());
 
         InternshipProgramEntity savedEntity = repository.save(entity);
         return InternshipProgram.fromEntity(savedEntity);

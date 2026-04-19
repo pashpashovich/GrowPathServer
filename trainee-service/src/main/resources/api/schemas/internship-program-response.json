@@ -23,13 +23,13 @@
     "maxPlaces": {
       "type": "integer"
     },
-    "itDirection": {
-      "type": "string"
+    "itDirectionRef": {
+      "$ref": "./it-direction-ref.json"
     },
-    "requirements": {
+    "requirementRefs": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "./requirement-definition-ref.json"
       }
     },
     "goals": {

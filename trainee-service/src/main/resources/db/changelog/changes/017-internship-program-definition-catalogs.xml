@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+  <changeSet id="017-01-rename-legacy-requirement-rows" author="Kasovich Pavel">
+    <renameTable oldTableName="internship_program_requirements" newTableName="internship_program_requirements_legacy"/>
+  </changeSet>
+  <changeSet id="017-02-create-requirement-definitions" author="Kasovich Pavel">
+    <createTable tableName="requirement_definitions">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="requirement_text" type="TEXT">
+        <constraints nullable="false" unique="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="017-03-seed-requirement-definitions-from-legacy" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO requirement_definitions (requirement_text)
+      SELECT DISTINCT requirement_text
+      FROM internship_program_requirements_legacy
+      WHERE requirement_text IS NOT NULL;
+    </sql>
+  </changeSet>
+  <changeSet id="017-04-create-internship-program-requirements-join" author="Kasovich Pavel">
+    <createTable tableName="internship_program_requirements">
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="requirement_definition_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="requirement_ord" type="INT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="internship_program_requirements"
+                   columnNames="internship_program_id, requirement_ord"
+                   constraintName="pk_ip_requirements"/>
+    <createIndex indexName="uq_ip_requirements_program_def" tableName="internship_program_requirements" unique="true">
+      <column name="internship_program_id"/>
+      <column name="requirement_definition_id"/>
+    </createIndex>
+    <addForeignKeyConstraint baseTableName="internship_program_requirements"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipr_program"
+                             onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="internship_program_requirements"
+                             baseColumnNames="requirement_definition_id"
+                             referencedTableName="requirement_definitions"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipr_requirement_def"
+                             onDelete="CASCADE"/>
+  </changeSet>
+  <changeSet id="017-05-migrate-internship-program-requirements" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO internship_program_requirements (internship_program_id, requirement_definition_id, requirement_ord)
+      SELECT internship_program_id,
+             requirement_definition_id,
+             ROW_NUMBER() OVER (PARTITION BY internship_program_id ORDER BY min_legacy_id) - 1
+      FROM (SELECT l.internship_program_id, d.id AS requirement_definition_id, MIN(l.id) AS min_legacy_id
+            FROM internship_program_requirements_legacy l
+                   JOIN requirement_definitions d ON d.requirement_text = l.requirement_text
+            GROUP BY l.internship_program_id, d.id) t;
+    </sql>
+  </changeSet>
+  <changeSet id="017-06-drop-requirements-legacy" author="Kasovich Pavel">
+    <dropTable tableName="internship_program_requirements_legacy"/>
+  </changeSet>
+  <changeSet id="017-07-rename-legacy-goals" author="Kasovich Pavel">
+    <renameTable oldTableName="internship_program_goals" newTableName="internship_program_goals_legacy"/>
+  </changeSet>
+  <changeSet id="017-08-create-program-goal-definitions" author="Kasovich Pavel">
+    <createTable tableName="program_goal_definitions">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(500)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+    </createTable>
+  </changeSet>
+  <changeSet id="017-09-seed-program-goal-definitions" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO program_goal_definitions (title, description)
+      SELECT DISTINCT title, description
+      FROM internship_program_goals_legacy;
+    </sql>
+  </changeSet>
+  <changeSet id="017-10-create-internship-program-goals-join" author="Kasovich Pavel">
+    <createTable tableName="internship_program_goals">
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="program_goal_definition_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="goal_ord" type="INT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="internship_program_goals"
+                   columnNames="internship_program_id, goal_ord"
+                   constraintName="pk_ip_goals"/>
+    <createIndex indexName="uq_ip_goals_program_goal" tableName="internship_program_goals" unique="true">
+      <column name="internship_program_id"/>
+      <column name="program_goal_definition_id"/>
+    </createIndex>
+    <addForeignKeyConstraint baseTableName="internship_program_goals"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipg_program"
+                             onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="internship_program_goals"
+                             baseColumnNames="program_goal_definition_id"
+                             referencedTableName="program_goal_definitions"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipg_goal_def"
+                             onDelete="CASCADE"/>
+  </changeSet>
+  <changeSet id="017-11-migrate-internship-program-goals" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO internship_program_goals (internship_program_id, program_goal_definition_id, goal_ord)
+      SELECT internship_program_id,
+             program_goal_definition_id,
+             ROW_NUMBER() OVER (PARTITION BY internship_program_id ORDER BY min_legacy_id) - 1
+      FROM (SELECT g.internship_program_id, d.id AS program_goal_definition_id, MIN(g.id) AS min_legacy_id
+            FROM internship_program_goals_legacy g
+                   JOIN program_goal_definitions d
+                        ON d.title = g.title AND (d.description IS NOT DISTINCT FROM g . description)
+            GROUP BY g.internship_program_id, d.id) t;
+    </sql>
+  </changeSet>
+  <changeSet id="017-12-drop-goals-legacy" author="Kasovich Pavel">
+    <dropTable tableName="internship_program_goals_legacy"/>
+  </changeSet>
+  <changeSet id="017-13-rename-legacy-selection-stages" author="Kasovich Pavel">
+    <renameTable oldTableName="internship_program_selection_stages"
+                 newTableName="internship_program_selection_stages_legacy"/>
+  </changeSet>
+  <changeSet id="017-14-create-selection-stage-definitions" author="Kasovich Pavel">
+    <createTable tableName="selection_stage_definitions">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="017-15-seed-selection-stage-definitions" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO selection_stage_definitions (name, description, is_active)
+      SELECT DISTINCT name, description, is_active
+      FROM internship_program_selection_stages_legacy;
+    </sql>
+  </changeSet>
+  <changeSet id="017-16-create-internship-program-selection-stages-join" author="Kasovich Pavel">
+    <createTable tableName="internship_program_selection_stages">
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="selection_stage_definition_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="stage_ord" type="INT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="internship_program_selection_stages"
+                   columnNames="internship_program_id, stage_ord"
+                   constraintName="pk_ip_selection_stages"/>
+    <createIndex indexName="uq_ip_stages_program_stage" tableName="internship_program_selection_stages" unique="true">
+      <column name="internship_program_id"/>
+      <column name="selection_stage_definition_id"/>
+    </createIndex>
+    <addForeignKeyConstraint baseTableName="internship_program_selection_stages"
+                             baseColumnNames="internship_program_id"
+                             referencedTableName="internship_programs"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipss_program"
+                             onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="internship_program_selection_stages"
+                             baseColumnNames="selection_stage_definition_id"
+                             referencedTableName="selection_stage_definitions"
+                             referencedColumnNames="id"
+                             constraintName="fk_ipss_stage_def"
+                             onDelete="CASCADE"/>
+  </changeSet>
+  <changeSet id="017-17-migrate-internship-program-selection-stages" author="Kasovich Pavel">
+    <sql>
+      INSERT INTO internship_program_selection_stages (internship_program_id, selection_stage_definition_id, stage_ord)
+      SELECT internship_program_id,
+             selection_stage_definition_id,
+             ROW_NUMBER() OVER (PARTITION BY internship_program_id ORDER BY min_legacy_id) - 1
+      FROM (SELECT s.internship_program_id, d.id AS selection_stage_definition_id, MIN(s.id) AS min_legacy_id
+            FROM internship_program_selection_stages_legacy s
+                   JOIN selection_stage_definitions d
+                        ON d.name = s.name
+                          AND (d.description IS NOT DISTINCT FROM s . description)
+                          AND d.is_active = s.is_active
+            GROUP BY s.internship_program_id, d.id) t;
+    </sql>
+  </changeSet>
+  <changeSet id="017-18-drop-selection-stages-legacy" author="Kasovich Pavel">
+    <dropTable tableName="internship_program_selection_stages_legacy"/>
+  </changeSet>
+  <changeSet id="017-19-create-it-directions" author="Kasovich Pavel">
+    <createTable tableName="it_directions">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="code" type="VARCHAR(50)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="display_name" type="VARCHAR(200)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="017-20-seed-it-directions" author="Kasovich Pavel">
+    <insert tableName="it_directions">
+      <column name="id" valueNumeric="1"/>
+      <column name="code" value="BACKEND"/>
+      <column name="display_name" value="Backend"/>
+    </insert>
+    <insert tableName="it_directions">
+      <column name="id" valueNumeric="2"/>
+      <column name="code" value="FRONTEND"/>
+      <column name="display_name" value="Frontend"/>
+    </insert>
+    <insert tableName="it_directions">
+      <column name="id" valueNumeric="3"/>
+      <column name="code" value="DEVOPS"/>
+      <column name="display_name" value="DevOps"/>
+    </insert>
+  </changeSet>
+  <changeSet id="017-21-add-it-direction-fk-to-programs" author="Kasovich Pavel">
+    <addColumn tableName="internship_programs">
+      <column name="it_direction_id" type="BIGINT"/>
+    </addColumn>
+    <addForeignKeyConstraint baseTableName="internship_programs"
+                             baseColumnNames="it_direction_id"
+                             referencedTableName="it_directions"
+                             referencedColumnNames="id"
+                             constraintName="fk_programs_it_direction"
+                             onDelete="SET NULL"/>
+  </changeSet>
+  <changeSet id="017-22-backfill-it-direction-id" author="Kasovich Pavel">
+    <sql>
+      UPDATE internship_programs p
+      SET it_direction_id = d.id FROM it_directions d
+      WHERE p.it_direction IS NOT NULL
+        AND UPPER (TRIM (p.it_direction)) = d.code;
+    </sql>
+  </changeSet>
+  <changeSet id="017-23-drop-it-direction-varchar" author="Kasovich Pavel">
+    <dropColumn tableName="internship_programs" columnName="it_direction"/>
+  </changeSet>
+  <changeSet id="017-24-sync-sequences-postgresql" author="Kasovich Pavel">
+    <preConditions onFail="MARK_RAN">
+      <dbms type="postgresql"/>
+    </preConditions>
+    <sql>
+      SELECT setval(pg_get_serial_sequence('requirement_definitions', 'id'),
+                    COALESCE((SELECT MAX(id) FROM requirement_definitions), 1));
+      SELECT setval(pg_get_serial_sequence('program_goal_definitions', 'id'),
+                    COALESCE((SELECT MAX(id) FROM program_goal_definitions), 1));
+      SELECT setval(pg_get_serial_sequence('selection_stage_definitions', 'id'),
+                    COALESCE((SELECT MAX(id) FROM selection_stage_definitions), 1));
+      SELECT setval(pg_get_serial_sequence('it_directions', 'id'),
+                    COALESCE((SELECT MAX(id) FROM it_directions), 1));
+    </sql>
+  </changeSet>
+</databaseChangeLog>

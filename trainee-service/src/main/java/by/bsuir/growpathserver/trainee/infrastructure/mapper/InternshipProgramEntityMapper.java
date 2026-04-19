@@ -1,13 +1,14 @@
 package by.bsuir.growpathserver.trainee.infrastructure.mapper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -20,11 +21,15 @@ import by.bsuir.growpathserver.trainee.application.command.CreateInternshipProgr
 import by.bsuir.growpathserver.trainee.application.command.UpdateInternshipProgramCommand;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramGoalEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramRequirementEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramSelectionStageEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ProgramGoalDefinitionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.RequirementDefinitionEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.SelectionStageDefinitionEntity;
 import by.bsuir.growpathserver.trainee.domain.validator.InternshipProgramValidator;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.CompetencyRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.ProgramGoalDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.RequirementDefinitionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.SelectionStageDefinitionRepository;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -32,9 +37,9 @@ public interface InternshipProgramEntityMapper {
 
     @Mapping(target = "title", source = "normalizedTitle")
     @Mapping(target = "itDirection", ignore = true)
-    @Mapping(target = "requirementItems", ignore = true)
-    @Mapping(target = "goalItems", ignore = true)
-    @Mapping(target = "selectionStageItems", ignore = true)
+    @Mapping(target = "requirementDefinitions", ignore = true)
+    @Mapping(target = "goalDefinitions", ignore = true)
+    @Mapping(target = "selectionStageDefinitions", ignore = true)
     @Mapping(target = "competencies", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -43,26 +48,32 @@ public interface InternshipProgramEntityMapper {
     InternshipProgramEntity toNewEntity(
             CreateInternshipProgramCommand command,
             String normalizedTitle,
-            @Context CompetencyRepository competencyRepository
+            @Context InternshipProgramCatalogRepositories catalogs
     );
 
     @AfterMapping
     default void afterCreateMapping(
             CreateInternshipProgramCommand command,
             @MappingTarget InternshipProgramEntity entity,
-            @Context CompetencyRepository competencyRepository
+            @Context InternshipProgramCatalogRepositories catalogs
     ) {
-        entity.setItDirection(normalizeItDirection(command.itDirection()));
-        replaceRequirementItems(entity, command.requirements());
-        replaceGoalItemsFromCreate(entity, command.goals());
-        replaceSelectionStagesFromCreate(entity, command.selectionStages());
-        entity.setCompetencies(resolveCompetencyEntities(command.competencyIds(), competencyRepository));
+        entity.setItDirection(resolveItDirection(command.itDirectionId(), catalogs));
+        entity.getRequirementDefinitions().clear();
+        entity.getRequirementDefinitions().addAll(
+                resolveRequirementDefinitions(command.requirementIds(), catalogs.requirementDefinitionRepository()));
+        entity.getGoalDefinitions().clear();
+        entity.getGoalDefinitions().addAll(
+                resolveGoalDefinitions(command.goalIds(), catalogs.programGoalDefinitionRepository()));
+        entity.getSelectionStageDefinitions().clear();
+        entity.getSelectionStageDefinitions().addAll(
+                resolveStageDefinitions(command.selectionStageIds(), catalogs.selectionStageDefinitionRepository()));
+        entity.setCompetencies(resolveCompetencyEntities(command.competencyIds(), catalogs.competencyRepository()));
     }
 
     default void applyUpdate(
             UpdateInternshipProgramCommand command,
             @MappingTarget InternshipProgramEntity entity,
-            @Context CompetencyRepository competencyRepository
+            @Context InternshipProgramCatalogRepositories catalogs
     ) {
         if (Objects.nonNull(command.title())) {
             entity.setTitle(command.title().trim());
@@ -80,103 +91,120 @@ public interface InternshipProgramEntityMapper {
         if (Objects.nonNull(command.maxPlaces())) {
             entity.setMaxPlaces(command.maxPlaces());
         }
-        if (Objects.nonNull(command.itDirection())) {
-            entity.setItDirection(normalizeItDirection(command.itDirection()));
+        if (Objects.nonNull(command.itDirectionId())) {
+            entity.setItDirection(resolveItDirection(command.itDirectionId(), catalogs));
         }
-        if (Objects.nonNull(command.requirements())) {
-            replaceRequirementItems(entity, command.requirements());
+        if (Objects.nonNull(command.requirementIds())) {
+            entity.getRequirementDefinitions().clear();
+            entity.getRequirementDefinitions().addAll(
+                    resolveRequirementDefinitions(command.requirementIds(),
+                                                  catalogs.requirementDefinitionRepository()));
         }
-        if (Objects.nonNull(command.goals())) {
-            replaceGoalItemsFromUpdate(entity, command.goals());
+        if (Objects.nonNull(command.goalIds())) {
+            entity.getGoalDefinitions().clear();
+            entity.getGoalDefinitions().addAll(
+                    resolveGoalDefinitions(command.goalIds(), catalogs.programGoalDefinitionRepository()));
         }
-        if (Objects.nonNull(command.selectionStages())) {
-            replaceSelectionStagesFromUpdate(entity, command.selectionStages());
+        if (Objects.nonNull(command.selectionStageIds())) {
+            entity.getSelectionStageDefinitions().clear();
+            entity.getSelectionStageDefinitions().addAll(
+                    resolveStageDefinitions(command.selectionStageIds(),
+                                            catalogs.selectionStageDefinitionRepository()));
         }
         if (Objects.nonNull(command.competencyIds())) {
             entity.getCompetencies().clear();
-            entity.getCompetencies().addAll(resolveCompetencyEntities(command.competencyIds(), competencyRepository));
+            entity.getCompetencies().addAll(resolveCompetencyEntities(command.competencyIds(),
+                                                                      catalogs.competencyRepository()));
         }
         if (Objects.nonNull(command.status())) {
             entity.setStatus(command.status());
         }
     }
 
-    private static void replaceRequirementItems(InternshipProgramEntity entity, List<String> requirements) {
-        entity.getRequirementItems().clear();
-        if (CollectionUtils.isEmpty(requirements)) {
-            return;
+    private static ItDirectionEntity resolveItDirection(Long itDirectionId,
+                                                        InternshipProgramCatalogRepositories catalogs) {
+        if (itDirectionId == null) {
+            return null;
         }
-        for (String text : requirements) {
-            if (StringUtils.isBlank(text)) {
-                continue;
+        return catalogs.itDirectionRepository().findById(itDirectionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid it direction id"));
+    }
+
+    private static List<Long> dedupePreserveOrder(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return List.of();
+        }
+        Set<Long> seen = new HashSet<>();
+        List<Long> out = new ArrayList<>();
+        for (Long id : ids) {
+            if (id != null && seen.add(id)) {
+                out.add(id);
             }
-            InternshipProgramRequirementEntity row = new InternshipProgramRequirementEntity();
-            row.setInternshipProgram(entity);
-            row.setRequirementText(text.trim());
-            entity.getRequirementItems().add(row);
         }
+        return out;
     }
 
-    private static void replaceGoalItemsFromCreate(InternshipProgramEntity entity,
-                                                   List<CreateInternshipProgramCommand.ProgramGoal> goals) {
-        entity.getGoalItems().clear();
-        if (CollectionUtils.isEmpty(goals)) {
-            return;
+    private static List<RequirementDefinitionEntity> resolveRequirementDefinitions(
+            List<Long> ids,
+            RequirementDefinitionRepository repo
+    ) {
+        List<Long> ordered = dedupePreserveOrder(ids);
+        if (ordered.isEmpty()) {
+            return List.of();
         }
-        for (CreateInternshipProgramCommand.ProgramGoal g : goals) {
-            InternshipProgramGoalEntity row = new InternshipProgramGoalEntity();
-            row.setInternshipProgram(entity);
-            row.setTitle(Objects.requireNonNullElse(g.title(), ""));
-            row.setDescription(g.description());
-            entity.getGoalItems().add(row);
+        long found = repo.countByIdIn(ordered);
+        if (found != ordered.size()) {
+            throw new IllegalArgumentException("One or more requirement ids are invalid");
         }
+        Map<Long, RequirementDefinitionEntity> map = repo.findAllById(ordered).stream()
+                .collect(Collectors.toMap(RequirementDefinitionEntity::getId, e -> e));
+        List<RequirementDefinitionEntity> out = new ArrayList<>();
+        for (Long id : ordered) {
+            out.add(Objects.requireNonNull(map.get(id)));
+        }
+        return out;
     }
 
-    private static void replaceGoalItemsFromUpdate(InternshipProgramEntity entity,
-                                                   List<UpdateInternshipProgramCommand.ProgramGoal> goals) {
-        entity.getGoalItems().clear();
-        if (CollectionUtils.isEmpty(goals)) {
-            return;
+    private static List<ProgramGoalDefinitionEntity> resolveGoalDefinitions(
+            List<Long> ids,
+            ProgramGoalDefinitionRepository repo
+    ) {
+        List<Long> ordered = dedupePreserveOrder(ids);
+        if (ordered.isEmpty()) {
+            return List.of();
         }
-        for (UpdateInternshipProgramCommand.ProgramGoal g : goals) {
-            InternshipProgramGoalEntity row = new InternshipProgramGoalEntity();
-            row.setInternshipProgram(entity);
-            row.setTitle(Objects.requireNonNullElse(g.title(), ""));
-            row.setDescription(g.description());
-            entity.getGoalItems().add(row);
+        long found = repo.countByIdIn(ordered);
+        if (found != ordered.size()) {
+            throw new IllegalArgumentException("One or more goal ids are invalid");
         }
+        Map<Long, ProgramGoalDefinitionEntity> map = repo.findAllById(ordered).stream()
+                .collect(Collectors.toMap(ProgramGoalDefinitionEntity::getId, e -> e));
+        List<ProgramGoalDefinitionEntity> out = new ArrayList<>();
+        for (Long id : ordered) {
+            out.add(Objects.requireNonNull(map.get(id)));
+        }
+        return out;
     }
 
-    private static void replaceSelectionStagesFromCreate(InternshipProgramEntity entity,
-                                                         List<CreateInternshipProgramCommand.SelectionStage> stages) {
-        entity.getSelectionStageItems().clear();
-        if (CollectionUtils.isEmpty(stages)) {
-            return;
+    private static List<SelectionStageDefinitionEntity> resolveStageDefinitions(
+            List<Long> ids,
+            SelectionStageDefinitionRepository repo
+    ) {
+        List<Long> ordered = dedupePreserveOrder(ids);
+        if (ordered.isEmpty()) {
+            return List.of();
         }
-        for (CreateInternshipProgramCommand.SelectionStage s : stages) {
-            InternshipProgramSelectionStageEntity row = new InternshipProgramSelectionStageEntity();
-            row.setInternshipProgram(entity);
-            row.setName(Objects.requireNonNullElse(s.name(), ""));
-            row.setDescription(s.description());
-            row.setActive(true);
-            entity.getSelectionStageItems().add(row);
+        long found = repo.countByIdIn(ordered);
+        if (found != ordered.size()) {
+            throw new IllegalArgumentException("One or more selection stage ids are invalid");
         }
-    }
-
-    private static void replaceSelectionStagesFromUpdate(InternshipProgramEntity entity,
-                                                         List<UpdateInternshipProgramCommand.SelectionStage> stages) {
-        entity.getSelectionStageItems().clear();
-        if (CollectionUtils.isEmpty(stages)) {
-            return;
+        Map<Long, SelectionStageDefinitionEntity> map = repo.findAllById(ordered).stream()
+                .collect(Collectors.toMap(SelectionStageDefinitionEntity::getId, e -> e));
+        List<SelectionStageDefinitionEntity> out = new ArrayList<>();
+        for (Long id : ordered) {
+            out.add(Objects.requireNonNull(map.get(id)));
         }
-        for (UpdateInternshipProgramCommand.SelectionStage s : stages) {
-            InternshipProgramSelectionStageEntity row = new InternshipProgramSelectionStageEntity();
-            row.setInternshipProgram(entity);
-            row.setName(Objects.requireNonNullElse(s.name(), ""));
-            row.setDescription(s.description());
-            row.setActive(true);
-            entity.getSelectionStageItems().add(row);
-        }
+        return out;
     }
 
     private static Set<CompetencyEntity> resolveCompetencyEntities(List<Long> competencyIds,
@@ -189,13 +217,6 @@ public interface InternshipProgramEntityMapper {
             throw new IllegalArgumentException("One or more competency ids are invalid");
         }
         return new HashSet<>(repo.findAllById(competencyIds));
-    }
-
-    private static String normalizeItDirection(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        return value.trim();
     }
 
     default boolean isStructuralChange(UpdateInternshipProgramCommand command, InternshipProgramEntity entity) {
@@ -215,21 +236,21 @@ public interface InternshipProgramEntityMapper {
         if (Objects.nonNull(command.maxPlaces()) && !Objects.equals(command.maxPlaces(), entity.getMaxPlaces())) {
             return true;
         }
-        if (Objects.nonNull(command.itDirection())) {
-            if (!Objects.equals(normalizeItDirection(command.itDirection()),
-                                normalizeItDirection(entity.getItDirection()))) {
+        if (Objects.nonNull(command.itDirectionId())) {
+            Long currentId = entity.getItDirection() == null ? null : entity.getItDirection().getId();
+            if (!Objects.equals(command.itDirectionId(), currentId)) {
                 return true;
             }
         }
-        if (Objects.nonNull(command.requirements())
-                && !requirementsMultisetEqual(entity, command.requirements())) {
+        if (Objects.nonNull(command.requirementIds())
+                && !requirementDefinitionIdsEqual(entity, command.requirementIds())) {
             return true;
         }
-        if (Objects.nonNull(command.goals()) && !goalsEqualUpdate(entity, command.goals())) {
+        if (Objects.nonNull(command.goalIds()) && !goalDefinitionIdsEqual(entity, command.goalIds())) {
             return true;
         }
-        if (Objects.nonNull(command.selectionStages())
-                && !selectionStagesEqualUpdate(entity, command.selectionStages())) {
+        if (Objects.nonNull(command.selectionStageIds())
+                && !selectionStageDefinitionIdsEqual(entity, command.selectionStageIds())) {
             return true;
         }
         if (Objects.nonNull(command.competencyIds())) {
@@ -244,50 +265,29 @@ public interface InternshipProgramEntityMapper {
         return false;
     }
 
-    private static boolean requirementsMultisetEqual(InternshipProgramEntity entity, List<String> next) {
-        List<String> current = entity.getRequirementItems().stream()
-                .map(InternshipProgramRequirementEntity::getRequirementText)
+    private static boolean requirementDefinitionIdsEqual(InternshipProgramEntity entity, List<Long> next) {
+        List<Long> current = entity.getRequirementDefinitions().stream()
+                .map(RequirementDefinitionEntity::getId)
                 .sorted()
                 .toList();
-        List<String> sortedNext = next.stream()
-                .filter(s -> !StringUtils.isBlank(s))
-                .map(String::trim)
-                .sorted()
-                .toList();
+        List<Long> sortedNext = dedupePreserveOrder(next).stream().sorted().toList();
         return Objects.equals(current, sortedNext);
     }
 
-    private static boolean goalsEqualUpdate(InternshipProgramEntity entity,
-                                            List<UpdateInternshipProgramCommand.ProgramGoal> next) {
-        List<String> current = entity.getGoalItems().stream()
-                .map(g -> goalKey(g.getTitle(), g.getDescription()))
+    private static boolean goalDefinitionIdsEqual(InternshipProgramEntity entity, List<Long> next) {
+        List<Long> current = entity.getGoalDefinitions().stream()
+                .map(ProgramGoalDefinitionEntity::getId)
                 .sorted()
                 .toList();
-        List<String> nextKeys = next.stream()
-                .map(g -> goalKey(g.title(), g.description()))
-                .sorted()
-                .toList();
-        return Objects.equals(current, nextKeys);
+        List<Long> sortedNext = dedupePreserveOrder(next).stream().sorted().toList();
+        return Objects.equals(current, sortedNext);
     }
 
-    private static boolean selectionStagesEqualUpdate(InternshipProgramEntity entity,
-                                                      List<UpdateInternshipProgramCommand.SelectionStage> next) {
-        List<String> current = entity.getSelectionStageItems().stream()
-                .map(s -> stageKey(s.getName(), s.getDescription()))
-                .sorted()
+    private static boolean selectionStageDefinitionIdsEqual(InternshipProgramEntity entity, List<Long> next) {
+        List<Long> current = entity.getSelectionStageDefinitions().stream()
+                .map(SelectionStageDefinitionEntity::getId)
                 .toList();
-        List<String> nextKeys = next.stream()
-                .map(s -> stageKey(s.name(), s.description()))
-                .sorted()
-                .toList();
-        return Objects.equals(current, nextKeys);
-    }
-
-    private static String goalKey(String title, String description) {
-        return Objects.requireNonNullElse(title, "") + "\0" + Objects.toString(description, "");
-    }
-
-    private static String stageKey(String name, String description) {
-        return Objects.requireNonNullElse(name, "") + "\0" + Objects.toString(description, "");
+        List<Long> nextOrdered = dedupePreserveOrder(next);
+        return Objects.equals(current, nextOrdered);
     }
 }

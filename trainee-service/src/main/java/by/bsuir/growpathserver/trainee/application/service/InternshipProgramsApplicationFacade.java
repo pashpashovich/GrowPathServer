@@ -1,7 +1,6 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,8 +17,6 @@ import by.bsuir.growpathserver.dto.model.InternshipProgramListResponse;
 import by.bsuir.growpathserver.dto.model.InternshipProgramResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
 import by.bsuir.growpathserver.dto.model.PaginationResponse;
-import by.bsuir.growpathserver.dto.model.ProgramGoal;
-import by.bsuir.growpathserver.dto.model.SelectionStage;
 import by.bsuir.growpathserver.dto.model.UpdateInternshipProgramRequest;
 import by.bsuir.growpathserver.trainee.application.command.CreateInternshipProgramCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteInternshipProgramCommand;
@@ -61,11 +58,11 @@ public class InternshipProgramsApplicationFacade {
                 .startDate(request.getStartDate())
                 .duration(request.getDuration())
                 .maxPlaces(request.getMaxPlaces())
-                .itDirection(request.getItDirection())
-                .competencyIds(normalizeCompetencyIds(request.getCompetencyIds()))
-                .requirements(request.getRequirements())
-                .goals(mapCreateGoals(request))
-                .selectionStages(mapCreateSelectionStages(request))
+                .itDirectionId(request.getItDirectionId())
+                .competencyIds(copyIdList(request.getCompetencyIds()))
+                .requirementIds(copyIdList(request.getRequirementIds()))
+                .goalIds(copyIdList(request.getGoalIds()))
+                .selectionStageIds(copyIdList(request.getSelectionStageIds()))
                 .status(Objects.nonNull(request.getStatus()) ?
                                 InternshipProgramStatus.fromString(request.getStatus().getValue()) :
                                 null)
@@ -138,11 +135,11 @@ public class InternshipProgramsApplicationFacade {
                 .startDate(request.getStartDate())
                 .duration(request.getDuration())
                 .maxPlaces(request.getMaxPlaces())
-                .itDirection(request.getItDirection())
-                .competencyIds(normalizeCompetencyIds(request.getCompetencyIds()))
-                .requirements(request.getRequirements())
-                .goals(mapUpdateGoals(request))
-                .selectionStages(mapUpdateSelectionStages(request))
+                .itDirectionId(request.getItDirectionId())
+                .competencyIds(copyIdList(request.getCompetencyIds()))
+                .requirementIds(copyIdList(request.getRequirementIds()))
+                .goalIds(copyIdList(request.getGoalIds()))
+                .selectionStageIds(copyIdList(request.getSelectionStageIds()))
                 .status(request.getStatus() != null ?
                                 InternshipProgramStatus.fromString(request.getStatus().getValue()) :
                                 null)
@@ -151,60 +148,10 @@ public class InternshipProgramsApplicationFacade {
         return internshipProgramMapper.toInternshipProgramResponse(program, objectMapper);
     }
 
-    private List<CreateInternshipProgramCommand.ProgramGoal> mapCreateGoals(CreateInternshipProgramRequest request) {
-        if (CollectionUtils.isEmpty(request.getGoals())) {
-            return null;
-        }
-        List<CreateInternshipProgramCommand.ProgramGoal> goals = new ArrayList<>();
-        for (Object goalObj : request.getGoals()) {
-            ProgramGoal goal = objectMapper.convertValue(goalObj, ProgramGoal.class);
-            goals.add(new CreateInternshipProgramCommand.ProgramGoal(goal.getTitle(), goal.getDescription()));
-        }
-        return goals;
-    }
-
-    private List<CreateInternshipProgramCommand.SelectionStage> mapCreateSelectionStages(CreateInternshipProgramRequest request) {
-        if (CollectionUtils.isEmpty(request.getSelectionStages())) {
-            return null;
-        }
-        List<CreateInternshipProgramCommand.SelectionStage> stages = new ArrayList<>();
-        for (Object stageObj : request.getSelectionStages()) {
-            SelectionStage stage = objectMapper.convertValue(stageObj, SelectionStage.class);
-            stages.add(new CreateInternshipProgramCommand.SelectionStage(
-                    stage.getName(), stage.getDescription(), stage.getOrder()));
-        }
-        return stages;
-    }
-
-    private List<UpdateInternshipProgramCommand.ProgramGoal> mapUpdateGoals(UpdateInternshipProgramRequest request) {
-        if (CollectionUtils.isEmpty(request.getGoals())) {
-            return null;
-        }
-        List<UpdateInternshipProgramCommand.ProgramGoal> goals = new ArrayList<>();
-        for (Object goalObj : request.getGoals()) {
-            ProgramGoal goal = objectMapper.convertValue(goalObj, ProgramGoal.class);
-            goals.add(new UpdateInternshipProgramCommand.ProgramGoal(goal.getTitle(), goal.getDescription()));
-        }
-        return goals;
-    }
-
-    private List<UpdateInternshipProgramCommand.SelectionStage> mapUpdateSelectionStages(UpdateInternshipProgramRequest request) {
-        if (CollectionUtils.isEmpty(request.getSelectionStages())) {
-            return null;
-        }
-        List<UpdateInternshipProgramCommand.SelectionStage> stages = new ArrayList<>();
-        for (Object stageObj : request.getSelectionStages()) {
-            SelectionStage stage = objectMapper.convertValue(stageObj, SelectionStage.class);
-            stages.add(new UpdateInternshipProgramCommand.SelectionStage(
-                    stage.getName(), stage.getDescription(), stage.getOrder()));
-        }
-        return stages;
-    }
-
-    private static List<Long> normalizeCompetencyIds(List<Long> ids) {
+    private static List<Long> copyIdList(List<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return null;
         }
-        return ids;
+        return List.copyOf(ids);
     }
 }

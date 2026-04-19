@@ -7,8 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,7 @@ import by.bsuir.growpathserver.trainee.application.command.CreateInternshipProgr
 import by.bsuir.growpathserver.trainee.application.service.InternshipProgramService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,20 +36,17 @@ class CreateInternshipProgramHandlerTest {
 
     @BeforeEach
     void setUp() {
-        List<CreateInternshipProgramCommand.ProgramGoal> goals = new ArrayList<>();
-        goals.add(new CreateInternshipProgramCommand.ProgramGoal("Learn Spring", "Master Spring Framework"));
-
         command = CreateInternshipProgramCommand.builder()
                 .title("Test Program")
                 .description("Test Description")
                 .startDate(LocalDate.of(2024, 9, 1))
                 .duration(6)
                 .maxPlaces(20)
-                .itDirection("BACKEND")
+                .itDirectionId(1L)
                 .competencyIds(null)
-                .requirements(new ArrayList<>())
-                .goals(goals)
-                .selectionStages(new ArrayList<>())
+                .requirementIds(null)
+                .goalIds(null)
+                .selectionStageIds(null)
                 .status(InternshipProgramStatus.ACTIVE)
                 .createdBy(1L)
                 .build();
@@ -62,7 +58,11 @@ class CreateInternshipProgramHandlerTest {
         entity.setStartDate(LocalDate.of(2024, 9, 1));
         entity.setDuration(6);
         entity.setMaxPlaces(20);
-        entity.setItDirection("BACKEND");
+        ItDirectionEntity dir = new ItDirectionEntity();
+        dir.setId(1L);
+        dir.setCode("BACKEND");
+        dir.setDisplayName("Backend");
+        entity.setItDirection(dir);
         entity.setStatus(InternshipProgramStatus.ACTIVE);
         entity.setCreatedBy(1L);
 
