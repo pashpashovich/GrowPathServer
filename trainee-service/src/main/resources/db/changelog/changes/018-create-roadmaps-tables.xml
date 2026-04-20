@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="018-create-roadmaps" author="Kasovich Pavel">
+    <createTable tableName="roadmaps">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="start_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(32)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mentor_id" type="BIGINT"/>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="roadmaps" baseColumnNames="program_id"
+                             referencedTableName="internship_programs" referencedColumnNames="id"
+                             constraintName="fk_roadmaps_program"/>
+    <addForeignKeyConstraint baseTableName="roadmaps" baseColumnNames="mentor_id"
+                             referencedTableName="users" referencedColumnNames="id"
+                             constraintName="fk_roadmaps_mentor"/>
+    <createIndex indexName="idx_roadmaps_program" tableName="roadmaps">
+      <column name="program_id"/>
+    </createIndex>
+    <createIndex indexName="idx_roadmaps_mentor" tableName="roadmaps">
+      <column name="mentor_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="018-create-roadmap-interns" author="Kasovich Pavel">
+    <createTable tableName="roadmap_interns">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="roadmap_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="keycloak_user_id" type="VARCHAR(64)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="roadmap_interns" columnNames="roadmap_id, keycloak_user_id"
+                         constraintName="uq_roadmap_intern"/>
+    <addForeignKeyConstraint baseTableName="roadmap_interns" baseColumnNames="roadmap_id"
+                             referencedTableName="roadmaps" referencedColumnNames="id"
+                             constraintName="fk_ri_roadmap" onDelete="CASCADE"/>
+    <createIndex indexName="idx_roadmap_interns_keycloak" tableName="roadmap_interns">
+      <column name="keycloak_user_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="018-create-roadmap-stages" author="Kasovich Pavel">
+    <createTable tableName="roadmap_stages">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="roadmap_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="start_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(32)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="priority" type="VARCHAR(16)"/>
+      <column name="is_checkpoint" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="comments" type="TEXT"/>
+      <column name="stage_order" type="INTEGER">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="BIGINT"/>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="roadmap_stages" baseColumnNames="roadmap_id"
+                             referencedTableName="roadmaps" referencedColumnNames="id"
+                             constraintName="fk_rs_roadmap" onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="roadmap_stages" baseColumnNames="created_by"
+                             referencedTableName="users" referencedColumnNames="id"
+                             constraintName="fk_rs_created_by"/>
+    <createIndex indexName="idx_roadmap_stages_roadmap" tableName="roadmap_stages">
+      <column name="roadmap_id"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

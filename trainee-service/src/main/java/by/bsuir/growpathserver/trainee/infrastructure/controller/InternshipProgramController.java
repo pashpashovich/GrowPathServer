@@ -12,34 +12,40 @@ import by.bsuir.growpathserver.dto.model.CreateInternshipProgramRequest;
 import by.bsuir.growpathserver.dto.model.InternshipProgramListResponse;
 import by.bsuir.growpathserver.dto.model.InternshipProgramResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
+import by.bsuir.growpathserver.dto.model.RoadmapListResponse;
 import by.bsuir.growpathserver.dto.model.UpdateInternshipProgramRequest;
 import by.bsuir.growpathserver.trainee.application.service.InternshipProgramsApplicationFacade;
+import by.bsuir.growpathserver.trainee.application.service.RoadmapApplicationFacade;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
 public class InternshipProgramController extends BaseController implements InternshipProgramsApi {
 
     private final InternshipProgramsApplicationFacade internshipProgramsApplicationFacade;
+    private final RoadmapApplicationFacade roadmapApplicationFacade;
 
     @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
     public ResponseEntity<InternshipProgramResponse> createInternshipProgram(CreateInternshipProgramRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(internshipProgramsApplicationFacade.createInternshipProgram(request));
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
     public ResponseEntity<MessageResponse> deleteInternshipProgram(String id) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.deleteInternshipProgram(id));
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
     public ResponseEntity<InternshipProgramResponse> getInternshipProgramById(String id) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.getInternshipProgramById(id));
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
     public ResponseEntity<InternshipProgramListResponse> getInternshipPrograms(Integer page,
                                                                                Integer limit,
                                                                                String status,
@@ -57,8 +63,15 @@ public class InternshipProgramController extends BaseController implements Inter
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
     public ResponseEntity<InternshipProgramResponse> updateInternshipProgram(String id,
                                                                              UpdateInternshipProgramRequest request) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.updateInternshipProgram(id, request));
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<RoadmapListResponse> getProgramInternships(String programId) {
+        return ResponseEntity.ok(roadmapApplicationFacade.getProgramInternships(programId));
     }
 }

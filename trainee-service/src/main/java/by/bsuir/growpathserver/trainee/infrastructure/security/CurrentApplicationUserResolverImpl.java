@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.trainee.infrastructure.security;
 
 import java.util.Optional;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
@@ -44,8 +45,16 @@ public class CurrentApplicationUserResolverImpl implements CurrentApplicationUse
         return Optional.empty();
     }
 
+    @Override
+    public Optional<String> resolveCurrentKeycloakSubject() {
+        return extractJwt(SecurityContextHolder.getContext().getAuthentication())
+                .map(Jwt::getSubject)
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim);
+    }
+
     private static Optional<Jwt> extractJwt(Authentication auth) {
-        if (auth == null) {
+        if (Objects.isNull(auth)) {
             return Optional.empty();
         }
         if (auth instanceof JwtAuthenticationToken jwtAuth) {

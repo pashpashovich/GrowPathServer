@@ -99,10 +99,10 @@ spring:
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/program-selection-stage-definitions/**
-            - id: roadmaps-service
+            - id: internships-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
-                - Path=/api/v1/roadmaps/**
+                - Path=/api/v1/internships/**
             - id: reports-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

@@ -28,7 +28,8 @@
       "enum": [
         "pending",
         "in_progress",
-        "completed"
+        "completed",
+        "delayed"
       ]
     },
     "priority": {

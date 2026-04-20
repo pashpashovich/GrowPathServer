@@ -5,4 +5,6 @@ import java.util.Optional;
 public interface CurrentApplicationUserResolver {
 
     Optional<Long> resolveCurrentUserDatabaseId();
+
+    Optional<String> resolveCurrentKeycloakSubject();
 }

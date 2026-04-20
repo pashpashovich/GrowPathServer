@@ -2507,12 +2507,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internship-programs/{programId}/roadmaps:
+  /internship-programs/{programId}/internships:
     get:
       tags:
-        - Roadmaps
-      summary: Get roadmaps for program
-      operationId: getProgramRoadmaps
+        - Internships
+      summary: List internships for program
+      operationId: getProgramInternships
       security:
         - bearerAuth: [ ]
       parameters:
@@ -2541,13 +2541,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  # ==================== Roadmaps ====================
-  /roadmaps:
+  # ==================== Internships ====================
+  /internships:
+    get:
+      tags:
+        - Internships
+      summary: List internships
+      description: |
+        Filter by mentor, intern (user id), or program. Mentors default to own internships; interns see assigned ones.
+        HR/ADMIN may list all when no filters are applied.
+      operationId: listInternships
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: mentorId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: internId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: programId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
     post:
       tags:
-        - Roadmaps
-      summary: Create roadmap
-      operationId: createRoadmap
+        - Internships
+      summary: Create internship
+      operationId: createInternship
       security:
         - bearerAuth: [ ]
       requestBody:
@@ -2558,7 +2600,7 @@ paths:
               $ref: '#/components/schemas/create-roadmap-request'
       responses:
         '201':
-          description: Roadmap created successfully
+          description: Internship created successfully
           content:
             application/json:
               schema:
@@ -2576,16 +2618,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /roadmaps/{id}:
+  /internships/profile:
     get:
       tags:
-        - Roadmaps
-      summary: Get roadmap by ID
-      operationId: getRoadmapById
+        - Internships
+      summary: List internships for the current user
+      description: Internships where the user is mentor or assigned intern (by Keycloak subject).
+      operationId: listMyInternships
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internships/{internshipId}:
+    get:
+      tags:
+        - Internships
+      summary: Get internship by id
+      operationId: getInternshipById
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: id
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2604,21 +2669,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Roadmap not found
+          description: Internship not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
-
     put:
       tags:
-        - Roadmaps
-      summary: Update roadmap
-      operationId: updateRoadmap
+        - Internships
+      summary: Update internship
+      operationId: updateInternship
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: id
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2631,7 +2695,7 @@ paths:
               $ref: '#/components/schemas/update-roadmap-request'
       responses:
         '200':
-          description: Roadmap updated successfully
+          description: Internship updated successfully
           content:
             application/json:
               schema:
@@ -2649,28 +2713,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Roadmap not found
+          description: Internship not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
-
     delete:
       tags:
-        - Roadmaps
-      summary: Delete roadmap
-      operationId: deleteRoadmap
+        - Internships
+      summary: Delete internship
+      operationId: deleteInternship
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: id
+        - name: internshipId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Roadmap deleted successfully
+          description: Internship deleted successfully
           content:
             application/json:
               schema:
@@ -2682,22 +2745,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Roadmap not found
+          description: Internship not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /roadmaps/{roadmapId}/stages:
+  /internships/{internshipId}/roadmap:
     get:
       tags:
-        - Stages
-      summary: Get roadmap stages
-      operationId: getRoadmapStages
+        - Internships
+      summary: Get roadmap metadata for an internship
+      description: Same payload as GET /internships/{internshipId}.
+      operationId: getInternshipRoadmap
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: roadmapId
+        - name: internshipId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roadmap-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Internship not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internships/{internshipId}/stages:
+    get:
+      tags:
+        - Internships
+      summary: List stages for an internship
+      operationId: getInternshipStages
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2716,21 +2814,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Roadmap not found
+          description: Internship not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
-
     post:
       tags:
-        - Stages
-      summary: Create stage
-      operationId: createStage
+        - Internships
+      summary: Create stage on internship roadmap
+      operationId: createInternshipStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: roadmapId
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2761,22 +2858,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Roadmap not found
+          description: Internship not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /roadmaps/{roadmapId}/stages/{stageId}:
+  /internships/{internshipId}/stages/{stageId}:
     put:
       tags:
-        - Stages
+        - Internships
       summary: Update stage
-      operationId: updateStage
+      operationId: updateInternshipStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: roadmapId
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2817,16 +2914,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
-
     delete:
       tags:
-        - Stages
+        - Internships
       summary: Delete stage
-      operationId: deleteStage
+      operationId: deleteInternshipStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: roadmapId
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2856,16 +2952,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /roadmaps/{roadmapId}/stages/{stageId}/status:
-    patch:
+  /internships/{internshipId}/stages/order:
+    put:
       tags:
-        - Stages
-      summary: Change stage status
-      operationId: changeStageStatus
+        - Internships
+      summary: Reorder stages
+      operationId: reorderInternshipStages
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: roadmapId
+        - name: internshipId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reorder-stages-request'
+      responses:
+        '200':
+          description: Stages reordered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Internship not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internships/{internshipId}/stages/{stageId}/status:
+    patch:
+      tags:
+        - Internships
+      summary: Change stage status
+      operationId: changeInternshipStageStatus
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: internshipId
           in: path
           required: true
           schema:
@@ -2902,52 +3044,6 @@ paths:
                 $ref: '#/components/schemas/error-response'
         '404':
           description: Stage not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-
-  /roadmaps/{roadmapId}/stages/reorder:
-    patch:
-      tags:
-        - Stages
-      summary: Reorder stages
-      operationId: reorderStages
-      security:
-        - bearerAuth: [ ]
-      parameters:
-        - name: roadmapId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/reorder-stages-request'
-      responses:
-        '200':
-          description: Stages reordered successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/message-response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-        '404':
-          description: Roadmap not found
           content:
             application/json:
               schema:
