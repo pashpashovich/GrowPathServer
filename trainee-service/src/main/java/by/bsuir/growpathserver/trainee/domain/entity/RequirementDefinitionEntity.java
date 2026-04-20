@@ -1,5 +1,7 @@
 package by.bsuir.growpathserver.trainee.domain.entity;
 
+import org.hibernate.annotations.SoftDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "requirement_definitions")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor

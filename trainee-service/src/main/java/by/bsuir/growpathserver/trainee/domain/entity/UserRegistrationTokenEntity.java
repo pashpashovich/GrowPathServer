@@ -2,6 +2,8 @@ package by.bsuir.growpathserver.trainee.domain.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SoftDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "user_registration_token")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor

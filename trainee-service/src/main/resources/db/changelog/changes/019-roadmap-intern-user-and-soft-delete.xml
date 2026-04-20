@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="019-01-roadmap-interns-user-id-cutover" author="Kasovich Pavel">
+    <preConditions onFail="HALT">
+      <sqlCheck expectedResult="0">
+        SELECT COUNT(*) FROM roadmap_interns ri
+                               LEFT JOIN users u ON ri.keycloak_user_id = u.keycloak_user_id
+        WHERE u.id IS NULL
+      </sqlCheck>
+
+    </preConditions>
+    <addColumn tableName="roadmap_interns">
+      <column name="user_id" type="BIGINT"/>
+    </addColumn>
+
+    <sql>
+      UPDATE roadmap_interns ri
+      SET user_id = u.id FROM users u
+      WHERE ri.keycloak_user_id = u.keycloak_user_id;
+    </sql>
+
+    <addNotNullConstraint tableName="roadmap_interns" columnName="user_id" columnDataType="BIGINT"/>
+    <dropUniqueConstraint tableName="roadmap_interns" constraintName="uq_roadmap_intern"/>
+    <addUniqueConstraint tableName="roadmap_interns" columnNames="roadmap_id, user_id"
+                         constraintName="uq_roadmap_intern"/>
+    <addForeignKeyConstraint baseTableName="roadmap_interns"
+                             baseColumnNames="user_id"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             constraintName="fk_ri_user"/>
+    <dropIndex indexName="idx_roadmap_interns_keycloak" tableName="roadmap_interns"/>
+    <createIndex indexName="idx_roadmap_interns_user" tableName="roadmap_interns">
+      <column name="user_id"/>
+    </createIndex>
+    <dropColumn tableName="roadmap_interns" columnName="keycloak_user_id"/>
+  </changeSet>
+
+  <changeSet id="019-02-add-soft-delete-columns" author="Kasovich Pavel">
+    <addColumn tableName="users">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="tasks">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="assessments">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="departments">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="internship_programs">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="user_registration_token">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="competencies">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="it_directions">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="program_goal_definitions">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="requirement_definitions">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="selection_stage_definitions">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="roadmaps">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="roadmap_interns">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="roadmap_stages">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="019-03-unique-indexes-for-soft-delete" author="Kasovich Pavel">
+    <preConditions onFail="MARK_RAN">
+      <dbms type="postgresql"/>
+    </preConditions>
+    <sql>
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key;
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_keycloak_user_id_key;
+      ALTER TABLE competencies DROP CONSTRAINT IF EXISTS competencies_name_key;
+      ALTER TABLE it_directions DROP CONSTRAINT IF EXISTS it_directions_code_key;
+      ALTER TABLE requirement_definitions DROP CONSTRAINT IF EXISTS requirement_definitions_requirement_text_key;
+      ALTER TABLE user_registration_token DROP CONSTRAINT IF EXISTS user_registration_token_token_key;
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email_active
+        ON users (LOWER (email))
+        WHERE deleted = false;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_users_keycloak_user_id_active
+        ON users (keycloak_user_id)
+        WHERE deleted = false AND keycloak_user_id IS NOT NULL;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_competencies_name_active
+        ON competencies (LOWER (name))
+        WHERE deleted = false;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_it_directions_code_active
+        ON it_directions (LOWER (code))
+        WHERE deleted = false;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_requirement_definitions_text_active
+        ON requirement_definitions (requirement_text)
+        WHERE deleted = false;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_user_registration_token_token_active
+        ON user_registration_token (token)
+        WHERE deleted = false;
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

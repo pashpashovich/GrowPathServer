@@ -4,13 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.SoftDelete;
+
 import by.bsuir.growpathserver.trainee.domain.valueobject.RoadmapStageStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.StagePriorityLevel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +26,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "roadmap_stages")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +36,7 @@ public class RoadmapStageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "roadmap_id", nullable = false)
     private RoadmapEntity roadmap;
 
@@ -67,7 +69,7 @@ public class RoadmapStageEntity {
     @Column(name = "stage_order", nullable = false)
     private Integer stageOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "created_by")
     private UserEntity createdBy;
 

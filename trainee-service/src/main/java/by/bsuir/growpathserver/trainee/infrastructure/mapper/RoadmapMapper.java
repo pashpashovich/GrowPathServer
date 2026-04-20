@@ -17,6 +17,7 @@ import by.bsuir.growpathserver.dto.model.StageResponse;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapInternEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapStageEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -58,7 +59,9 @@ public interface RoadmapMapper {
 
     default List<String> mapInternIds(RoadmapEntity entity) {
         return entity.getInterns().stream()
-                .map(RoadmapInternEntity::getKeycloakUserId)
+                .map(RoadmapInternEntity::getUser)
+                .filter(Objects::nonNull)
+                .map(UserEntity::getKeycloakUserId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

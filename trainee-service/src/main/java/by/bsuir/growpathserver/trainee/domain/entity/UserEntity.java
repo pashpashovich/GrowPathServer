@@ -2,6 +2,8 @@ package by.bsuir.growpathserver.trainee.domain.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SoftDelete;
+
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import jakarta.persistence.Column;
@@ -19,6 +21,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "users")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor

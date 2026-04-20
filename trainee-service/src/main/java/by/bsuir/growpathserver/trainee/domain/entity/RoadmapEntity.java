@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.SoftDelete;
+
 import by.bsuir.growpathserver.trainee.domain.valueobject.RoadmapLifecycleStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +30,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "roadmaps")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,7 +40,7 @@ public class RoadmapEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "program_id", nullable = false)
     private InternshipProgramEntity program;
 
@@ -58,7 +60,7 @@ public class RoadmapEntity {
     @Column(nullable = false, length = 32)
     private RoadmapLifecycleStatus status = RoadmapLifecycleStatus.DRAFT;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "mentor_id")
     private UserEntity mentor;
 

@@ -27,7 +27,7 @@ public class InternshipController extends BaseController implements InternshipsA
     private final RoadmapApplicationFacade roadmapApplicationFacade;
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<StageResponse> changeInternshipStageStatus(String internshipId,
                                                                      String stageId,
                                                                      ChangeStageStatusRequest changeStageStatusRequest) {
@@ -43,7 +43,7 @@ public class InternshipController extends BaseController implements InternshipsA
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<StageResponse> createInternshipStage(String internshipId,
                                                                CreateStageRequest createStageRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -57,57 +57,57 @@ public class InternshipController extends BaseController implements InternshipsA
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<MessageResponse> deleteInternshipStage(String internshipId, String stageId) {
         return ResponseEntity.ok(roadmapApplicationFacade.deleteInternshipStage(internshipId, stageId));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<RoadmapResponse> getInternshipById(String internshipId) {
         return ResponseEntity.ok(roadmapApplicationFacade.getInternshipById(internshipId));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<RoadmapResponse> getInternshipRoadmap(String internshipId) {
         return ResponseEntity.ok(roadmapApplicationFacade.getInternshipById(internshipId));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<StageListResponse> getInternshipStages(String internshipId) {
         return ResponseEntity.ok(roadmapApplicationFacade.getInternshipStages(internshipId));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
     public ResponseEntity<RoadmapListResponse> listInternships(Long mentorId, Long internId, Long programId) {
         return ResponseEntity.ok(roadmapApplicationFacade.listInternships(mentorId, internId, programId));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN')")
     public ResponseEntity<RoadmapListResponse> listMyInternships() {
         return ResponseEntity.ok(roadmapApplicationFacade.listMyInternships());
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER')")
     public ResponseEntity<MessageResponse> reorderInternshipStages(String internshipId,
                                                                    ReorderStagesRequest reorderStagesRequest) {
         return ResponseEntity.ok(roadmapApplicationFacade.reorderInternshipStages(internshipId, reorderStagesRequest));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER')")
     public ResponseEntity<RoadmapResponse> updateInternship(String internshipId,
                                                             UpdateRoadmapRequest updateRoadmapRequest) {
         return ResponseEntity.ok(roadmapApplicationFacade.updateInternship(internshipId, updateRoadmapRequest));
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER')")
     public ResponseEntity<StageResponse> updateInternshipStage(String internshipId,
                                                                String stageId,
                                                                UpdateStageRequest updateStageRequest) {

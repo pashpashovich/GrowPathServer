@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.SoftDelete;
+
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.converter.InternshipProgramStatusConverter;
 import jakarta.persistence.CascadeType;
@@ -30,6 +32,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "internship_programs")
+@SoftDelete
 @Getter
 @Setter
 @NoArgsConstructor
@@ -54,7 +57,7 @@ public class InternshipProgramEntity {
     @Column(name = "max_places", nullable = false)
     private Integer maxPlaces;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "it_direction_id")
     private ItDirectionEntity itDirection;
 

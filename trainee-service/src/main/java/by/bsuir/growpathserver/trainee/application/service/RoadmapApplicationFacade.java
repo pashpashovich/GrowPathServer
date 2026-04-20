@@ -71,13 +71,13 @@ public class RoadmapApplicationFacade {
     @Transactional(readOnly = true)
     public RoadmapListResponse listInternships(Long mentorId, Long internId, Long programId) {
         if (isIntern() && !isHrOrAdmin()) {
-            String kc = currentUserResolver.resolveCurrentKeycloakSubject().orElse(null);
-            if (StringUtils.isBlank(kc)) {
+            Long currentInternUserId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
+            if (Objects.isNull(currentInternUserId)) {
                 RoadmapListResponse empty = new RoadmapListResponse();
                 empty.setData(new ArrayList<>());
                 return empty;
             }
-            return toRoadmapListResponse(roadmapRepository.findByInternKeycloakUserId(kc));
+            return toRoadmapListResponse(roadmapRepository.findByInternUserId(currentInternUserId));
         }
 
         Long effectiveMentorId = mentorId;
@@ -85,14 +85,7 @@ public class RoadmapApplicationFacade {
             effectiveMentorId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
         }
 
-        String internKeycloak = null;
-        if (Objects.nonNull(internId)) {
-            internKeycloak = userRepository.findById(internId)
-                    .map(UserEntity::getKeycloakUserId)
-                    .orElse(null);
-        }
-
-        Specification<RoadmapEntity> spec = buildRoadmapSpec(programId, effectiveMentorId, internKeycloak);
+        Specification<RoadmapEntity> spec = buildRoadmapSpec(programId, effectiveMentorId, internId);
         return toRoadmapListResponse(roadmapRepository.findAll(spec));
     }
 
@@ -100,8 +93,6 @@ public class RoadmapApplicationFacade {
     public RoadmapListResponse listMyInternships() {
         Long uid = currentUserResolver.resolveCurrentUserDatabaseId()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-        String sub = currentUserResolver.resolveCurrentKeycloakSubject().orElse(null);
-
         Set<Long> seen = new LinkedHashSet<>();
         List<RoadmapEntity> out = new ArrayList<>();
         for (RoadmapEntity r : roadmapRepository.findByMentorId(uid)) {
@@ -109,11 +100,9 @@ public class RoadmapApplicationFacade {
                 out.add(r);
             }
         }
-        if (StringUtils.isNotBlank(sub)) {
-            for (RoadmapEntity r : roadmapRepository.findByInternKeycloakUserId(sub)) {
-                if (seen.add(r.getId())) {
-                    out.add(r);
-                }
+        for (RoadmapEntity r : roadmapRepository.findByInternUserId(uid)) {
+            if (seen.add(r.getId())) {
+                out.add(r);
             }
         }
         return toRoadmapListResponse(out);
@@ -149,9 +138,8 @@ public class RoadmapApplicationFacade {
         int nextOrder = Objects.nonNull(request.getOrder()) ? request.getOrder() : nextStageOrder(roadmap.getId());
         stage.setStageOrder(nextOrder);
         stage.setStatus(RoadmapStageStatus.PENDING);
-        currentUserResolver.resolveCurrentUserDatabaseId().ifPresent(uid ->
-                                                                             userRepository.findById(uid)
-                                                                                     .ifPresent(stage::setCreatedBy));
+        currentUserResolver.resolveCurrentUserDatabaseId().flatMap(userRepository::findById)
+                .ifPresent(stage::setCreatedBy);
         RoadmapStageEntity saved = roadmapStageRepository.save(stage);
         return roadmapMapper.toStageResponse(saved);
     }
@@ -333,14 +321,16 @@ public class RoadmapApplicationFacade {
             return true;
         }
         Long uid = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
-        String sub = currentUserResolver.resolveCurrentKeycloakSubject().orElse(null);
         if (Objects.nonNull(uid)
                 && Objects.nonNull(r.getMentor())
                 && uid.equals(r.getMentor().getId())) {
             return true;
         }
-        if (StringUtils.isNotBlank(sub)) {
-            return r.getInterns().stream().anyMatch(i -> sub.equals(i.getKeycloakUserId()));
+        if (Objects.nonNull(uid)) {
+            return r.getInterns().stream()
+                    .map(RoadmapInternEntity::getUser)
+                    .filter(Objects::nonNull)
+                    .anyMatch(u -> uid.equals(u.getId()));
         }
         return false;
     }
@@ -379,7 +369,7 @@ public class RoadmapApplicationFacade {
         return hasAuthority("INTERN");
     }
 
-    private static Specification<RoadmapEntity> buildRoadmapSpec(Long programId, Long mentorId, String internKeycloak) {
+    private static Specification<RoadmapEntity> buildRoadmapSpec(Long programId, Long mentorId, Long internUserId) {
         return (root, query, cb) -> {
             query.distinct(true);
             List<Predicate> parts = new ArrayList<>();
@@ -389,9 +379,9 @@ public class RoadmapApplicationFacade {
             if (Objects.nonNull(mentorId)) {
                 parts.add(cb.equal(root.get("mentor").get("id"), mentorId));
             }
-            if (StringUtils.isNotBlank(internKeycloak)) {
+            if (Objects.nonNull(internUserId)) {
                 var join = root.join("interns", JoinType.INNER);
-                parts.add(cb.equal(join.get("keycloakUserId"), internKeycloak));
+                parts.add(cb.equal(join.get("user").get("id"), internUserId));
             }
             if (parts.isEmpty()) {
                 return cb.conjunction();
@@ -409,9 +399,11 @@ public class RoadmapApplicationFacade {
             if (StringUtils.isBlank(kid)) {
                 continue;
             }
+            UserEntity user = userRepository.findByKeycloakUserId(kid.trim())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid intern id"));
             RoadmapInternEntity ri = new RoadmapInternEntity();
             ri.setRoadmap(roadmap);
-            ri.setKeycloakUserId(kid.trim());
+            ri.setUser(user);
             roadmap.getInterns().add(ri);
         }
     }

@@ -23,6 +23,6 @@ public interface RoadmapRepository extends JpaRepository<RoadmapEntity, Long>, J
 
     List<RoadmapEntity> findByMentorId(Long mentorId);
 
-    @Query("SELECT DISTINCT r FROM RoadmapEntity r JOIN r.interns i WHERE i.keycloakUserId = :sub")
-    List<RoadmapEntity> findByInternKeycloakUserId(@Param("sub") String sub);
+    @Query("SELECT DISTINCT r FROM RoadmapEntity r JOIN r.interns i WHERE i.user.id = :userId")
+    List<RoadmapEntity> findByInternUserId(@Param("userId") Long userId);
 }

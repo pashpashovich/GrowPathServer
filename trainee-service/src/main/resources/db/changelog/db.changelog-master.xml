@@ -23,5 +23,6 @@
   <include file="/db/changelog/changes/016-internship-program-structured-collections.xml"/>
   <include file="/db/changelog/changes/017-internship-program-definition-catalogs.xml"/>
   <include file="/db/changelog/changes/018-create-roadmaps-tables.xml"/>
+  <include file="/db/changelog/changes/019-roadmap-intern-user-and-soft-delete.xml"/>
 
 </databaseChangeLog>
