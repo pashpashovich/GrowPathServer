@@ -42,7 +42,7 @@ public class InternshipProgramController extends BaseController implements Inter
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR')")
     public ResponseEntity<InternshipProgramListResponse> getInternshipPrograms(Integer page,
                                                                                Integer limit,
                                                                                String status,
