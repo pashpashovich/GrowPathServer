@@ -2507,12 +2507,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internship-programs/{programId}/internships:
+  /internship-programs/{programId}/roadmap-templates:
     get:
       tags:
-        - Internships
-      summary: List internships for program
-      operationId: getProgramInternships
+        - Roadmap Templates
+      summary: List roadmap templates for program
+      operationId: getProgramRoadmapTemplates
       security:
         - bearerAuth: [ ]
       parameters:
@@ -2527,7 +2527,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roadmap-list-response'
+                $ref: '#/components/schemas/roadmap-template-list-response'
         '401':
           description: Unauthorized
           content:
@@ -2541,32 +2541,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  # ==================== Internships ====================
-  /internships:
+  # ==================== Roadmap Templates ====================
+  /roadmap-templates:
     get:
       tags:
-        - Internships
-      summary: List internships
-      description: |
-        Filter by mentor, intern (user id), or program. Mentors default to own internships; interns see assigned ones.
-        HR/ADMIN may list all when no filters are applied.
-      operationId: listInternships
+        - Roadmap Templates
+      summary: List roadmap templates
+      operationId: listRoadmapTemplates
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: mentorId
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: internId
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
         - name: programId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: mentorId
           in: query
           required: false
           schema:
@@ -2578,7 +2569,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roadmap-list-response'
+                $ref: '#/components/schemas/roadmap-template-list-response'
         '401':
           description: Unauthorized
           content:
@@ -2587,9 +2578,9 @@ paths:
                 $ref: '#/components/schemas/error-response'
     post:
       tags:
-        - Internships
-      summary: Create internship
-      operationId: createInternship
+        - Roadmap Templates
+      summary: Create roadmap template
+      operationId: createRoadmapTemplate
       security:
         - bearerAuth: [ ]
       requestBody:
@@ -2597,14 +2588,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/create-roadmap-request'
+              $ref: '#/components/schemas/create-roadmap-template-request'
       responses:
         '201':
-          description: Internship created successfully
+          description: Roadmap template created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roadmap-response'
+                $ref: '#/components/schemas/roadmap-template-response'
         '400':
           description: Bad request
           content:
@@ -2618,39 +2609,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internships/profile:
+  /roadmap-templates/{templateId}:
     get:
       tags:
-        - Internships
-      summary: List internships for the current user
-      description: Internships where the user is mentor or assigned intern (by Keycloak subject).
-      operationId: listMyInternships
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/roadmap-list-response'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-
-  /internships/{internshipId}:
-    get:
-      tags:
-        - Internships
-      summary: Get internship by id
-      operationId: getInternshipById
+        - Roadmap Templates
+      summary: Get roadmap template by id
+      operationId: getRoadmapTemplateById
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2661,7 +2629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roadmap-response'
+                $ref: '#/components/schemas/roadmap-template-response'
         '401':
           description: Unauthorized
           content:
@@ -2669,20 +2637,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
     put:
       tags:
-        - Internships
-      summary: Update internship
-      operationId: updateInternship
+        - Roadmap Templates
+      summary: Update roadmap template
+      operationId: updateRoadmapTemplate
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2692,14 +2660,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/update-roadmap-request'
+              $ref: '#/components/schemas/update-roadmap-template-request'
       responses:
         '200':
-          description: Internship updated successfully
+          description: Roadmap template updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roadmap-response'
+                $ref: '#/components/schemas/roadmap-template-response'
         '400':
           description: Bad request
           content:
@@ -2713,27 +2681,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
     delete:
       tags:
-        - Internships
-      summary: Delete internship
-      operationId: deleteInternship
+        - Roadmap Templates
+      summary: Delete roadmap template
+      operationId: deleteRoadmapTemplate
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Internship deleted successfully
+          description: Roadmap template deleted successfully
           content:
             application/json:
               schema:
@@ -2745,57 +2713,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internships/{internshipId}/roadmap:
+  /roadmap-templates/{templateId}/stages:
     get:
       tags:
-        - Internships
-      summary: Get roadmap metadata for an internship
-      description: Same payload as GET /internships/{internshipId}.
-      operationId: getInternshipRoadmap
+        - Roadmap Templates
+      summary: List roadmap template stages
+      operationId: getRoadmapTemplateStages
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/roadmap-response'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-        '404':
-          description: Internship not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-response'
-
-  /internships/{internshipId}/stages:
-    get:
-      tags:
-        - Internships
-      summary: List stages for an internship
-      operationId: getInternshipStages
-      security:
-        - bearerAuth: [ ]
-      parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2814,20 +2747,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
     post:
       tags:
-        - Internships
-      summary: Create stage on internship roadmap
-      operationId: createInternshipStage
+        - Roadmap Templates
+      summary: Create roadmap template stage
+      operationId: createRoadmapTemplateStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2858,22 +2791,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internships/{internshipId}/stages/{stageId}:
+  /roadmap-templates/{templateId}/stages/{stageId}:
     put:
       tags:
-        - Internships
-      summary: Update stage
-      operationId: updateInternshipStage
+        - Roadmap Templates
+      summary: Update roadmap template stage
+      operationId: updateRoadmapTemplateStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2916,13 +2849,13 @@ paths:
                 $ref: '#/components/schemas/error-response'
     delete:
       tags:
-        - Internships
-      summary: Delete stage
-      operationId: deleteInternshipStage
+        - Roadmap Templates
+      summary: Delete roadmap template stage
+      operationId: deleteRoadmapTemplateStage
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2952,16 +2885,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internships/{internshipId}/stages/order:
+  /roadmap-templates/{templateId}/stages/order:
     put:
       tags:
-        - Internships
-      summary: Reorder stages
-      operationId: reorderInternshipStages
+        - Roadmap Templates
+      summary: Reorder roadmap template stages
+      operationId: reorderRoadmapTemplateStages
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -2992,22 +2925,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Internship not found
+          description: Roadmap template not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
 
-  /internships/{internshipId}/stages/{stageId}/status:
+  /roadmap-templates/{templateId}/stages/{stageId}/status:
     patch:
       tags:
-        - Internships
-      summary: Change stage status
-      operationId: changeInternshipStageStatus
+        - Roadmap Templates
+      summary: Change roadmap template stage status
+      operationId: changeRoadmapTemplateStageStatus
       security:
         - bearerAuth: [ ]
       parameters:
-        - name: internshipId
+        - name: templateId
           in: path
           required: true
           schema:
@@ -3048,6 +2981,484 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+
+  # ==================== IPR ====================
+  /iprs:
+    get:
+      tags:
+        - IPR
+      summary: List individual development plans
+      operationId: listIprs
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: mentorId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: internId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: programId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: templateId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ipr-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - IPR
+      summary: Create individual development plan
+      operationId: createIpr
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-ipr-request'
+      responses:
+        '201':
+          description: IPR created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ipr-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+
+  /iprs/profile:
+    get:
+      tags:
+        - IPR
+      summary: List IPRs for the current user
+      operationId: listMyIprs
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ipr-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /iprs/{iprId}:
+    get:
+      tags:
+        - IPR
+      summary: Get IPR by id
+      operationId: getIprById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ipr-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - IPR
+      summary: Update IPR
+      operationId: updateIpr
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-ipr-request'
+      responses:
+        '200':
+          description: IPR updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ipr-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - IPR
+      summary: Delete IPR
+      operationId: deleteIpr
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: IPR deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+
+  /iprs/{iprId}/stages:
+    get:
+      tags:
+        - IPR
+      summary: List stages for IPR
+      operationId: getIprStages
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - IPR
+      summary: Create stage in IPR
+      operationId: createIprStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-stage-request'
+      responses:
+        '201':
+          description: Stage created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /iprs/{iprId}/stages/{stageId}:
+    put:
+      tags:
+        - IPR
+      summary: Update IPR stage
+      operationId: updateIprStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-stage-request'
+      responses:
+        '200':
+          description: Stage updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    delete:
+      tags:
+        - IPR
+      summary: Delete IPR stage
+      operationId: deleteIprStage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stage deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /iprs/{iprId}/stages/order:
+    put:
+      tags:
+        - IPR
+      summary: Reorder IPR stages
+      operationId: reorderIprStages
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reorder-stages-request'
+      responses:
+        '200':
+          description: Stages reordered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /iprs/{iprId}/stages/{stageId}/status:
+    patch:
+      tags:
+        - IPR
+      summary: Change IPR stage status
+      operationId: changeIprStageStatus
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/change-stage-status-request'
+      responses:
+        '200':
+          description: Stage status changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stage-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Stage not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
 
   # ==================== Assessments ====================
   /assessments:
@@ -3722,6 +4133,14 @@ components:
       $ref: './schemas/update-selection-stage-definition-request.json'
 
     # Roadmap schemas
+    roadmap-template-response:
+      $ref: './schemas/roadmap-template-response.json'
+    roadmap-template-list-response:
+      $ref: './schemas/roadmap-template-list-response.json'
+    create-roadmap-template-request:
+      $ref: './schemas/create-roadmap-template-request.json'
+    update-roadmap-template-request:
+      $ref: './schemas/update-roadmap-template-request.json'
     roadmap-response:
       $ref: './schemas/roadmap-response.json'
     roadmap-list-response:
@@ -3730,6 +4149,16 @@ components:
       $ref: './schemas/create-roadmap-request.json'
     update-roadmap-request:
       $ref: './schemas/update-roadmap-request.json'
+
+    # IPR schemas
+    ipr-response:
+      $ref: './schemas/ipr-response.json'
+    ipr-list-response:
+      $ref: './schemas/ipr-list-response.json'
+    create-ipr-request:
+      $ref: './schemas/create-ipr-request.json'
+    update-ipr-request:
+      $ref: './schemas/update-ipr-request.json'
 
     # Stage schemas
     stage-response:

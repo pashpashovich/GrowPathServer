@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "programId",
+    "title"
+  ],
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    }
+  }
+}

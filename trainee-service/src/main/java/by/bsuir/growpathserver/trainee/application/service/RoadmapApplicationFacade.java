@@ -1,13 +1,10 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -17,20 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import by.bsuir.growpathserver.dto.model.ChangeStageStatusRequest;
-import by.bsuir.growpathserver.dto.model.CreateRoadmapRequest;
+import by.bsuir.growpathserver.dto.model.CreateRoadmapTemplateRequest;
 import by.bsuir.growpathserver.dto.model.CreateStageRequest;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
 import by.bsuir.growpathserver.dto.model.ReorderStagesRequest;
-import by.bsuir.growpathserver.dto.model.RoadmapListResponse;
-import by.bsuir.growpathserver.dto.model.RoadmapResponse;
+import by.bsuir.growpathserver.dto.model.RoadmapTemplateListResponse;
+import by.bsuir.growpathserver.dto.model.RoadmapTemplateResponse;
 import by.bsuir.growpathserver.dto.model.StageListResponse;
 import by.bsuir.growpathserver.dto.model.StageResponse;
-import by.bsuir.growpathserver.dto.model.UpdateRoadmapRequest;
+import by.bsuir.growpathserver.dto.model.UpdateRoadmapTemplateRequest;
 import by.bsuir.growpathserver.dto.model.UpdateStageRequest;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapEntity;
-import by.bsuir.growpathserver.trainee.domain.entity.RoadmapInternEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapStageEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.RoadmapLifecycleStatus;
@@ -57,73 +53,45 @@ public class RoadmapApplicationFacade {
     private final RoadmapMapper roadmapMapper;
 
     @Transactional(readOnly = true)
-    public RoadmapListResponse getProgramInternships(String programId) {
+    public RoadmapTemplateListResponse getProgramRoadmapTemplates(String programId) {
         long pid = parseLongId(programId, "programId");
         internshipProgramRepository.findById(pid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<RoadmapEntity> all = roadmapRepository.findByProgramId(pid);
         if (isHrOrAdmin()) {
-            return toRoadmapListResponse(all);
+            return toRoadmapTemplateListResponse(all);
         }
-        return toRoadmapListResponse(all.stream().filter(this::canView).collect(Collectors.toList()));
+        return toRoadmapTemplateListResponse(all.stream().filter(this::canView).collect(Collectors.toList()));
     }
 
     @Transactional(readOnly = true)
-    public RoadmapListResponse listInternships(Long mentorId, Long internId, Long programId) {
-        if (isIntern() && !isHrOrAdmin()) {
-            Long currentInternUserId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
-            if (Objects.isNull(currentInternUserId)) {
-                RoadmapListResponse empty = new RoadmapListResponse();
-                empty.setData(new ArrayList<>());
-                return empty;
-            }
-            return toRoadmapListResponse(roadmapRepository.findByInternUserId(currentInternUserId));
-        }
-
+    public RoadmapTemplateListResponse listRoadmapTemplates(Long mentorId, Long programId) {
         Long effectiveMentorId = mentorId;
         if (isMentor() && !isHrOrAdmin() && Objects.isNull(effectiveMentorId)) {
             effectiveMentorId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
         }
 
-        Specification<RoadmapEntity> spec = buildRoadmapSpec(programId, effectiveMentorId, internId);
-        return toRoadmapListResponse(roadmapRepository.findAll(spec));
+        Specification<RoadmapEntity> spec = buildRoadmapSpec(programId, effectiveMentorId, null);
+        return toRoadmapTemplateListResponse(roadmapRepository.findAll(spec));
     }
 
     @Transactional(readOnly = true)
-    public RoadmapListResponse listMyInternships() {
-        Long uid = currentUserResolver.resolveCurrentUserDatabaseId()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-        Set<Long> seen = new LinkedHashSet<>();
-        List<RoadmapEntity> out = new ArrayList<>();
-        for (RoadmapEntity r : roadmapRepository.findByMentorId(uid)) {
-            if (seen.add(r.getId())) {
-                out.add(r);
-            }
-        }
-        for (RoadmapEntity r : roadmapRepository.findByInternUserId(uid)) {
-            if (seen.add(r.getId())) {
-                out.add(r);
-            }
-        }
-        return toRoadmapListResponse(out);
+    public RoadmapTemplateResponse getRoadmapTemplateById(String templateId) {
+        return roadmapMapper.toRoadmapTemplateResponse(requireRoadmapViewable(parseLongId(templateId, "templateId")));
     }
 
     @Transactional(readOnly = true)
-    public RoadmapResponse getInternshipById(String internshipId) {
-        return roadmapMapper.toRoadmapResponse(requireRoadmapViewable(parseLongId(internshipId, "internshipId")));
-    }
-
-    @Transactional(readOnly = true)
-    public StageListResponse getInternshipStages(String internshipId) {
-        long rid = parseLongId(internshipId, "internshipId");
+    public StageListResponse getRoadmapTemplateStages(String templateId) {
+        long rid = parseLongId(templateId, "templateId");
         requireRoadmapViewable(rid);
         List<RoadmapStageEntity> stages = roadmapStageRepository.findByRoadmapIdOrderByStageOrderAsc(rid);
         return roadmapMapper.toStageListResponse(stages);
     }
 
     @Transactional
-    public StageResponse createInternshipStage(String internshipId, CreateStageRequest request) {
-        RoadmapEntity roadmap = requireRoadmapEditable(parseLongId(internshipId, "internshipId"));
+    public StageResponse createRoadmapTemplateStage(String templateId, CreateStageRequest request) {
+        RoadmapEntity roadmap = requireRoadmapEditable(parseLongId(templateId, "templateId"));
+        validateStageDateRange(roadmap, request.getStartDate(), request.getEndDate());
         RoadmapStageEntity stage = new RoadmapStageEntity();
         stage.setRoadmap(roadmap);
         stage.setTitle(request.getTitle());
@@ -145,10 +113,10 @@ public class RoadmapApplicationFacade {
     }
 
     @Transactional
-    public StageResponse updateInternshipStage(String internshipId, String stageId, UpdateStageRequest request) {
-        long rid = parseLongId(internshipId, "internshipId");
+    public StageResponse updateRoadmapTemplateStage(String templateId, String stageId, UpdateStageRequest request) {
+        long rid = parseLongId(templateId, "templateId");
         long sid = parseLongId(stageId, "stageId");
-        requireRoadmapEditable(rid);
+        RoadmapEntity roadmap = requireRoadmapEditable(rid);
         RoadmapStageEntity stage = roadmapStageRepository.findByIdAndRoadmapId(sid, rid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (Objects.nonNull(request.getTitle())) {
@@ -163,6 +131,7 @@ public class RoadmapApplicationFacade {
         if (Objects.nonNull(request.getEndDate())) {
             stage.setEndDate(request.getEndDate());
         }
+        validateStageDateRange(roadmap, stage.getStartDate(), stage.getEndDate());
         if (Objects.nonNull(request.getPriority())) {
             stage.setPriority(StagePriorityLevel.fromString(request.getPriority().getValue()));
         }
@@ -176,8 +145,8 @@ public class RoadmapApplicationFacade {
     }
 
     @Transactional
-    public MessageResponse deleteInternshipStage(String internshipId, String stageId) {
-        long rid = parseLongId(internshipId, "internshipId");
+    public MessageResponse deleteRoadmapTemplateStage(String templateId, String stageId) {
+        long rid = parseLongId(templateId, "templateId");
         long sid = parseLongId(stageId, "stageId");
         requireRoadmapEditable(rid);
         RoadmapStageEntity stage = roadmapStageRepository.findByIdAndRoadmapId(sid, rid)
@@ -190,8 +159,8 @@ public class RoadmapApplicationFacade {
     }
 
     @Transactional
-    public MessageResponse reorderInternshipStages(String internshipId, ReorderStagesRequest request) {
-        long rid = parseLongId(internshipId, "internshipId");
+    public MessageResponse reorderRoadmapTemplateStages(String templateId, ReorderStagesRequest request) {
+        long rid = parseLongId(templateId, "templateId");
         requireRoadmapEditable(rid);
         List<Long> ids = request.getStageIds();
         for (int i = 0; i < ids.size(); i++) {
@@ -206,9 +175,9 @@ public class RoadmapApplicationFacade {
     }
 
     @Transactional
-    public StageResponse changeInternshipStageStatus(String internshipId, String stageId,
-                                                     ChangeStageStatusRequest request) {
-        long rid = parseLongId(internshipId, "internshipId");
+    public StageResponse changeRoadmapTemplateStageStatus(String templateId, String stageId,
+                                                          ChangeStageStatusRequest request) {
+        long rid = parseLongId(templateId, "templateId");
         long sid = parseLongId(stageId, "stageId");
         requireRoadmapEditable(rid);
         RoadmapStageEntity stage = roadmapStageRepository.findByIdAndRoadmapId(sid, rid)
@@ -221,15 +190,15 @@ public class RoadmapApplicationFacade {
     }
 
     @Transactional
-    public RoadmapResponse createInternship(CreateRoadmapRequest request) {
+    public RoadmapTemplateResponse createRoadmapTemplate(CreateRoadmapTemplateRequest request) {
         InternshipProgramEntity program = internshipProgramRepository.findById(request.getProgramId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         RoadmapEntity entity = new RoadmapEntity();
         entity.setProgram(program);
         entity.setTitle(request.getTitle());
         entity.setDescription(request.getDescription());
-        entity.setStartDate(request.getStartDate());
-        entity.setEndDate(request.getEndDate());
+        entity.setStartDate(program.getStartDate());
+        entity.setEndDate(program.getStartDate().plusDays(Math.max(1, program.getDuration()) - 1L));
         entity.setStatus(RoadmapLifecycleStatus.DRAFT);
         if (Objects.nonNull(request.getMentorId())) {
             UserEntity mentor = userRepository.findById(request.getMentorId())
@@ -237,50 +206,43 @@ public class RoadmapApplicationFacade {
             entity.setMentor(mentor);
         }
         RoadmapEntity saved = roadmapRepository.save(entity);
-        replaceInterns(saved, request.getInternIds());
-        saved = roadmapRepository.save(saved);
-        return roadmapMapper.toRoadmapResponse(
+        return roadmapMapper.toRoadmapTemplateResponse(
                 roadmapRepository.findWithMentorAndInternsById(saved.getId()).orElse(saved));
     }
 
     @Transactional
-    public RoadmapResponse updateInternship(String id, UpdateRoadmapRequest request) {
-        RoadmapEntity entity = requireRoadmapEditable(parseLongId(id, "internshipId"));
+    public RoadmapTemplateResponse updateRoadmapTemplate(String id, UpdateRoadmapTemplateRequest request) {
+        RoadmapEntity entity = requireRoadmapEditable(parseLongId(id, "templateId"));
         if (Objects.nonNull(request.getTitle())) {
             entity.setTitle(request.getTitle());
         }
         if (Objects.nonNull(request.getDescription())) {
             entity.setDescription(request.getDescription());
         }
-        if (Objects.nonNull(request.getStartDate())) {
-            entity.setStartDate(request.getStartDate());
-        }
-        if (Objects.nonNull(request.getEndDate())) {
-            entity.setEndDate(request.getEndDate());
-        }
         if (Objects.nonNull(request.getStatus())) {
-            entity.setStatus(RoadmapLifecycleStatus.fromString(request.getStatus().getValue()));
+            RoadmapLifecycleStatus targetStatus = RoadmapLifecycleStatus.fromString(request.getStatus().getValue());
+            if (targetStatus == RoadmapLifecycleStatus.ACTIVE) {
+                validateRoadmapActivation(entity);
+            }
+            entity.setStatus(targetStatus);
         }
         if (Objects.nonNull(request.getMentorId())) {
             UserEntity mentor = userRepository.findById(request.getMentorId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
             entity.setMentor(mentor);
         }
-        if (Objects.nonNull(request.getInternIds())) {
-            replaceInterns(entity, request.getInternIds());
-        }
         roadmapRepository.save(entity);
-        return roadmapMapper.toRoadmapResponse(
+        return roadmapMapper.toRoadmapTemplateResponse(
                 roadmapRepository.findWithMentorAndInternsById(entity.getId()).orElse(entity));
     }
 
     @Transactional
-    public MessageResponse deleteInternship(String id) {
-        long rid = parseLongId(id, "internshipId");
+    public MessageResponse deleteRoadmapTemplate(String id) {
+        long rid = parseLongId(id, "templateId");
         requireRoadmapEditable(rid);
         roadmapRepository.deleteById(rid);
         MessageResponse m = new MessageResponse();
-        m.setMessage("Internship deleted");
+        m.setMessage("Roadmap template deleted");
         return m;
     }
 
@@ -326,13 +288,9 @@ public class RoadmapApplicationFacade {
                 && uid.equals(r.getMentor().getId())) {
             return true;
         }
-        if (Objects.nonNull(uid)) {
-            return r.getInterns().stream()
-                    .map(RoadmapInternEntity::getUser)
-                    .filter(Objects::nonNull)
-                    .anyMatch(u -> uid.equals(u.getId()));
-        }
-        return false;
+        return Objects.nonNull(uid)
+                && Objects.nonNull(r.getMentor())
+                && uid.equals(r.getMentor().getId());
     }
 
     private boolean canEdit(RoadmapEntity r) {
@@ -390,30 +348,12 @@ public class RoadmapApplicationFacade {
         };
     }
 
-    private void replaceInterns(RoadmapEntity roadmap, List<String> internIds) {
-        roadmap.getInterns().clear();
-        if (Objects.isNull(internIds)) {
-            return;
-        }
-        for (String kid : internIds) {
-            if (StringUtils.isBlank(kid)) {
-                continue;
-            }
-            UserEntity user = userRepository.findByKeycloakUserId(kid.trim())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid intern id"));
-            RoadmapInternEntity ri = new RoadmapInternEntity();
-            ri.setRoadmap(roadmap);
-            ri.setUser(user);
-            roadmap.getInterns().add(ri);
-        }
-    }
-
-    private RoadmapListResponse toRoadmapListResponse(List<RoadmapEntity> entities) {
+    private RoadmapTemplateListResponse toRoadmapTemplateListResponse(List<RoadmapEntity> entities) {
         List<RoadmapEntity> loaded = new ArrayList<>();
         for (RoadmapEntity entity : entities) {
             loaded.add(roadmapRepository.findWithMentorAndInternsById(entity.getId()).orElse(entity));
         }
-        return roadmapMapper.toRoadmapListResponse(loaded);
+        return roadmapMapper.toRoadmapTemplateListResponse(loaded);
     }
 
     private static long parseLongId(String raw, String label) {
@@ -422,6 +362,38 @@ public class RoadmapApplicationFacade {
         }
         catch (NumberFormatException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid " + label);
+        }
+    }
+
+    private void validateStageDateRange(RoadmapEntity roadmap,
+                                        java.time.LocalDate startDate,
+                                        java.time.LocalDate endDate) {
+        if (Objects.isNull(startDate) || Objects.isNull(endDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stage dates are required");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stage startDate must be before endDate");
+        }
+        if (startDate.isBefore(roadmap.getStartDate()) || endDate.isAfter(roadmap.getEndDate())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Stage dates must be within internship period");
+        }
+    }
+
+    private void validateRoadmapActivation(RoadmapEntity roadmap) {
+        if (Objects.isNull(roadmap.getMentor())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mentor must be assigned before activation");
+        }
+        if (roadmap.getInterns().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one intern must be assigned");
+        }
+        List<RoadmapStageEntity> stages = roadmapStageRepository.findByRoadmapIdOrderByStageOrderAsc(roadmap.getId());
+        if (stages.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one stage is required for activation");
+        }
+        for (RoadmapStageEntity stage : stages) {
+            validateStageDateRange(roadmap, stage.getStartDate(), stage.getEndDate());
         }
     }
 }

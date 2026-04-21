@@ -10,8 +10,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import by.bsuir.growpathserver.dto.model.RoadmapListResponse;
 import by.bsuir.growpathserver.dto.model.RoadmapResponse;
+import by.bsuir.growpathserver.dto.model.RoadmapTemplateListResponse;
+import by.bsuir.growpathserver.dto.model.RoadmapTemplateResponse;
 import by.bsuir.growpathserver.dto.model.StageListResponse;
 import by.bsuir.growpathserver.dto.model.StageResponse;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapEntity;
@@ -29,6 +30,11 @@ public interface RoadmapMapper {
     @Mapping(target = "status", expression = "java(toRoadmapStatus(entity))")
     RoadmapResponse toRoadmapResponse(RoadmapEntity entity);
 
+    @Mapping(target = "programId", source = "program.id")
+    @Mapping(target = "mentorId", source = "mentor.id")
+    @Mapping(target = "status", expression = "java(toRoadmapTemplateStatus(entity))")
+    RoadmapTemplateResponse toRoadmapTemplateResponse(RoadmapEntity entity);
+
     @Mapping(target = "roadmapId", source = "roadmap.id")
     @Mapping(target = "createdBy", source = "createdBy.id")
     @Mapping(target = "isCheckpoint", source = "checkpoint")
@@ -37,11 +43,11 @@ public interface RoadmapMapper {
     @Mapping(target = "priority", expression = "java(toStagePriority(stage))")
     StageResponse toStageResponse(RoadmapStageEntity stage);
 
-    default RoadmapListResponse toRoadmapListResponse(List<RoadmapEntity> entities) {
-        RoadmapListResponse response = new RoadmapListResponse();
+    default RoadmapTemplateListResponse toRoadmapTemplateListResponse(List<RoadmapEntity> entities) {
+        RoadmapTemplateListResponse response = new RoadmapTemplateListResponse();
         List<Object> rows = new ArrayList<>();
         for (RoadmapEntity entity : entities) {
-            rows.add(toRoadmapResponse(entity));
+            rows.add(toRoadmapTemplateResponse(entity));
         }
         response.setData(rows);
         return response;
@@ -72,6 +78,10 @@ public interface RoadmapMapper {
 
     default StageResponse.StatusEnum toStageStatus(RoadmapStageEntity stage) {
         return StageResponse.StatusEnum.fromValue(stage.getStatus().getValue());
+    }
+
+    default RoadmapTemplateResponse.StatusEnum toRoadmapTemplateStatus(RoadmapEntity entity) {
+        return RoadmapTemplateResponse.StatusEnum.fromValue(entity.getStatus().getValue());
     }
 
     default StageResponse.PriorityEnum toStagePriority(RoadmapStageEntity stage) {

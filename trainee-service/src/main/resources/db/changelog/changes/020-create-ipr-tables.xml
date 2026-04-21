@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="020-01-create-iprs" author="Kasovich Pavel">
+    <createTable tableName="iprs">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="program_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="roadmap_template_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="intern_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mentor_id" type="BIGINT"/>
+      <column name="title" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="start_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(32)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP"/>
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="iprs" baseColumnNames="program_id"
+                             referencedTableName="internship_programs" referencedColumnNames="id"
+                             constraintName="fk_iprs_program"/>
+    <addForeignKeyConstraint baseTableName="iprs" baseColumnNames="roadmap_template_id"
+                             referencedTableName="roadmaps" referencedColumnNames="id"
+                             constraintName="fk_iprs_template"/>
+    <addForeignKeyConstraint baseTableName="iprs" baseColumnNames="intern_id"
+                             referencedTableName="users" referencedColumnNames="id"
+                             constraintName="fk_iprs_intern"/>
+    <addForeignKeyConstraint baseTableName="iprs" baseColumnNames="mentor_id"
+                             referencedTableName="users" referencedColumnNames="id"
+                             constraintName="fk_iprs_mentor"/>
+
+    <createIndex indexName="idx_iprs_program" tableName="iprs">
+      <column name="program_id"/>
+    </createIndex>
+    <createIndex indexName="idx_iprs_template" tableName="iprs">
+      <column name="roadmap_template_id"/>
+    </createIndex>
+    <createIndex indexName="idx_iprs_intern" tableName="iprs">
+      <column name="intern_id"/>
+    </createIndex>
+    <createIndex indexName="idx_iprs_mentor" tableName="iprs">
+      <column name="mentor_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="020-02-create-ipr-stages" author="Kasovich Pavel">
+    <createTable tableName="ipr_stages">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ipr_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="template_stage_id" type="BIGINT"/>
+      <column name="title" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="start_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_date" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(32)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="priority" type="VARCHAR(16)"/>
+      <column name="is_checkpoint" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="comments" type="TEXT"/>
+      <column name="stage_order" type="INTEGER">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="BIGINT"/>
+      <column name="created_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP"/>
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="ipr_stages" baseColumnNames="ipr_id"
+                             referencedTableName="iprs" referencedColumnNames="id"
+                             constraintName="fk_ipr_stages_ipr" onDelete="CASCADE"/>
+    <addForeignKeyConstraint baseTableName="ipr_stages" baseColumnNames="template_stage_id"
+                             referencedTableName="roadmap_stages" referencedColumnNames="id"
+                             constraintName="fk_ipr_stages_template_stage"/>
+    <addForeignKeyConstraint baseTableName="ipr_stages" baseColumnNames="created_by"
+                             referencedTableName="users" referencedColumnNames="id"
+                             constraintName="fk_ipr_stages_created_by"/>
+
+    <createIndex indexName="idx_ipr_stages_ipr" tableName="ipr_stages">
+      <column name="ipr_id"/>
+    </createIndex>
+    <createIndex indexName="idx_ipr_stages_template_stage" tableName="ipr_stages">
+      <column name="template_stage_id"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

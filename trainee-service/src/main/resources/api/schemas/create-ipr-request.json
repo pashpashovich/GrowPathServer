@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "required": [
+    "programId",
+    "templateId",
+    "internId",
+    "title",
+    "startDate",
+    "endDate"
+  ],
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "templateId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "internId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}
