@@ -23,6 +23,39 @@
     "dueDate": {
       "type": "string",
       "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "on_review",
+        "needs_rework",
+        "completed",
+        "rejected"
+      ],
+      "description": "Optional status transition; same rules as PATCH /tasks/{id}/status (validated server-side)."
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Artifact links when transitioning to on_review / submitted."
+    },
+    "comment": {
+      "type": "string",
+      "description": "Submission comment (on_review) or optional mentor comment (completed)."
+    },
+    "rating": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Required when transitioning to completed via PUT."
+    },
+    "feedback": {
+      "type": "string",
+      "description": "Required when transitioning to needs_rework via PUT."
     }
   }
 }

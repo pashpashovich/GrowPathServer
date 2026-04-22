@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "description": "Either \"to\" (target status) or \"action\" (alias) is required. Use \"links\"/\"comment\" when moving to on_review; \"rating\"/\"comment\" when accepting; \"feedback\" (or \"comment\") when sending to needs_rework.",
+  "properties": {
+    "to": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "on_review",
+        "needs_rework",
+        "completed",
+        "rejected"
+      ]
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "take",
+        "start",
+        "submit",
+        "accept",
+        "approve",
+        "rework"
+      ]
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "comment": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "feedback": {
+      "type": "string"
+    }
+  }
+}

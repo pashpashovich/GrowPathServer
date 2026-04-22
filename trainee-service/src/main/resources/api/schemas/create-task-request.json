@@ -21,10 +21,12 @@
         "high"
       ]
     },
-    "assigneeId": {
-      "nullable": true,
-      "type": "integer",
-      "format": "int64"
+    "assigneeIds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      }
     },
     "internshipId": {
       "type": "integer",

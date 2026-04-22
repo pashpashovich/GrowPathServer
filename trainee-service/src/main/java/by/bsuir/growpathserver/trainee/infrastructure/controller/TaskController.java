@@ -1,138 +1,85 @@
 package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
-import java.util.NoSuchElementException;
+import java.util.Map;
+import java.util.Optional;
 
-import org.springframework.data.domain.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import by.bsuir.growpathserver.dto.api.MeApi;
 import by.bsuir.growpathserver.dto.api.TasksApi;
+import by.bsuir.growpathserver.dto.model.ChangeTaskStatusRequest;
+import by.bsuir.growpathserver.dto.model.CommentListResponse;
 import by.bsuir.growpathserver.dto.model.CommentResponse;
+import by.bsuir.growpathserver.dto.model.ConfirmTaskArtifactRequest;
 import by.bsuir.growpathserver.dto.model.CreateCommentRequest;
 import by.bsuir.growpathserver.dto.model.CreateTaskRequest;
+import by.bsuir.growpathserver.dto.model.FileResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
-import by.bsuir.growpathserver.dto.model.PaginationResponse;
+import by.bsuir.growpathserver.dto.model.PresignTaskArtifactRequest;
+import by.bsuir.growpathserver.dto.model.ReorderTasksRequest;
+import by.bsuir.growpathserver.dto.model.ReviewTaskRequest;
+import by.bsuir.growpathserver.dto.model.SubmitTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
 import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
-import by.bsuir.growpathserver.trainee.application.command.CompleteTaskCommand;
-import by.bsuir.growpathserver.trainee.application.command.CreateTaskCommand;
-import by.bsuir.growpathserver.trainee.application.command.DeleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateTaskCommand;
-import by.bsuir.growpathserver.trainee.application.handler.CompleteTaskHandler;
-import by.bsuir.growpathserver.trainee.application.handler.CreateTaskHandler;
-import by.bsuir.growpathserver.trainee.application.handler.DeleteTaskHandler;
-import by.bsuir.growpathserver.trainee.application.handler.GetTaskByIdHandler;
-import by.bsuir.growpathserver.trainee.application.handler.GetTasksHandler;
-import by.bsuir.growpathserver.trainee.application.handler.UpdateTaskHandler;
-import by.bsuir.growpathserver.trainee.application.query.GetTaskByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetTasksQuery;
-import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
+import by.bsuir.growpathserver.trainee.application.service.TaskFacade;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
-import by.bsuir.growpathserver.trainee.infrastructure.mapper.TaskMapper;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class TaskController implements TasksApi {
+public class TaskController extends BaseController implements TasksApi, MeApi {
 
-    private final CreateTaskHandler createTaskHandler;
-    private final GetTasksHandler getTasksHandler;
-    private final GetTaskByIdHandler getTaskByIdHandler;
-    private final UpdateTaskHandler updateTaskHandler;
-    private final CompleteTaskHandler completeTaskHandler;
-    private final DeleteTaskHandler deleteTaskHandler;
-    private final TaskMapper taskMapper;
+    private final TaskFacade taskFacade;
+
+    @Override
+    public Optional<NativeWebRequest> getRequest() {
+        return Optional.empty();
+    }
 
     @Override
     public ResponseEntity<CommentResponse> addTaskComment(String id, CreateCommentRequest createCommentRequest) {
-        // TODO: Implement comment functionality
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskFacade.addTaskComment(id, createCommentRequest));
     }
 
     @Override
     public ResponseEntity<TaskStatusResponse> completeTask(String id) {
-        try {
-            Long taskId = Long.parseLong(id);
-            CompleteTaskCommand command = new CompleteTaskCommand(taskId);
-            Task task = completeTaskHandler.handle(command);
-
-            TaskStatusResponse response = new TaskStatusResponse();
-            response.setId(task.getId());
-            response.setStatus(TaskStatusResponse.StatusEnum.fromValue(task.getStatus().getValue()));
-            response.setCompletedAt(task.getCompletedAt());
-
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-        catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        TaskStatusResponse taskStatusResponse = taskFacade.completeTask(id);
+        return ResponseEntity.ok(taskStatusResponse);
     }
 
     @Override
     public ResponseEntity<TaskResponse> createTask(CreateTaskRequest createTaskRequest) {
-        try {
-            // TODO: Get mentorId from JWT token when authentication is properly configured
-            Long mentorId = 1L; // Should be extracted from JWT
-            Long assigneeId = createTaskRequest.getAssigneeId();
-            Long stageId = createTaskRequest.getStageId();
-            Long internshipId = createTaskRequest.getInternshipId();
-            java.time.LocalDateTime dueDate = createTaskRequest.getDueDate();
-
-            CreateTaskCommand command = CreateTaskCommand.builder()
-                    .title(createTaskRequest.getTitle())
-                    .description(createTaskRequest.getDescription())
-                    .priority(TaskPriority.fromString(createTaskRequest.getPriority().getValue()))
-                    .assigneeId(assigneeId)
-                    .mentorId(mentorId)
-                    .internshipId(internshipId)
-                    .stageId(stageId)
-                    .dueDate(dueDate)
-                    .build();
-
-            Task task = createTaskHandler.handle(command);
-            TaskResponse response = taskMapper.toTaskResponse(task);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        TaskResponse task = taskFacade.createTask(createTaskRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @Override
     public ResponseEntity<MessageResponse> deleteTask(String id) {
-        try {
-            Long taskId = Long.parseLong(id);
-            DeleteTaskCommand command = new DeleteTaskCommand(taskId);
-            deleteTaskHandler.handle(command);
-
-            MessageResponse response = new MessageResponse();
-            response.setMessage("Task deleted successfully");
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        taskFacade.deleteTask(id);
+        MessageResponse response = new MessageResponse();
+        response.setMessage("Task deleted successfully");
+        return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<TaskResponse> getTaskById(String id) {
-        try {
-            Long taskId = Long.parseLong(id);
-            GetTaskByIdQuery query = new GetTaskByIdQuery(taskId);
-            Task task = getTaskByIdHandler.handle(query);
-            TaskResponse response = taskMapper.toTaskResponse(task);
-            return ResponseEntity.ok(response);
-        }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(taskFacade.getTaskById(id));
+    }
+
+    @Override
+    public ResponseEntity<CommentListResponse> getTaskComments(String id) {
+        return ResponseEntity.ok(taskFacade.getTaskComments(id));
     }
 
     @Override
@@ -142,46 +89,59 @@ public class TaskController implements TasksApi {
                                                      String assignee,
                                                      String priority,
                                                      String internshipId,
-                                                     String mentorId) {
-        try {
-            GetTasksQuery query = GetTasksQuery.builder()
-                    .page(page)
-                    .limit(limit)
-                    .status(status != null ? TaskStatus.fromString(status) : null)
-                    .assignee(assignee)
-                    .priority(priority != null ? TaskPriority.fromString(priority) : null)
-                    .internshipId(internshipId)
-                    .mentorId(mentorId)
-                    .build();
+                                                     String mentorId,
+                                                     String scope) {
+        GetTasksQuery query = GetTasksQuery.builder()
+                .page(page)
+                .limit(limit)
+                .status(status != null ? TaskStatus.fromString(status) : null)
+                .assignee(assignee)
+                .priority(priority != null ? TaskPriority.fromString(priority) : null)
+                .internshipId(internshipId)
+                .mentorId(mentorId)
+                .scope(scope)
+                .build();
 
-            Page<Task> tasksPage = getTasksHandler.handle(query);
+        return ResponseEntity.ok(taskFacade.getTasks(query));
+    }
 
-            TaskListResponse response = new TaskListResponse();
-            response.setData(tasksPage.getContent().stream()
-                                     .map(taskMapper::toTaskResponse)
-                                     .toList());
-
-            PaginationResponse pagination = new PaginationResponse();
-            pagination.setPage(tasksPage.getNumber() + 1);
-            pagination.setLimit(tasksPage.getSize());
-            pagination.setTotal((int) tasksPage.getTotalElements());
-            pagination.setTotalPages(tasksPage.getTotalPages());
-            response.setPagination(pagination);
-
-            return ResponseEntity.ok(response);
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @Override
+    public ResponseEntity<TaskListResponse> listMyTasks(Integer page,
+                                                        Integer limit,
+                                                        String status,
+                                                        String priority,
+                                                        String internshipId) {
+        GetTasksQuery query = GetTasksQuery.builder()
+                .page(page)
+                .limit(limit)
+                .status(status != null ? TaskStatus.fromString(status) : null)
+                .assignee(null)
+                .priority(priority != null ? TaskPriority.fromString(priority) : null)
+                .internshipId(internshipId)
+                .mentorId(null)
+                .scope("assigned_to_me")
+                .build();
+        return ResponseEntity.ok(taskFacade.getTasks(query));
     }
 
     @Override
     public ResponseEntity<TaskResponse> updateTask(String id, UpdateTaskRequest updateTaskRequest) {
-        try {
-            Long taskId = Long.parseLong(id);
-            Long assigneeId = updateTaskRequest.getAssigneeId();
-            java.time.LocalDateTime dueDate = updateTaskRequest.getDueDate();
+        Long taskId = Long.parseLong(id);
+        boolean hasTransitionFieldsWithoutStatus = updateTaskRequest.getStatus() == null
+                && ((updateTaskRequest.getLinks() != null && !updateTaskRequest.getLinks().isEmpty())
+                || updateTaskRequest.getRating() != null
+                || StringUtils.isNotBlank(updateTaskRequest.getFeedback()));
+        if (hasTransitionFieldsWithoutStatus) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                                              "links, rating, and feedback require status on PUT");
+        }
 
+        boolean structural = updateTaskRequest.getTitle() != null
+                || updateTaskRequest.getDescription() != null
+                || updateTaskRequest.getPriority() != null
+                || updateTaskRequest.getAssigneeId() != null
+                || updateTaskRequest.getDueDate() != null;
+        if (structural) {
             UpdateTaskCommand command = UpdateTaskCommand.builder()
                     .id(taskId)
                     .title(updateTaskRequest.getTitle())
@@ -189,20 +149,73 @@ public class TaskController implements TasksApi {
                     .status(null)
                     .priority(updateTaskRequest.getPriority() != null ?
                                       TaskPriority.fromString(updateTaskRequest.getPriority().getValue()) : null)
-                    .assigneeId(assigneeId)
+                    .assigneeId(updateTaskRequest.getAssigneeId())
                     .stageId(null)
-                    .dueDate(dueDate)
+                    .dueDate(updateTaskRequest.getDueDate())
                     .build();
+            taskFacade.updateTask(command);
+        }
 
-            Task task = updateTaskHandler.handle(command);
-            TaskResponse response = taskMapper.toTaskResponse(task);
-            return ResponseEntity.ok(response);
+        if (updateTaskRequest.getStatus() != null) {
+            ChangeTaskStatusRequest transition = new ChangeTaskStatusRequest();
+            transition.setTo(ChangeTaskStatusRequest.ToEnum.fromValue(updateTaskRequest.getStatus().getValue()));
+            transition.setLinks(updateTaskRequest.getLinks());
+            transition.setComment(updateTaskRequest.getComment());
+            transition.setRating(updateTaskRequest.getRating());
+            transition.setFeedback(updateTaskRequest.getFeedback());
+            taskFacade.changeTaskStatus(id, transition);
         }
-        catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        return ResponseEntity.ok(taskFacade.getTaskById(id));
+    }
+
+    @Override
+    public ResponseEntity<TaskStatusResponse> patchTaskStatus(String id,
+                                                              ChangeTaskStatusRequest changeTaskStatusRequest) {
+        return ResponseEntity.ok(taskFacade.changeTaskStatus(id, changeTaskStatusRequest));
+    }
+
+    @Override
+    public ResponseEntity<Void> reorderTasks(ReorderTasksRequest reorderTasksRequest, String status) {
+        taskFacade.reorderTasks(reorderTasksRequest, status);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<TaskStatusResponse> takeTask(String id) {
+        return ResponseEntity.ok(taskFacade.takeTask(id));
+    }
+
+    @Override
+    public ResponseEntity<TaskStatusResponse> submitTask(String id, SubmitTaskRequest submitTaskRequest) {
+        return ResponseEntity.ok(taskFacade.submitTask(id, submitTaskRequest));
+    }
+
+    @Override
+    public ResponseEntity<TaskStatusResponse> reviewTask(String id, ReviewTaskRequest reviewTaskRequest) {
+        return ResponseEntity.ok(taskFacade.reviewTask(id, reviewTaskRequest));
+    }
+
+    @Override
+    public ResponseEntity<FileResponse> uploadTaskFile(String id, MultipartFile file) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Override
+    public ResponseEntity<Map<String, String>> presignTaskArtifactUpload(String id,
+                                                                         PresignTaskArtifactRequest request) {
+        return ResponseEntity.ok(taskFacade.createPresignedUpload(Long.parseLong(id), request.getFileName()));
+    }
+
+    @Override
+    public ResponseEntity<FileResponse> confirmTaskArtifactUpload(String id, ConfirmTaskArtifactRequest request) {
+        FileResponse response = taskFacade.confirmUploadedArtifact(
+                Long.parseLong(id),
+                request.getObjectKey(),
+                request.getName(),
+                request.getContentType(),
+                request.getSizeBytes()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

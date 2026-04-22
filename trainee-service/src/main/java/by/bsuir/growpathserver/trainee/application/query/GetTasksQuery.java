@@ -12,6 +12,7 @@ public record GetTasksQuery(
         String assignee,
         TaskPriority priority,
         String internshipId,
-        String mentorId
+        String mentorId,
+        String scope
 ) {
 }

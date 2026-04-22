@@ -63,6 +63,10 @@ spring:
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/departments/**
+            - id: me-service
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/me/**
             - id: tasks-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

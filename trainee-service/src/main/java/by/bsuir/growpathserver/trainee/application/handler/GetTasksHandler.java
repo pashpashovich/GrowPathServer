@@ -3,6 +3,7 @@ package by.bsuir.growpathserver.trainee.application.handler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,8 @@ public class GetTasksHandler {
     public Page<Task> handle(GetTasksQuery query) {
         int page = query.page() != null && query.page() > 0 ? query.page() - 1 : 0;
         int limit = query.limit() != null && query.limit() > 0 ? query.limit() : 10;
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page, limit,
+                Sort.by(Sort.Order.asc("sortOrder"), Sort.Order.asc("id")));
 
         Specification<TaskEntity> spec = (root, criteriaQuery, cb) -> cb.conjunction();
 

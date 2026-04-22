@@ -731,7 +731,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [ pending, in_progress, submitted, completed, rejected ]
+            enum: [ pending, in_progress, submitted, on_review, needs_rework, completed, rejected ]
       responses:
         '200':
           description: Successful response
@@ -922,11 +922,12 @@ paths:
           in: query
           schema:
             type: string
-            enum: [ pending, in_progress, submitted, completed, rejected ]
+            enum: [ pending, in_progress, submitted, on_review, needs_rework, completed, rejected ]
         - name: assignee
           in: query
           schema:
             type: string
+            description: Assignee user id or the string "me" for the current user.
         - name: priority
           in: query
           schema:
@@ -936,10 +937,18 @@ paths:
           in: query
           schema:
             type: string
+          description: Internship program id (numeric). Value "me" is reserved for future use.
         - name: mentorId
           in: query
           schema:
             type: string
+            description: Use literal user id or the string "me" for the current user (mentor filter).
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [ assigned_to_me ]
+          description: When set to assigned_to_me, tasks are filtered to the current user as assignee (server-resolved; ignores client assignee id).
       responses:
         '200':
           description: Successful response
@@ -1395,6 +1404,269 @@ paths:
                 $ref: '#/components/schemas/error-response'
         '404':
           description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/artifacts/presign-upload:
+    post:
+      tags:
+        - Tasks
+      summary: Get presigned URL for task artifact upload
+      description: Generates a presigned URL for uploading a file artifact to a task
+      operationId: presignTaskArtifactUpload
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/presign-task-artifact-request'
+      responses:
+        '200':
+          description: Presigned URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                description: Map containing presigned URL and related fields
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/artifacts/confirm:
+    post:
+      tags:
+        - Tasks
+      summary: Confirm task artifact upload
+      description: Confirms the upload of an artifact and creates the file record in the system
+      operationId: confirmTaskArtifactUpload
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/confirm-task-artifact-request'
+      responses:
+        '201':
+          description: Artifact upload confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/file-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/{id}/status:
+    patch:
+      tags:
+        - Tasks
+      summary: Change task status (explicit transition)
+      description: |
+        Single endpoint for board/DnD column moves. Provide target status in `to` or an `action` alias
+        (`take`/`start` → in_progress, `submit` → on_review, `accept`/`approve` → completed, `rework` → needs_rework).
+        Server validates role, current state, and required payload; returns 409 if the transition is not allowed
+        from the current state, 422 if the transition is understood but the request is semantically invalid.
+      operationId: patchTaskStatus
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/change-task-status-request'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-status-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden for this role or task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Transition not allowed from current status (or wrong actor for this transition)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '422':
+          description: Semantic validation failed (e.g. missing links for submit, missing score for accept)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/reorder:
+    patch:
+      tags:
+        - Tasks
+      summary: Reorder tasks within a status column
+      operationId: reorderTasks
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: When set, all tasks in the body must currently be in this status (column consistency).
+          schema:
+            type: string
+            enum: [ pending, in_progress, submitted, on_review, needs_rework, completed, rejected ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reorder-tasks-request'
+      responses:
+        '204':
+          description: Order updated
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Reorder rejected (e.g. column status mismatch)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /me/tasks:
+    get:
+      tags:
+        - Tasks
+      summary: List tasks for the current user (assignee)
+      description: Same filters as GET /tasks; assignee is resolved to the authenticated user (ignores assignee query for non-admin behaviour — server uses JWT).
+      operationId: listMyTasks
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ pending, in_progress, submitted, on_review, needs_rework, completed, rejected ]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [ low, medium, high ]
+        - name: internshipId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task-list-response'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -4077,6 +4349,14 @@ components:
       $ref: './schemas/create-comment-request.json'
     task-status-history-item:
       $ref: './schemas/task-status-history-item.json'
+    presign-task-artifact-request:
+      $ref: './schemas/presign-task-artifact-request.json'
+    confirm-task-artifact-request:
+      $ref: './schemas/confirm-task-artifact-request.json'
+    change-task-status-request:
+      $ref: './schemas/change-task-status-request.json'
+    reorder-tasks-request:
+      $ref: './schemas/reorder-tasks-request.json'
 
     # Internship Program schemas
     internship-program-response:

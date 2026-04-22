@@ -25,5 +25,7 @@
   <include file="/db/changelog/changes/018-create-roadmaps-tables.xml"/>
   <include file="/db/changelog/changes/019-roadmap-intern-user-and-soft-delete.xml"/>
   <include file="/db/changelog/changes/020-create-ipr-tables.xml"/>
+  <include file="/db/changelog/changes/021-task-review-artifacts-competencies.xml"/>
+  <include file="/db/changelog/changes/022-task-sort-order.xml"/>
 
 </databaseChangeLog>

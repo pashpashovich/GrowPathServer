@@ -72,6 +72,7 @@ class TaskServiceImplTest {
                 .dueDate(dueDate)
                 .build();
 
+        when(taskRepository.findMaxSortOrderByAssigneeIdAndStatus(10L, TaskStatus.PENDING)).thenReturn(0L);
         when(taskRepository.save(any(TaskEntity.class))).thenAnswer(invocation -> {
             TaskEntity entity = invocation.getArgument(0);
             entity.setId(1L);
@@ -96,7 +97,7 @@ class TaskServiceImplTest {
                 .id(1L)
                 .title("Updated Title")
                 .description("Updated Description")
-                .status(TaskStatus.IN_PROGRESS)
+                .status(null)
                 .priority(TaskPriority.HIGH)
                 .assigneeId(15L)
                 .stageId(45L)
@@ -113,7 +114,7 @@ class TaskServiceImplTest {
         assertNotNull(result);
         assertEquals("Updated Title", existingTaskEntity.getTitle());
         assertEquals("Updated Description", existingTaskEntity.getDescription());
-        assertEquals(TaskStatus.IN_PROGRESS, existingTaskEntity.getStatus());
+        assertEquals(TaskStatus.PENDING, existingTaskEntity.getStatus());
         assertEquals(TaskPriority.HIGH, existingTaskEntity.getPriority());
         assertEquals(15L, existingTaskEntity.getAssigneeId());
         verify(taskRepository).findById(1L);

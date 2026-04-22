@@ -38,6 +38,14 @@ public class TaskServiceImpl implements TaskService {
         );
 
         TaskEntity entity = task.toEntity();
+        Long assigneeId = entity.getAssigneeId();
+        if (assigneeId != null) {
+            long max = taskRepository.findMaxSortOrderByAssigneeIdAndStatus(assigneeId, TaskStatus.PENDING);
+            entity.setSortOrder(max + 1);
+        }
+        else {
+            entity.setSortOrder(0L);
+        }
         TaskEntity savedEntity = taskRepository.save(entity);
         return Task.fromEntity(savedEntity);
     }
@@ -53,9 +61,6 @@ public class TaskServiceImpl implements TaskService {
         }
         if (command.description() != null) {
             entity.setDescription(command.description());
-        }
-        if (command.status() != null) {
-            entity.setStatus(command.status());
         }
         if (command.priority() != null) {
             entity.setPriority(command.priority());
@@ -80,12 +85,13 @@ public class TaskServiceImpl implements TaskService {
         TaskEntity entity = taskRepository.findById(command.id())
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + command.id()));
 
-        if (entity.getStatus() != TaskStatus.SUBMITTED) {
-            throw new IllegalStateException("Task must be in submitted status to be completed");
+        if (entity.getStatus() != TaskStatus.ON_REVIEW && entity.getStatus() != TaskStatus.SUBMITTED) {
+            throw new IllegalStateException("Task must be in review status to be completed");
         }
 
         entity.setStatus(TaskStatus.COMPLETED);
         entity.setCompletedAt(LocalDateTime.now());
+        entity.setReviewedAt(LocalDateTime.now());
 
         TaskEntity savedEntity = taskRepository.save(entity);
         return Task.fromEntity(savedEntity);

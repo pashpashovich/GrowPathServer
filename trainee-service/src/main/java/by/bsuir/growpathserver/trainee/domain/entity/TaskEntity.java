@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.trainee.domain.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.hibernate.annotations.SoftDelete;
 
@@ -49,7 +50,7 @@ public class TaskEntity {
     @Column(name = "assignee_id")
     private Long assigneeId;
 
-    @Column(name = "mentor_id", nullable = false)
+    @Column(name = "mentor_id")
     private Long mentorId;
 
     @Column(name = "internship_id", nullable = false)
@@ -70,8 +71,11 @@ public class TaskEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
+
     @Column(name = "rating")
-    private Double rating;
+    private Integer rating;
 
     @Column(name = "review_comment", columnDefinition = "TEXT")
     private String reviewComment;
@@ -85,13 +89,19 @@ public class TaskEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "sort_order", nullable = false)
+    private Long sortOrder = 0L;
+
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
+        if (Objects.isNull(createdAt)) {
             createdAt = LocalDateTime.now();
         }
-        if (status == null) {
+        if (Objects.isNull(status)) {
             status = TaskStatus.PENDING;
+        }
+        if (Objects.isNull(sortOrder)) {
+            sortOrder = 0L;
         }
         updatedAt = LocalDateTime.now();
     }

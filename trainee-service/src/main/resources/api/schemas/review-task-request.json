@@ -8,15 +8,15 @@
       "type": "string",
       "enum": [
         "completed",
-        "rejected"
+        "needs_rework"
       ]
     },
     "comment": {
       "type": "string"
     },
     "rating": {
-      "type": "number",
-      "format": "double"
+      "type": "integer",
+      "format": "int32"
     }
   }
 }

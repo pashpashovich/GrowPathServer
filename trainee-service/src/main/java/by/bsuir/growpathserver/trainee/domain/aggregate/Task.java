@@ -22,11 +22,13 @@ public class Task {
     private final LocalDateTime takenAt;
     private final LocalDateTime submittedAt;
     private final LocalDateTime completedAt;
-    private final Double rating;
+    private final LocalDateTime reviewedAt;
+    private final Integer rating;
     private final String reviewComment;
     private final String submissionComment;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private final Long sortOrder;
 
     private Task(TaskEntity entity) {
         this.id = entity.getId();
@@ -42,11 +44,13 @@ public class Task {
         this.takenAt = entity.getTakenAt();
         this.submittedAt = entity.getSubmittedAt();
         this.completedAt = entity.getCompletedAt();
+        this.reviewedAt = entity.getReviewedAt();
         this.rating = entity.getRating();
         this.reviewComment = entity.getReviewComment();
         this.submissionComment = entity.getSubmissionComment();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
+        this.sortOrder = entity.getSortOrder();
     }
 
     public static Task fromEntity(TaskEntity entity) {
@@ -68,11 +72,13 @@ public class Task {
         entity.setTakenAt(this.takenAt);
         entity.setSubmittedAt(this.submittedAt);
         entity.setCompletedAt(this.completedAt);
+        entity.setReviewedAt(this.reviewedAt);
         entity.setRating(this.rating);
         entity.setReviewComment(this.reviewComment);
         entity.setSubmissionComment(this.submissionComment);
         entity.setCreatedAt(this.createdAt);
         entity.setUpdatedAt(this.updatedAt);
+        entity.setSortOrder(this.sortOrder);
         return entity;
     }
 

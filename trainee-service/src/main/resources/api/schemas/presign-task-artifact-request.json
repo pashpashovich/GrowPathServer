@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "required": [
+    "fileName"
+  ],
+  "properties": {
+    "fileName": {
+      "type": "string",
+      "description": "Name of the file to be uploaded",
+      "example": "report.pdf"
+    }
+  }
+}

@@ -7,6 +7,8 @@
         "pending",
         "in_progress",
         "submitted",
+        "on_review",
+        "needs_rework",
         "completed",
         "rejected"
       ]
@@ -24,8 +26,8 @@
       "nullable": true
     },
     "rating": {
-      "type": "number",
-      "format": "double",
+      "type": "integer",
+      "format": "int32",
       "nullable": true
     }
   },

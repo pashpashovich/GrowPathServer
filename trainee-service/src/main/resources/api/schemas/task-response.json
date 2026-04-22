@@ -17,6 +17,8 @@
         "pending",
         "in_progress",
         "submitted",
+        "on_review",
+        "needs_rework",
         "completed",
         "rejected"
       ]
@@ -81,9 +83,19 @@
       "format": "date-time",
       "nullable": true
     },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "sortOrder": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order within status column for DnD boards"
+    },
     "rating": {
-      "type": "number",
-      "format": "double",
+      "type": "integer",
+      "format": "int32",
       "nullable": true
     },
     "reviewComment": {

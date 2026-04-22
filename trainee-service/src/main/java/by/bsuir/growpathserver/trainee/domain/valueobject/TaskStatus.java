@@ -9,6 +9,8 @@ public enum TaskStatus {
     PENDING("pending"),
     IN_PROGRESS("in_progress"),
     SUBMITTED("submitted"),
+    ON_REVIEW("on_review"),
+    NEEDS_REWORK("needs_rework"),
     COMPLETED("completed"),
     REJECTED("rejected");
 
