@@ -195,11 +195,12 @@ public class TaskFacade {
 
         switch (target) {
             case IN_PROGRESS -> applyTransitionToInProgress(task, userId);
-            case ON_REVIEW -> applyTransitionToOnReview(task, userId, taskId, request);
+            case ON_REVIEW -> applyTransitionToOnReview(task, userId);
             case NEEDS_REWORK -> applyTransitionToNeedsRework(task, userId, request);
             case COMPLETED -> applyTransitionToCompleted(task, userId, request);
             default -> throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Transition to \"" + target.getValue() + "\" is not supported through this endpoint");
+                                                         "Transition to \"" + target.getValue()
+                                                                 + "\" is not supported through this endpoint");
         }
 
         taskRepository.save(task);
@@ -230,9 +231,11 @@ public class TaskFacade {
             TaskEntity task = getTaskEntity(item.getId());
             if (expectedColumn != null && task.getStatus() != expectedColumn) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Task " + task.getId() + " is not in status " + expectedColumn.getValue());
+                                                  "Task " + task.getId() + " is not in status "
+                                                          + expectedColumn.getValue());
             }
-            boolean allowed = Objects.equals(task.getAssigneeId(), userId) || Objects.equals(task.getMentorId(), userId);
+            boolean allowed =
+                    Objects.equals(task.getAssigneeId(), userId) || Objects.equals(task.getMentorId(), userId);
             if (!allowed) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to reorder this task");
             }
@@ -409,7 +412,7 @@ public class TaskFacade {
         }
         if (!(task.getStatus() == TaskStatus.PENDING || task.getStatus() == TaskStatus.NEEDS_REWORK)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot move to in_progress from status " + task.getStatus().getValue());
+                                              "Cannot move to in_progress from status " + task.getStatus().getValue());
         }
         task.setStatus(TaskStatus.IN_PROGRESS);
         if (Objects.isNull(task.getTakenAt())) {
@@ -417,34 +420,15 @@ public class TaskFacade {
         }
     }
 
-    private void applyTransitionToOnReview(TaskEntity task, Long userId, Long taskId, ChangeTaskStatusRequest request) {
-        if (!Objects.equals(task.getAssigneeId(), userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only assignee can submit task for review");
+    private void applyTransitionToOnReview(TaskEntity task, Long userId) {
+        if (!Objects.equals(task.getMentorId(), userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only mentor can submit task for review");
         }
-        if (!(task.getStatus() == TaskStatus.IN_PROGRESS || task.getStatus() == TaskStatus.NEEDS_REWORK)) {
+        if (!(TaskStatus.IN_PROGRESS.equals(task.getStatus()) || TaskStatus.NEEDS_REWORK.equals(task.getStatus()))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot move to on_review from status " + task.getStatus().getValue());
+                                              "Cannot move to on_review from status " + task.getStatus().getValue());
         }
-        boolean hasLinks = Objects.nonNull(request.getLinks()) && !request.getLinks().isEmpty();
-        boolean hasArtifacts = !taskArtifactRepository.findAllByTaskId(taskId).isEmpty();
-        if (!hasLinks && !hasArtifacts) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                    "At least one artifact link or uploaded file is required to submit for review");
-        }
-        if (hasLinks) {
-            request.getLinks().stream().filter(StringUtils::isNotBlank).forEach(link -> {
-                TaskArtifactEntity entity = new TaskArtifactEntity();
-                entity.setTask(task);
-                entity.setArtifactType("LINK");
-                entity.setName("Link");
-                entity.setUrl(link.trim());
-                entity.setUploadedBy(userId);
-                taskArtifactRepository.save(entity);
-            });
-        }
-        task.setSubmissionComment(StringUtils.trimToNull(request.getComment()));
         task.setStatus(TaskStatus.ON_REVIEW);
-        task.setSubmittedAt(LocalDateTime.now());
     }
 
     private void applyTransitionToNeedsRework(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {
@@ -453,7 +437,7 @@ public class TaskFacade {
         }
         if (!(task.getStatus() == TaskStatus.ON_REVIEW || task.getStatus() == TaskStatus.SUBMITTED)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot move to needs_rework from status " + task.getStatus().getValue());
+                                              "Cannot move to needs_rework from status " + task.getStatus().getValue());
         }
         String feedback = StringUtils.trimToNull(request.getFeedback());
         if (StringUtils.isBlank(feedback)) {
@@ -477,7 +461,7 @@ public class TaskFacade {
         }
         if (!(task.getStatus() == TaskStatus.ON_REVIEW || task.getStatus() == TaskStatus.SUBMITTED)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot move to completed from status " + task.getStatus().getValue());
+                                              "Cannot move to completed from status " + task.getStatus().getValue());
         }
         if (Objects.isNull(request.getRating()) || request.getRating() < 1 || request.getRating() > 10) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Score must be an integer from 1 to 10");

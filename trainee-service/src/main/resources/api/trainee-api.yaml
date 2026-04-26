@@ -4072,6 +4072,81 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /reports/export:
+    get:
+      tags:
+        - Reports
+      summary: Export internship efficiency report
+      operationId: exportReportsCsv
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: query
+          schema:
+            type: string
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [ weekly, monthly, program ]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV report file
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /reports/mentor-workload/export:
+    get:
+      tags:
+        - Reports
+      summary: Export mentor workload report
+      operationId: exportMentorWorkloadCsv
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: mentorId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CSV report file
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /dashboard:
     get:
       tags:
