@@ -53,6 +53,68 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset email
+      description: |
+        If an account exists for the email, sends a message with a one-time reset link.
+        Always returns success without revealing whether the email is registered.
+        Public endpoint (no JWT required).
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forget-password-request'
+      responses:
+        '204':
+          description: Request accepted (no response body)
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: Reset password using email link token
+      description: Validates the one-time token from the reset link and sets the new password.
+        Public endpoint (no JWT required).
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reset-password-request'
+      responses:
+        '204':
+          description: Password updated successfully
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '422':
+          description: Invalid or expired reset token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '503':
+          description: Keycloak integration error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /users:
     get:
       tags:
@@ -4358,6 +4420,10 @@ components:
       $ref: './schemas/error-response.json'
     complete-registration-request:
       $ref: './schemas/complete-registration-request.json'
+    forget-password-request:
+      $ref: './schemas/forget-password-request.json'
+    reset-password-request:
+      $ref: './schemas/reset-password-request.json'
 
     # User schemas
     user-response:

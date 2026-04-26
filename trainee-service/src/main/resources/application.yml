@@ -69,10 +69,12 @@ springdoc:
 
 app:
   registration-token-validity-days: ${REGISTRATION_TOKEN_VALIDITY_DAYS:7}
+  password-reset-token-validity-hours: ${PASSWORD_RESET_TOKEN_VALIDITY_HOURS:24}
 
 kafka:
   topic:
     user-invited: ${KAFKA_TOPIC_USER_INVITED:USERINVITED}
+    password-reset-requested: ${KAFKA_TOPIC_PASSWORD_RESET_REQUESTED:PASSWORDRESETREQUESTED}
 
 growpath:
   security:

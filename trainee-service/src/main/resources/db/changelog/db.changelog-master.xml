@@ -27,5 +27,6 @@
   <include file="/db/changelog/changes/020-create-ipr-tables.xml"/>
   <include file="/db/changelog/changes/021-task-review-artifacts-competencies.xml"/>
   <include file="/db/changelog/changes/022-task-sort-order.xml"/>
+  <include file="/db/changelog/changes/023-create-user-password-reset-token-table.xml"/>
 
 </databaseChangeLog>

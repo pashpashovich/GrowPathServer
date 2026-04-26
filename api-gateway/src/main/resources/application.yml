@@ -46,6 +46,16 @@ spring:
               predicates:
                 - Path=/api/v1/auth/complete-registration
                 - Method=POST
+            - id: forgot-password
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/auth/forgot-password
+                - Method=POST
+            - id: reset-password
+              uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/auth/reset-password
+                - Method=POST
             - id: users-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

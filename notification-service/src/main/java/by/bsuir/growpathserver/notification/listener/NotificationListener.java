@@ -10,6 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import by.bsuir.growpathserver.common.model.kafka.ApplicationCreatedEvent;
+import by.bsuir.growpathserver.common.model.kafka.PasswordResetRequestedEvent;
 import by.bsuir.growpathserver.common.model.kafka.TaskCompletedEvent;
 import by.bsuir.growpathserver.common.model.kafka.UserInvitedEvent;
 import by.bsuir.growpathserver.notification.service.NotificationService;
@@ -25,6 +26,9 @@ public class NotificationListener {
 
     @Value("${app.registration-base-url:http://localhost:3000}")
     private String registrationBaseUrl;
+
+    @Value("${app.password-reset-base-url:http://localhost:3000}")
+    private String passwordResetBaseUrl;
 
     @KafkaListener(
             topics = "${kafka.topic.user-invited}",
@@ -44,7 +48,7 @@ public class NotificationListener {
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.joining(" "))
                 .trim();
-        String greeting =  "Здравствуйте, " + fullName + "!";
+        String greeting = "Здравствуйте, " + fullName + "!";
         Map<String, Object> variables = Map.of(
                 "greeting", greeting,
                 "email", event.getEmail(),
@@ -56,6 +60,37 @@ public class NotificationListener {
                 "user-invited",
                 variables
         );
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topic.password-reset-requested}",
+            groupId = "notification-service-group",
+            containerFactory = "passwordResetRequestedListenerFactory"
+    )
+    public void onPasswordResetRequested(PasswordResetRequestedEvent event) {
+        log.info("Received PasswordResetRequestedEvent for user id={}, email={}", event.getUserId(), event.getEmail());
+        if (StringUtils.isNotEmpty(event.getEmail())) {
+            String resetLink = passwordResetBaseUrl + "/reset-password";
+            if (StringUtils.isNotEmpty(event.getResetToken())) {
+                resetLink += "?token=" + event.getResetToken();
+            }
+            String fullName = Stream.of(event.getLastName(), event.getFirstName(), event.getPatronymicName())
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.joining(" "))
+                    .trim();
+            String greeting = StringUtils.isNotBlank(fullName) ? "Здравствуйте, " + fullName + "!" : "Здравствуйте!";
+            Map<String, Object> variables = Map.of(
+                    "greeting", greeting,
+                    "email", event.getEmail(),
+                    "resetLink", resetLink
+            );
+            notificationService.sendEmail(
+                    event.getEmail(),
+                    "Восстановление пароля GrowPath",
+                    "password-reset",
+                    variables
+            );
+        }
     }
 
     @KafkaListener(

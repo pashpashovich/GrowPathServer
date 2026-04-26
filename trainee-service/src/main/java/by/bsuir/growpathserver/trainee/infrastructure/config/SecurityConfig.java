@@ -38,7 +38,9 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/trainee/health").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**",
                                          "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/v1/auth/complete-registration").permitAll()
+                        .requestMatchers("/api/v1/auth/complete-registration",
+                                         "/api/v1/auth/forgot-password",
+                                         "/api/v1/auth/reset-password").permitAll()
                         .requestMatchers("/trainee/**", "/api/users/**", "/api/v1/**", "/tasks/**").authenticated()
                         .anyRequest().authenticated()
                 )

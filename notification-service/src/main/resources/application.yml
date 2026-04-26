@@ -79,9 +79,11 @@ mailersend:
 
 app:
   registration-base-url: ${REGISTRATION_BASE_URL:http://localhost:3000}
+  password-reset-base-url: ${PASSWORD_RESET_BASE_URL:http://localhost:3000}
 
 kafka:
   topic:
     user-invited: ${KAFKA_TOPIC_USER_INVITED:USERINVITED}
     application-created: ${KAFKA_TOPIC_APPLICATION_CREATED:APPLICATIONCREATED}
     task-completed: ${KAFKA_TOPIC_TASK_COMPLETED:TASKCOMPLETED}
+    password-reset-requested: ${KAFKA_TOPIC_PASSWORD_RESET_REQUESTED:PASSWORDRESETREQUESTED}
