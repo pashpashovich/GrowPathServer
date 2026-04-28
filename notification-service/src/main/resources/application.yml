@@ -15,16 +15,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: ${JPA_FORMAT_SQL:true}
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
+            enable: false
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
   kafka:
