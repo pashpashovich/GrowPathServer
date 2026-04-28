@@ -54,6 +54,7 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:minioadmin}
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket-name: ${MINIO_BUCKET_NAME:growpath-storage}
+  avatar-bucket-name: ${MINIO_AVATAR_BUCKET_NAME:growpath-avatars}
 
 springdoc:
   override-with-generic-response: false

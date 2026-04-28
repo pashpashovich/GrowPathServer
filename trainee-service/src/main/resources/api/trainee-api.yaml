@@ -12,6 +12,93 @@ servers:
     description: Local development server
 
 paths:
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get current user profile
+      description: Retrieve the profile of the currently authenticated user
+      operationId: getCurrentUserProfile
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-profile-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /profile/avatar/presign-upload:
+    post:
+      tags:
+        - Profile
+      summary: Get presigned URL for avatar upload
+      description: Generates a presigned URL for uploading user avatar. The objectKey is saved immediately.
+      operationId: presignAvatarUpload
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/presign-avatar-upload-request'
+      responses:
+        '200':
+          description: Presigned URL generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/presign-avatar-upload-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /profile/avatar:
+    delete:
+      tags:
+        - Profile
+      summary: Delete user avatar
+      description: Removes the avatar from user profile (sets avatarUrl to null)
+      operationId: deleteAvatar
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Avatar deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /auth/complete-registration:
     post:
       tags:
@@ -4428,6 +4515,12 @@ components:
     # User schemas
     user-response:
       $ref: './schemas/user-response.json'
+    user-profile-response:
+      $ref: './schemas/user-profile-response.json'
+    presign-avatar-upload-request:
+      $ref: './schemas/presign-avatar-upload-request.json'
+    presign-avatar-upload-response:
+      $ref: './schemas/presign-avatar-upload-response.json'
     user-list-response:
       $ref: './schemas/user-list-response.json'
     create-user-request:

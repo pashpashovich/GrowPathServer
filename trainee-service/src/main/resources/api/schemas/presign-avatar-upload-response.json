@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "objectKey": {
+      "type": "string",
+      "description": "Object key in MinIO storage"
+    },
+    "uploadUrl": {
+      "type": "string",
+      "description": "Presigned URL for uploading avatar (valid for 15 minutes)"
+    }
+  },
+  "required": [
+    "objectKey",
+    "uploadUrl"
+  ]
+}

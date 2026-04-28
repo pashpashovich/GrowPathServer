@@ -65,6 +65,9 @@ public class UserEntity {
     @Column(name = "invitation_sent_at")
     private LocalDateTime invitationSentAt;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

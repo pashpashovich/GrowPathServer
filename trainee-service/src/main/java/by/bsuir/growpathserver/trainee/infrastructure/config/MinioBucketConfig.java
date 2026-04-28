@@ -20,4 +20,16 @@ public class MinioBucketConfig {
             throw new IllegalStateException("Failed to initialize trainee task artifact bucket: " + bucketName, e);
         }
     }
+
+    @Bean(name = "userAvatarBucket")
+    public String userAvatarBucket(MinioHelper minioHelper,
+                                   @Value("${minio.avatar-bucket-name:growpath-avatars}") String bucketName) {
+        try {
+            minioHelper.initBucket(bucketName);
+            return bucketName;
+        }
+        catch (IllegalStateException e) {
+            throw new IllegalStateException("Failed to initialize user avatar bucket: " + bucketName, e);
+        }
+    }
 }

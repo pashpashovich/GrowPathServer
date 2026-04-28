@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "User unique identifier",
+      "type": "integer",
+      "format": "int64"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "Given name"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Family name"
+    },
+    "patronymicName": {
+      "type": "string",
+      "description": "Patronymic (optional)"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "hr",
+        "mentor",
+        "intern"
+      ],
+      "description": "User role"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "blocked",
+        "pending"
+      ],
+      "description": "User status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User creation timestamp"
+    },
+    "lastLogin": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last login timestamp"
+    },
+    "invitedBy": {
+      "description": "ID of user who invited this user",
+      "type": "integer",
+      "format": "int64"
+    },
+    "invitationSentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation sent timestamp"
+    },
+    "avatarUrl": {
+      "type": "string",
+      "description": "Presigned URL to user avatar image (valid for 7 days)"
+    }
+  },
+  "required": [
+    "id",
+    "email",
+    "firstName",
+    "lastName",
+    "role",
+    "status",
+    "createdAt"
+  ]
+}

@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import by.bsuir.growpathserver.dto.model.UserProfileResponse;
 import by.bsuir.growpathserver.dto.model.UserResponse;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 
@@ -17,6 +18,12 @@ public abstract class UserMapper {
     @Mapping(target = "role", expression = "java(by.bsuir.growpathserver.dto.model.UserResponse.RoleEnum.fromValue(user.getRole().getValue()))")
     @Mapping(target = "status", expression = "java(by.bsuir.growpathserver.dto.model.UserResponse.StatusEnum.fromValue(user.getStatus().getValue()))")
     public abstract UserResponse toUserResponse(User user);
+
+    @Mapping(source = "user.email.value", target = "email")
+    @Mapping(target = "role", expression = "java(by.bsuir.growpathserver.dto.model.UserProfileResponse.RoleEnum.fromValue(user.getRole().getValue()))")
+    @Mapping(target = "status", expression = "java(by.bsuir.growpathserver.dto.model.UserProfileResponse.StatusEnum.fromValue(user.getStatus().getValue()))")
+    @Mapping(source = "avatarPresignedUrl", target = "avatarUrl")
+    public abstract UserProfileResponse toUserProfileResponse(User user, String avatarPresignedUrl);
 
     public abstract List<UserResponse> toUserResponseList(List<User> users);
 }
