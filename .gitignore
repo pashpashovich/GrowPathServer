@@ -44,3 +44,4 @@ out/
 ### Logs ###
 *.log
 /.cursor/rules/null-and-emptiness-checks.mdc
+/CLAUDE.md
