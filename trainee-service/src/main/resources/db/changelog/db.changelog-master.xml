@@ -29,5 +29,6 @@
   <include file="/db/changelog/changes/022-task-sort-order.xml"/>
   <include file="/db/changelog/changes/023-create-user-password-reset-token-table.xml"/>
   <include file="/db/changelog/changes/024-add-avatar-url-to-users.xml"/>
+  <include file="/db/changelog/changes/025-add-phone-number-to-users.xml"/>
 
 </databaseChangeLog>

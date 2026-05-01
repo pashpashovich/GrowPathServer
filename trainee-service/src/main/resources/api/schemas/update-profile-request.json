@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "Given name",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Family name",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "patronymicName": {
+      "type": "string",
+      "description": "Patronymic (optional)",
+      "maxLength": 100
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "User phone number",
+      "pattern": "^\\+?[1-9]\\d{1,14}$"
+    }
+  },
+  "required": [
+    "firstName",
+    "lastName"
+  ]
+}

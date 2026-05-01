@@ -11,8 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import by.bsuir.growpathserver.dto.model.MessageResponse;
 import by.bsuir.growpathserver.dto.model.PresignAvatarUploadResponse;
+import by.bsuir.growpathserver.dto.model.UpdateProfileRequest;
 import by.bsuir.growpathserver.dto.model.UserProfileResponse;
+import by.bsuir.growpathserver.trainee.application.command.UpdateCurrentUserProfileCommand;
 import by.bsuir.growpathserver.trainee.application.handler.GetCurrentUserProfileHandler;
+import by.bsuir.growpathserver.trainee.application.handler.UpdateCurrentUserProfileHandler;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.application.query.GetCurrentUserProfileQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
@@ -28,6 +31,7 @@ public class UserProfileApplicationFacade {
     private static final String MSG_AVATAR_DELETED = "Avatar deleted successfully";
 
     private final GetCurrentUserProfileHandler getCurrentUserProfileHandler;
+    private final UpdateCurrentUserProfileHandler updateCurrentUserProfileHandler;
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
     private final UserRepository userRepository;
     private final UserAvatarStorageService userAvatarStorageService;
@@ -36,6 +40,19 @@ public class UserProfileApplicationFacade {
     public UserProfileResponse getCurrentUserProfile() {
         GetCurrentUserProfileQuery query = new GetCurrentUserProfileQuery();
         User user = getCurrentUserProfileHandler.handle(query);
+
+        return userMapper.toUserProfileResponse(user, user.getAvatarUrl());
+    }
+
+    public UserProfileResponse updateCurrentUserProfile(UpdateProfileRequest request) {
+        UpdateCurrentUserProfileCommand command = new UpdateCurrentUserProfileCommand(
+                request.getFirstName(),
+                request.getLastName(),
+                request.getPatronymicName(),
+                request.getPhoneNumber()
+        );
+
+        User user = updateCurrentUserProfileHandler.handle(command);
 
         return userMapper.toUserProfileResponse(user, user.getAvatarUrl());
     }

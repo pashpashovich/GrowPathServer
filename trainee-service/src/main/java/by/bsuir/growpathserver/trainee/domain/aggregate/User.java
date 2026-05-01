@@ -26,6 +26,7 @@ public class User {
     private final Long invitedBy;
     private final LocalDateTime invitationSentAt;
     private final String avatarUrl;
+    private final String phoneNumber;
 
     private User(UserEntity entity) {
         this.id = entity.getId();
@@ -40,6 +41,7 @@ public class User {
         this.lastName = entity.getLastName();
         this.patronymicName = entity.getPatronymicName();
         this.avatarUrl = entity.getAvatarUrl();
+        this.phoneNumber = entity.getPhoneNumber();
     }
 
     public static User fromEntity(UserEntity entity) {
@@ -60,6 +62,7 @@ public class User {
         entity.setInvitedBy(this.invitedBy);
         entity.setInvitationSentAt(this.invitationSentAt);
         entity.setAvatarUrl(this.avatarUrl);
+        entity.setPhoneNumber(this.phoneNumber);
         return entity;
     }
 

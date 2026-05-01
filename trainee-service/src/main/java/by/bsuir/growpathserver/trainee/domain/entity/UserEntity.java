@@ -68,6 +68,9 @@ public class UserEntity {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

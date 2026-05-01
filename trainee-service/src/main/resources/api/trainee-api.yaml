@@ -40,6 +40,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Profile
+      summary: Update current user profile
+      description: Update firstName, lastName, patronymicName, and phoneNumber of the currently authenticated user
+      operationId: updateCurrentUserProfile
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-profile-request'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-profile-response'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
 
   /profile/avatar/presign-upload:
     post:
@@ -4533,6 +4572,8 @@ components:
       $ref: './schemas/user-response.json'
     user-profile-response:
       $ref: './schemas/user-profile-response.json'
+    update-profile-request:
+      $ref: './schemas/update-profile-request.json'
     presign-avatar-upload-response:
       $ref: './schemas/presign-avatar-upload-response.json'
     user-list-response:

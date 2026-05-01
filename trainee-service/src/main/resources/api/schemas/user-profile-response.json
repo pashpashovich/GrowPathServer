@@ -65,6 +65,10 @@
     "avatarUrl": {
       "type": "string",
       "description": "Presigned URL to user avatar image (valid for 7 days)"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "User phone number"
     }
   },
   "required": [
