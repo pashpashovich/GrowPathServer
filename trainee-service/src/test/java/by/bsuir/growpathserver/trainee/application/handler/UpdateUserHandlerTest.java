@@ -22,9 +22,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import by.bsuir.growpathserver.trainee.application.command.UpdateUserCommand;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
+import by.bsuir.growpathserver.trainee.domain.entity.DepartmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.DepartmentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,10 +35,15 @@ class UpdateUserHandlerTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private DepartmentRepository departmentRepository;
+
     @InjectMocks
     private UpdateUserHandler updateUserHandler;
 
     private UserEntity existingUser;
+
+    private DepartmentEntity existingDepartment;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +56,7 @@ class UpdateUserHandlerTest {
         existingUser.setRole(UserRole.INTERN);
         existingUser.setStatus(UserStatus.ACTIVE);
         existingUser.setCreatedAt(LocalDateTime.now());
+        existingDepartment = new DepartmentEntity();
     }
 
     @Test
@@ -59,11 +67,13 @@ class UpdateUserHandlerTest {
                 Optional.of("Ivan"),
                 Optional.of("Petrov"),
                 Optional.empty(),
-                Optional.of(UserRole.MENTOR)
+                Optional.of(UserRole.MENTOR),
+                Optional.of(1L)
         );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(existingDepartment));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         User result = updateUserHandler.handle(command);
@@ -85,6 +95,7 @@ class UpdateUserHandlerTest {
                 Optional.empty(),
                 Optional.of("Updated"),
                 Optional.of("Surname"),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty()
         );
@@ -110,6 +121,7 @@ class UpdateUserHandlerTest {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of("   "),
+                Optional.empty(),
                 Optional.empty()
         );
 
@@ -128,6 +140,7 @@ class UpdateUserHandlerTest {
                 Optional.of("old@example.com"),
                 Optional.of("Ivan"),
                 Optional.of("Petrov"),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty()
         );
@@ -150,6 +163,7 @@ class UpdateUserHandlerTest {
                 Optional.of("Ivan"),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
                 Optional.empty()
         );
 
@@ -167,6 +181,7 @@ class UpdateUserHandlerTest {
                 Optional.of("X"),
                 Optional.of("Y"),
                 Optional.empty(),
+                Optional.empty(),
                 Optional.empty()
         );
 
@@ -181,6 +196,7 @@ class UpdateUserHandlerTest {
         UpdateUserCommand command = new UpdateUserCommand(
                 1L,
                 Optional.of("existing@example.com"),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
