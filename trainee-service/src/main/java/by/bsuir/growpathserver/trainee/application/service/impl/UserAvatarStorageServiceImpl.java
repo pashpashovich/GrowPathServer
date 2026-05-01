@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import by.bsuir.growpathserver.trainee.application.service.UserAvatarStorageService;
@@ -24,7 +25,7 @@ public class UserAvatarStorageServiceImpl implements UserAvatarStorageService {
     }
 
     @Override
-    public String createPresignedDownloadUrl(String objectKey) {
-        return minioHelper.getGetPresignedUrl(userAvatarBucket, objectKey, 7 * 24 * 60 * 60);
+    public Resource downloadFile(String objectKey) {
+        return minioHelper.download(userAvatarBucket, objectKey);
     }
 }

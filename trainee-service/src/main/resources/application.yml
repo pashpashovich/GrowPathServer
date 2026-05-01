@@ -55,6 +55,7 @@ minio:
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket-name: ${MINIO_BUCKET_NAME:growpath-storage}
   avatar-bucket-name: ${MINIO_AVATAR_BUCKET_NAME:growpath-avatars}
+  gateway-url: ${MINIO_GATEWAY_URL:http://localhost:8080/api/v1/storage}
 
 springdoc:
   override-with-generic-response: false

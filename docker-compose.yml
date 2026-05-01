@@ -168,6 +168,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       TRAINEE_SERVICE_URL: http://trainee-service:8081
       NOTIFICATION_SERVICE_URL: http://notification-service:8082
+      MINIO_URL: http://minio:9000
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
       CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS:-GET,POST,PUT,DELETE,OPTIONS,PATCH}
       CORS_ALLOWED_HEADERS: ${CORS_ALLOWED_HEADERS:-Content-Type,Authorization,Accept,X-Requested-With,Origin,Access-Control-Request-Method,Access-Control-Request-Headers}
@@ -213,9 +214,11 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_TRAINEE_GROUP_ID: ${KAFKA_TRAINEE_GROUP_ID:-trainee-service-group}
       MINIO_ENDPOINT: http://minio:9000
+      MINIO_GATEWAY_URL: http://localhost:8080/api/v1/storage
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-growpath-storage}
+      MINIO_AVATAR_BUCKET_NAME: ${MINIO_AVATAR_BUCKET_NAME:-growpath-avatars}
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
     depends_on:
       trainee-db:

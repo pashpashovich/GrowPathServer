@@ -1,6 +1,9 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,32 +37,26 @@ public class UserProfileApplicationFacade {
         GetCurrentUserProfileQuery query = new GetCurrentUserProfileQuery();
         User user = getCurrentUserProfileHandler.handle(query);
 
-        String avatarPresignedUrl = null;
-        if (StringUtils.isNotBlank(user.getAvatarUrl())) {
-            avatarPresignedUrl = userAvatarStorageService.createPresignedDownloadUrl(user.getAvatarUrl());
-        }
-
-        return userMapper.toUserProfileResponse(user, avatarPresignedUrl);
+        return userMapper.toUserProfileResponse(user, user.getAvatarUrl());
     }
 
     @Transactional
-    public PresignAvatarUploadResponse createAvatarPresignedUpload(String fileName) {
+    public PresignAvatarUploadResponse createAvatarPresignedUpload() {
         Long userId = currentApplicationUserResolver.resolveCurrentUserDatabaseId()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        String safeName = StringUtils.defaultIfBlank(fileName, "avatar.jpg").replace(" ", "_");
-        String objectKey = "avatars/%d/%d_%s".formatted(userId, System.currentTimeMillis(), safeName);
-        String uploadUrl = userAvatarStorageService.createPresignedUploadUrl(objectKey);
+        String token = UUID.randomUUID().toString();
 
-        // Save objectKey immediately
-        userEntity.setAvatarUrl(objectKey);
+        String uploadUrl = userAvatarStorageService.createPresignedUploadUrl(token);
+
+        userEntity.setAvatarUrl(token);
         userRepository.save(userEntity);
 
         PresignAvatarUploadResponse response = new PresignAvatarUploadResponse();
-        response.setObjectKey(objectKey);
+        response.setObjectKey(token);
         response.setUploadUrl(uploadUrl);
         return response;
     }
@@ -78,5 +75,19 @@ public class UserProfileApplicationFacade {
         MessageResponse response = new MessageResponse();
         response.setMessage(MSG_AVATAR_DELETED);
         return response;
+    }
+
+    public Resource downloadAvatar() {
+        Long userId = currentApplicationUserResolver.resolveCurrentUserDatabaseId()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (StringUtils.isBlank(userEntity.getAvatarUrl())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Avatar not found");
+        }
+
+        return userAvatarStorageService.downloadFile(userEntity.getAvatarUrl());
     }
 }

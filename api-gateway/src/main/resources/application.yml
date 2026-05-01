@@ -169,6 +169,13 @@ spring:
                 - Path=/api/v1/in-app-notifications/**
               filters:
                 - StripPrefix=2
+            - id: minio-storage
+              uri: ${MINIO_URL:http://localhost:9000}
+              predicates:
+                - Path=/api/v1/storage/**
+              filters:
+                - StripPrefix=3
+                - RemoveRequestHeader=Authorization
   security:
     oauth2:
       resourceserver:

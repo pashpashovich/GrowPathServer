@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.ProfileApi;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
-import by.bsuir.growpathserver.dto.model.PresignAvatarUploadRequest;
 import by.bsuir.growpathserver.dto.model.PresignAvatarUploadResponse;
 import by.bsuir.growpathserver.dto.model.UserProfileResponse;
 import by.bsuir.growpathserver.trainee.application.service.UserProfileApplicationFacade;
@@ -23,8 +22,16 @@ public class UserProfileController extends BaseController implements ProfileApi 
     }
 
     @Override
-    public ResponseEntity<PresignAvatarUploadResponse> presignAvatarUpload(PresignAvatarUploadRequest request) {
-        return ResponseEntity.ok(userProfileApplicationFacade.createAvatarPresignedUpload(request.getFileName()));
+    public ResponseEntity<PresignAvatarUploadResponse> presignAvatarUpload() {
+        return ResponseEntity.ok(userProfileApplicationFacade.createAvatarPresignedUpload());
+    }
+
+    @Override
+    public ResponseEntity<org.springframework.core.io.Resource> downloadAvatar() {
+        org.springframework.core.io.Resource resource = userProfileApplicationFacade.downloadAvatar();
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .body(resource);
     }
 
     @Override
