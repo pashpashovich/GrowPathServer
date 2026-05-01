@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import by.bsuir.growpathserver.trainee.application.command.UpdateUserCommand;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
+import by.bsuir.growpathserver.trainee.domain.entity.DepartmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.DepartmentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UpdateUserHandler {
 
     private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Transactional
     public User handle(UpdateUserCommand command) {
@@ -51,6 +54,12 @@ public class UpdateUserHandler {
         });
 
         command.role().ifPresent(entity::setRole);
+
+        command.departmentId().ifPresent(deptId -> {
+            DepartmentEntity department = departmentRepository.findById(deptId)
+                    .orElseThrow(() -> new NoSuchElementException("Department not found with id: " + deptId));
+            entity.setDepartmentId(deptId);
+        });
 
         UserEntity savedEntity = userRepository.save(entity);
         return User.fromEntity(savedEntity);

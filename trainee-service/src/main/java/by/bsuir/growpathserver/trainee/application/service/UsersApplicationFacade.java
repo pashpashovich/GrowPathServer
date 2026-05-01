@@ -122,7 +122,8 @@ public class UsersApplicationFacade {
                 Optional.ofNullable(updateUserRequest.getLastName()),
                 Optional.ofNullable(updateUserRequest.getPatronymicName()),
                 Optional.ofNullable(updateUserRequest.getRole())
-                        .map(r -> UserRole.fromString(r.getValue()))
+                        .map(r -> UserRole.fromString(r.getValue())),
+                Optional.ofNullable(updateUserRequest.getDepartmentId())
         );
 
         User user = updateUserHandler.handle(command);

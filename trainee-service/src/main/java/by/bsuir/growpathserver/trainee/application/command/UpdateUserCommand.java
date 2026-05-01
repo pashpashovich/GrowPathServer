@@ -10,6 +10,7 @@ public record UpdateUserCommand(
         Optional<String> firstName,
         Optional<String> lastName,
         Optional<String> patronymicName,
-        Optional<UserRole> role
+        Optional<UserRole> role,
+        Optional<Long> departmentId
 ) {
 }
