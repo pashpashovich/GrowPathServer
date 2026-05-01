@@ -61,6 +61,11 @@
       "type": "string",
       "format": "date-time",
       "description": "Invitation sent timestamp"
+    },
+    "departmentId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Department ID"
     }
   },
   "required": [
