@@ -45,10 +45,12 @@ set "COMPOSE_FILE=docker-compose.yml"
 set "DO_CLEAN=0"
 set "DO_REBUILD=0"
 set "DO_WAIT=1"
+set "SKIP_TESTS=0"
 for %%A in (%*) do (
     if /I "%%~A"=="clean" set "DO_CLEAN=1"
     if /I "%%~A"=="rebuild" set "DO_REBUILD=1"
     if /I "%%~A"=="no-wait" set "DO_WAIT=0"
+    if /I "%%~A"=="skip-tests" set "SKIP_TESTS=1"
 )
 
 if "!DO_CLEAN!"=="1" (
@@ -56,9 +58,16 @@ if "!DO_CLEAN!"=="1" (
     %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" down
 )
 
+if "!SKIP_TESTS!"=="1" (
+    echo [INFO] Пропуск тестов при сборке...
+    set "BUILD_ARGS=--build-arg GRADLE_ARGS=-x test"
+) else (
+    set "BUILD_ARGS="
+)
+
 if "!DO_REBUILD!"=="1" (
     echo [INFO] Сборка без кэша ^(rebuild — долго^)...
-    %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" build --no-cache
+    %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" build --no-cache !BUILD_ARGS!
     echo [INFO] Запуск контейнеров из свежих образов...
     if "!DO_WAIT!"=="1" (
         %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --wait
@@ -72,13 +81,13 @@ if "!DO_REBUILD!"=="1" (
 ) else (
     echo [INFO] Сборка с кэшем + запуск ^(быстрый режим^). Полная пересборка: deploy.bat rebuild
     if "!DO_WAIT!"=="1" (
-        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build --wait
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build !BUILD_ARGS! --wait
         if errorlevel 1 (
             echo [WARN] --wait не поддерживается. Запуск без ожидания...
-            %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build
+            %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build !BUILD_ARGS!
         )
     ) else (
-        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build
+        %DOCKER_COMPOSE% -f "%COMPOSE_FILE%" up -d --build !BUILD_ARGS!
     )
 )
 
@@ -92,7 +101,8 @@ echo   Notification:  http://localhost:8082
 echo   Keycloak:      http://localhost:8090
 echo.
 echo Подсказки:
-echo   Быстрый цикл:     scripts\deploy.bat
+echo   Быстрый цикл:      scripts\deploy.bat
+echo   Без тестов:        scripts\deploy.bat skip-tests
 echo   С нуля контейнеры: scripts\deploy.bat clean
 echo   Полная пересборка: scripts\deploy.bat rebuild
 echo   Старый Compose:    scripts\deploy.bat no-wait
