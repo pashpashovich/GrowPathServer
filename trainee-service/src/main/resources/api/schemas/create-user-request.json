@@ -27,6 +27,11 @@
         "intern"
       ],
       "description": "User role"
+    },
+    "departmentId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Department ID"
     }
   },
   "required": [

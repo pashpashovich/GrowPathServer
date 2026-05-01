@@ -19,8 +19,10 @@ import by.bsuir.growpathserver.trainee.application.handler.UpdateCurrentUserProf
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.application.query.GetCurrentUserProfileQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
+import by.bsuir.growpathserver.trainee.domain.entity.DepartmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.UserMapper;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.DepartmentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,7 @@ public class UserProfileApplicationFacade {
     private final UpdateCurrentUserProfileHandler updateCurrentUserProfileHandler;
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
     private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
     private final UserAvatarStorageService userAvatarStorageService;
     private final UserMapper userMapper;
 
@@ -41,7 +44,14 @@ public class UserProfileApplicationFacade {
         GetCurrentUserProfileQuery query = new GetCurrentUserProfileQuery();
         User user = getCurrentUserProfileHandler.handle(query);
 
-        return userMapper.toUserProfileResponse(user, user.getAvatarUrl());
+        String departmentName = null;
+        if (user.getDepartmentId() != null) {
+            departmentName = departmentRepository.findById(user.getDepartmentId())
+                    .map(DepartmentEntity::getName)
+                    .orElse(null);
+        }
+
+        return userMapper.toUserProfileResponse(user, user.getAvatarUrl(), departmentName);
     }
 
     public UserProfileResponse updateCurrentUserProfile(UpdateProfileRequest request) {
@@ -54,7 +64,14 @@ public class UserProfileApplicationFacade {
 
         User user = updateCurrentUserProfileHandler.handle(command);
 
-        return userMapper.toUserProfileResponse(user, user.getAvatarUrl());
+        String departmentName = null;
+        if (user.getDepartmentId() != null) {
+            departmentName = departmentRepository.findById(user.getDepartmentId())
+                    .map(DepartmentEntity::getName)
+                    .orElse(null);
+        }
+
+        return userMapper.toUserProfileResponse(user, user.getAvatarUrl(), departmentName);
     }
 
     @Transactional

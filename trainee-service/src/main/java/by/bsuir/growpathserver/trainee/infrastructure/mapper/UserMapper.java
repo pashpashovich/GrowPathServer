@@ -23,7 +23,8 @@ public abstract class UserMapper {
     @Mapping(target = "role", expression = "java(by.bsuir.growpathserver.dto.model.UserProfileResponse.RoleEnum.fromValue(user.getRole().getValue()))")
     @Mapping(target = "status", expression = "java(by.bsuir.growpathserver.dto.model.UserProfileResponse.StatusEnum.fromValue(user.getStatus().getValue()))")
     @Mapping(source = "avatarPresignedUrl", target = "avatarUrl")
-    public abstract UserProfileResponse toUserProfileResponse(User user, String avatarPresignedUrl);
+    @Mapping(source = "departmentName", target = "departmentName")
+    public abstract UserProfileResponse toUserProfileResponse(User user, String avatarPresignedUrl, String departmentName);
 
     public abstract List<UserResponse> toUserResponseList(List<User> users);
 }

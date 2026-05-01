@@ -69,6 +69,15 @@
     "phoneNumber": {
       "type": "string",
       "description": "User phone number"
+    },
+    "departmentId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Department ID"
+    },
+    "departmentName": {
+      "type": "string",
+      "description": "Department name"
     }
   },
   "required": [

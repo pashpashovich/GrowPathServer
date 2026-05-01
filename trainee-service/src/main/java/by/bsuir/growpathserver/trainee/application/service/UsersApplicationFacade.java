@@ -106,6 +106,7 @@ public class UsersApplicationFacade {
                 .patronymicName(createUserRequest.getPatronymicName())
                 .role(UserRole.fromString(createUserRequest.getRole().getValue()))
                 .invitedBy(invitedBy)
+                .departmentId(createUserRequest.getDepartmentId())
                 .build();
 
         User user = createUserHandler.handle(command);

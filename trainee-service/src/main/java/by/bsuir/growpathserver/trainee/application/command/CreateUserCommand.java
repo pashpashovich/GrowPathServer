@@ -5,5 +5,5 @@ import lombok.Builder;
 
 @Builder
 public record CreateUserCommand(String email, String firstName, String lastName, String patronymicName, UserRole role,
-                                Long invitedBy) {
+                                Long invitedBy, Long departmentId) {
 }

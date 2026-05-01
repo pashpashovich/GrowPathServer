@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
         );
 
         UserEntity entity = user.toEntity();
+        entity.setDepartmentId(command.departmentId());
         UserEntity savedEntity = userRepository.save(entity);
         User savedUser = User.fromEntity(savedEntity);
 

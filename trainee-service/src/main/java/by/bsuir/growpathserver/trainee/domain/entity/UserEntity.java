@@ -71,6 +71,9 @@ public class UserEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    @Column(name = "department_id")
+    private Long departmentId;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
