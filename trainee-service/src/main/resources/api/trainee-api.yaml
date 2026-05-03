@@ -3935,6 +3935,81 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /iprs/{iprId}/progress:
+    get:
+      tags:
+        - IPR
+      summary: Calculate IPR progress
+      description: Calculate intern progress for the specified IPR including completion percentage, status, and estimated completion date
+      operationId: calculateIprProgress
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: iprId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Progress calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-progress-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /tasks/recommendations:
+    get:
+      tags:
+        - Tasks
+      summary: Get recommended tasks for intern
+      description: Get personalized task recommendations based on intern's competencies, priorities, and deadlines
+      operationId: getRecommendedTasks
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of recommendations to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Recommendations generated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/task-recommendation-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Active IPR not found for intern
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
 
   # ==================== Assessments ====================
   /assessments:
@@ -4355,7 +4430,7 @@ paths:
     get:
       tags:
         - Dashboard
-      summary: Get dashboard data
+      summary: Get dashboard data with filters
       operationId: getDashboard
       security:
         - bearerAuth: [ ]
@@ -4365,6 +4440,42 @@ paths:
           schema:
             type: string
             enum: [ admin, hr, mentor, intern ]
+        - name: dateFrom
+          in: query
+          description: Start date for filtering statistics (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          description: End date for filtering statistics (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: departmentId
+          in: query
+          description: Filter by department ID
+          schema:
+            type: integer
+            format: int64
+        - name: programId
+          in: query
+          description: Filter by internship program ID
+          schema:
+            type: integer
+            format: int64
+        - name: mentorId
+          in: query
+          description: Filter by mentor ID (for HR/Admin)
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          description: Filter by intern status
+          schema:
+            type: string
+            enum: [ active, completed, on_hold ]
       responses:
         '200':
           description: Successful response
@@ -4372,6 +4483,264 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/dashboard-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/interns-stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get interns statistics
+      operationId: getInternsStats
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: departmentId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: programId
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/interns-stats-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/tasks-stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get tasks statistics
+      operationId: getTasksStats
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ pending, in_progress, submitted, on_review, completed, cancelled ]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [ low, medium, high, critical ]
+        - name: mentorId
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks-stats-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/mentors-stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get mentors statistics
+      operationId: getMentorsStats
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: departmentId
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mentors-stats-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/programs-stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get internship programs statistics
+      operationId: getProgramsStats
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ active, completed, archived ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/programs-stats-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/trends:
+    get:
+      tags:
+        - Dashboard
+      summary: Get trends over time
+      operationId: getTrends
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: metric
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ new_interns, completed_tasks, average_rating, task_completion_rate, active_users ]
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [ day, week, month ]
+            default: day
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/trends-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /dashboard/upcoming-deadlines:
+    get:
+      tags:
+        - Dashboard
+      summary: Get upcoming task deadlines
+      operationId: getUpcomingDeadlines
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: days
+          in: query
+          description: Number of days ahead to look for deadlines
+          schema:
+            type: integer
+            default: 7
+        - name: mentorId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: internId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [ low, medium, high, critical ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upcoming-deadlines-response'
         '401':
           description: Unauthorized
           content:
@@ -4604,6 +4973,8 @@ components:
       $ref: './schemas/update-intern-request.json'
     intern-progress-response:
       $ref: './schemas/intern-progress-response.json'
+    stage-progress-item:
+      $ref: './schemas/stage-progress-item.json'
 
     # Mentor schemas
     mentor-response:
@@ -4646,6 +5017,8 @@ components:
       $ref: './schemas/change-task-status-request.json'
     reorder-tasks-request:
       $ref: './schemas/reorder-tasks-request.json'
+    task-recommendation-response:
+      $ref: './schemas/task-recommendation-response.json'
 
     # Internship Program schemas
     internship-program-response:
@@ -4764,8 +5137,24 @@ components:
       $ref: './schemas/report-list-response.json'
     mentor-workload-response:
       $ref: './schemas/mentor-workload-response.json'
+
+    # Dashboard schemas
     dashboard-response:
       $ref: './schemas/dashboard-response.json'
+    interns-stats-response:
+      $ref: './schemas/interns-stats-response.json'
+    tasks-stats-response:
+      $ref: './schemas/tasks-stats-response.json'
+    mentors-stats-response:
+      $ref: './schemas/mentors-stats-response.json'
+    programs-stats-response:
+      $ref: './schemas/programs-stats-response.json'
+    trends-response:
+      $ref: './schemas/trends-response.json'
+    upcoming-deadlines-response:
+      $ref: './schemas/upcoming-deadlines-response.json'
+
+    # Dashboard sub-schemas
     intern-stats:
       $ref: './schemas/intern-stats.json'
     mentor-stats:
@@ -4780,6 +5169,10 @@ components:
       $ref: './schemas/mentor-performance.json'
     competencies:
       $ref: './schemas/competencies.json'
+    trend-data-point:
+      $ref: './schemas/trend-data-point.json'
+    top-performer:
+      $ref: './schemas/top-performer.json'
 
     # Department schemas
     department-response:

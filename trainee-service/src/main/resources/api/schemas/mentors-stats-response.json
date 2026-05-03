@@ -1,0 +1,112 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "departmentId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "totalMentors": {
+      "type": "integer"
+    },
+    "activeMentors": {
+      "type": "integer"
+    },
+    "averageInternsPerMentor": {
+      "type": "number",
+      "format": "double"
+    },
+    "averageTaskRating": {
+      "type": "number",
+      "format": "double",
+      "description": "Average rating of tasks reviewed by mentors"
+    },
+    "averageReviewTime": {
+      "type": "number",
+      "format": "double",
+      "description": "Average time to review tasks in hours"
+    },
+    "topMentors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "mentorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "activeInterns": {
+            "type": "integer"
+          },
+          "completedTasks": {
+            "type": "integer"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "departmentName": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Top 5 mentors by performance"
+    },
+    "workloadDistribution": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "mentorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mentorName": {
+            "type": "string"
+          },
+          "activeInterns": {
+            "type": "integer"
+          },
+          "activeTasks": {
+            "type": "integer"
+          },
+          "workloadLevel": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "overloaded"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "totalMentors",
+    "activeMentors",
+    "averageInternsPerMentor"
+  ]
+}

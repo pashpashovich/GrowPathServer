@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "properties": {
+    "internId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "avatarUrl": {
+      "type": "string"
+    },
+    "averageRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "completedTasks": {
+      "type": "integer"
+    },
+    "progress": {
+      "type": "number",
+      "format": "double",
+      "description": "Progress percentage"
+    },
+    "programName": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "internId",
+    "firstName",
+    "lastName",
+    "completedTasks"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "type": "object",
+  "properties": {
+    "taskId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Task identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Task description"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "description": "Task priority"
+    },
+    "dueDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Task due date"
+    },
+    "relevanceScore": {
+      "type": "number",
+      "format": "double",
+      "description": "Relevance score (0-100)",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "recommendationReason": {
+      "type": "string",
+      "description": "Reason for recommendation"
+    },
+    "difficultyLevel": {
+      "type": "integer",
+      "description": "Difficulty level (1-5)",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "estimatedHours": {
+      "type": "integer",
+      "description": "Estimated time to complete in hours"
+    },
+    "relatedCompetencies": {
+      "type": "array",
+      "description": "List of related competencies",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Stage identifier"
+    },
+    "stageTitle": {
+      "type": "string",
+      "description": "Stage title"
+    },
+    "daysUntilDue": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Days until due date"
+    }
+  },
+  "required": [
+    "taskId",
+    "title",
+    "priority",
+    "relevanceScore",
+    "recommendationReason",
+    "difficultyLevel",
+    "estimatedHours",
+    "relatedCompetencies"
+  ]
+}

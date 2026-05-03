@@ -1,0 +1,84 @@
+{
+  "type": "object",
+  "properties": {
+    "metric": {
+      "type": "string",
+      "enum": ["new_interns", "completed_tasks", "average_rating", "task_completion_rate", "active_users"]
+    },
+    "groupBy": {
+      "type": "string",
+      "enum": ["day", "week", "month"]
+    },
+    "dateFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "dateTo": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "dataPoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for the data point"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["date", "value"]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number",
+          "format": "double",
+          "description": "Total value over the period"
+        },
+        "average": {
+          "type": "number",
+          "format": "double",
+          "description": "Average value over the period"
+        },
+        "min": {
+          "type": "number",
+          "format": "double",
+          "description": "Minimum value"
+        },
+        "max": {
+          "type": "number",
+          "format": "double",
+          "description": "Maximum value"
+        },
+        "trend": {
+          "type": "string",
+          "enum": ["increasing", "decreasing", "stable"],
+          "description": "Overall trend direction"
+        },
+        "changePercentage": {
+          "type": "number",
+          "format": "double",
+          "description": "Percentage change from start to end"
+        }
+      }
+    }
+  },
+  "required": [
+    "metric",
+    "groupBy",
+    "dateFrom",
+    "dateTo",
+    "dataPoints"
+  ]
+}

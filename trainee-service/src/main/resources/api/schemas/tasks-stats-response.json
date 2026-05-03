@@ -1,0 +1,107 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "submitted", "on_review", "completed", "cancelled"]
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "mentorId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "totalTasks": {
+      "type": "integer"
+    },
+    "pendingTasks": {
+      "type": "integer"
+    },
+    "inProgressTasks": {
+      "type": "integer"
+    },
+    "submittedTasks": {
+      "type": "integer"
+    },
+    "onReviewTasks": {
+      "type": "integer"
+    },
+    "completedTasks": {
+      "type": "integer"
+    },
+    "cancelledTasks": {
+      "type": "integer"
+    },
+    "overdueTasks": {
+      "type": "integer"
+    },
+    "averageCompletionTime": {
+      "type": "number",
+      "format": "double",
+      "description": "Average completion time in days"
+    },
+    "onTimeCompletionRate": {
+      "type": "number",
+      "format": "double",
+      "description": "Percentage of tasks completed on time"
+    },
+    "averageRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "distributionByPriority": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "distributionByStatus": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "completionTrend": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for the data point"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["date", "value"]
+      },
+      "description": "Daily/weekly task completion trend"
+    }
+  },
+  "required": [
+    "totalTasks",
+    "completedTasks",
+    "overdueTasks"
+  ]
+}

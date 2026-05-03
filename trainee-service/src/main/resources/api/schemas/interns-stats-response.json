@@ -1,0 +1,169 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "departmentId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "programId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "totalInterns": {
+      "type": "integer",
+      "description": "Total number of interns"
+    },
+    "activeInterns": {
+      "type": "integer",
+      "description": "Number of active interns"
+    },
+    "completedInterns": {
+      "type": "integer",
+      "description": "Number of interns who completed the program"
+    },
+    "onHoldInterns": {
+      "type": "integer",
+      "description": "Number of interns on hold"
+    },
+    "averageProgress": {
+      "type": "number",
+      "format": "double",
+      "description": "Average task completion progress in percentage"
+    },
+    "averageRating": {
+      "type": "number",
+      "format": "double",
+      "description": "Average rating of interns"
+    },
+    "distributionByStatus": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Distribution of interns by status"
+    },
+    "distributionByProgram": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "programId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "programName": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "topPerformers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "internId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedTasks": {
+            "type": "integer"
+          },
+          "progress": {
+            "type": "number",
+            "format": "double",
+            "description": "Progress percentage"
+          },
+          "programName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "internId",
+          "firstName",
+          "lastName",
+          "completedTasks"
+        ]
+      },
+      "description": "Top 5 best performing interns"
+    },
+    "needsAttention": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "internId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedTasks": {
+            "type": "integer"
+          },
+          "progress": {
+            "type": "number",
+            "format": "double",
+            "description": "Progress percentage"
+          },
+          "programName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "internId",
+          "firstName",
+          "lastName",
+          "completedTasks"
+        ]
+      },
+      "description": "Top 5 interns who need attention"
+    }
+  },
+  "required": [
+    "totalInterns",
+    "activeInterns",
+    "averageProgress",
+    "averageRating"
+  ]
+}

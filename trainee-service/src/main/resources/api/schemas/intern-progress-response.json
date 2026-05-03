@@ -1,44 +1,113 @@
 {
   "type": "object",
   "properties": {
+    "iprId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR identifier"
+    },
     "internId": {
       "type": "integer",
-      "format": "int64"
+      "format": "int64",
+      "description": "Intern identifier"
     },
-    "totalTasks": {
-      "type": "integer"
+    "overallProgress": {
+      "type": "number",
+      "format": "double",
+      "description": "Overall completion percentage (0-100)",
+      "minimum": 0,
+      "maximum": 100
     },
     "completedTasks": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Number of completed tasks"
     },
-    "inProgressTasks": {
-      "type": "integer"
+    "totalTasks": {
+      "type": "integer",
+      "description": "Total number of tasks"
     },
-    "pendingTasks": {
-      "type": "integer"
-    },
-    "completionRate": {
-      "type": "number",
-      "format": "double"
-    },
-    "averageTaskTime": {
-      "type": "number",
-      "format": "double"
-    },
-    "competencies": {
-      "$ref": "./competencies.json"
-    },
-    "stagesCompleted": {
-      "type": "integer"
+    "completedStages": {
+      "type": "integer",
+      "description": "Number of completed stages"
     },
     "totalStages": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Total number of stages"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ON_TRACK",
+        "BEHIND_SCHEDULE",
+        "AHEAD_OF_SCHEDULE"
+      ],
+      "description": "Progress status"
+    },
+    "estimatedCompletionDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Estimated completion date"
+    },
+    "plannedEndDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Planned end date"
+    },
+    "stageProgress": {
+      "type": "array",
+      "description": "Progress details by stage",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stageId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "stageTitle": {
+            "type": "string"
+          },
+          "progressPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedTasks": {
+            "type": "integer"
+          },
+          "totalTasks": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "averageTaskRating": {
+      "type": "number",
+      "format": "double",
+      "description": "Average rating of completed tasks"
     }
   },
   "required": [
+    "iprId",
     "internId",
-    "totalTasks",
+    "overallProgress",
     "completedTasks",
-    "completionRate"
+    "totalTasks",
+    "completedStages",
+    "totalStages",
+    "status",
+    "estimatedCompletionDate",
+    "plannedEndDate",
+    "stageProgress",
+    "averageTaskRating"
   ]
 }

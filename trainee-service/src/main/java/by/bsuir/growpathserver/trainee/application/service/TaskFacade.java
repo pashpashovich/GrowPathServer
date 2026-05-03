@@ -24,12 +24,14 @@ import by.bsuir.growpathserver.dto.model.ReorderTasksRequestItemsInner;
 import by.bsuir.growpathserver.dto.model.ReviewTaskRequest;
 import by.bsuir.growpathserver.dto.model.SubmitTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
+import by.bsuir.growpathserver.dto.model.TaskRecommendationResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
 import by.bsuir.growpathserver.trainee.application.command.CompleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.CreateTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateTaskCommand;
+import by.bsuir.growpathserver.trainee.application.dto.TaskRecommendationDto;
 import by.bsuir.growpathserver.trainee.application.handler.CompleteTaskHandler;
 import by.bsuir.growpathserver.trainee.application.handler.CreateTaskHandler;
 import by.bsuir.growpathserver.trainee.application.handler.DeleteTaskHandler;
@@ -68,6 +70,7 @@ public class TaskFacade {
     private final TaskCommentRepository taskCommentRepository;
     private final TaskReviewNotificationService taskReviewNotificationService;
     private final TaskArtifactStorageService taskArtifactStorageService;
+    private final TaskRecommendationService taskRecommendationService;
 
     @Transactional
     public TaskStatusResponse completeTask(String id) {
@@ -476,5 +479,33 @@ public class TaskFacade {
     private Long resolveCurrentUserId() {
         return currentApplicationUserResolver.resolveCurrentUserDatabaseId()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskRecommendationResponse> getRecommendedTasks(int limit) {
+        Long internId = resolveCurrentUserId();
+        List<TaskRecommendationDto> recommendations = taskRecommendationService.getRecommendedTasks(internId, limit);
+
+        return recommendations.stream()
+                .map(this::toTaskRecommendationResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    private TaskRecommendationResponse toTaskRecommendationResponse(TaskRecommendationDto dto) {
+        TaskRecommendationResponse response = new TaskRecommendationResponse();
+        response.setTaskId(dto.getTaskId());
+        response.setTitle(dto.getTitle());
+        response.setDescription(dto.getDescription());
+        response.setPriority(TaskRecommendationResponse.PriorityEnum.fromValue(dto.getPriority()));
+        response.setDueDate(dto.getDueDate());
+        response.setRelevanceScore(dto.getRelevanceScore());
+        response.setRecommendationReason(dto.getRecommendationReason());
+        response.setDifficultyLevel(dto.getDifficultyLevel());
+        response.setEstimatedHours(dto.getEstimatedHours());
+        response.setRelatedCompetencies(dto.getRelatedCompetencies());
+        response.setStageId(dto.getStageId());
+        response.setStageTitle(dto.getStageTitle());
+        response.setDaysUntilDue(dto.getDaysUntilDue());
+        return response;
     }
 }

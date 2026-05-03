@@ -10,6 +10,35 @@
         "intern"
       ]
     },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "departmentId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "programId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "mentorId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "completed", "on_hold"]
+        }
+      }
+    },
     "stats": {
       "type": "object",
       "properties": {
@@ -27,8 +56,49 @@
         },
         "completedTasks": {
           "type": "integer"
+        },
+        "overdueTasks": {
+          "type": "integer"
+        },
+        "averageTaskRating": {
+          "type": "number",
+          "format": "double"
+        },
+        "taskCompletionRate": {
+          "type": "number",
+          "format": "double",
+          "description": "Percentage of tasks completed on time"
+        },
+        "averageTaskCompletionTime": {
+          "type": "number",
+          "format": "double",
+          "description": "Average task completion time in days"
         }
       }
+    },
+    "trends": {
+      "type": "object",
+      "properties": {
+        "internsGrowth": {
+          "type": "string",
+          "description": "Percentage change in interns (e.g., '+12%')"
+        },
+        "tasksCompletionGrowth": {
+          "type": "string",
+          "description": "Percentage change in completed tasks"
+        },
+        "averageRatingChange": {
+          "type": "string",
+          "description": "Change in average rating (e.g., '+0.3')"
+        }
+      }
+    },
+    "topPerformers": {
+      "type": "array",
+      "items": {
+        "$ref": "./top-performer.json"
+      },
+      "description": "Top 5 performing interns"
     },
     "recentActivity": {
       "type": "array",

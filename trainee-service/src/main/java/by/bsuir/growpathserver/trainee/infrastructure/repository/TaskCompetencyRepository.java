@@ -10,4 +10,6 @@ import by.bsuir.growpathserver.trainee.domain.entity.TaskCompetencyEntity;
 @Repository
 public interface TaskCompetencyRepository extends JpaRepository<TaskCompetencyEntity, Long> {
     List<TaskCompetencyEntity> findAllByTaskId(Long taskId);
+
+    List<TaskCompetencyEntity> findByTaskId(Long taskId);
 }

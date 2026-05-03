@@ -9,6 +9,7 @@ import by.bsuir.growpathserver.dto.api.IprsApi;
 import by.bsuir.growpathserver.dto.model.ChangeStageStatusRequest;
 import by.bsuir.growpathserver.dto.model.CreateIprRequest;
 import by.bsuir.growpathserver.dto.model.CreateStageRequest;
+import by.bsuir.growpathserver.dto.model.InternProgressResponse;
 import by.bsuir.growpathserver.dto.model.IprListResponse;
 import by.bsuir.growpathserver.dto.model.IprResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
@@ -98,5 +99,11 @@ public class IprController extends BaseController implements IprsApi {
                                                               String stageId,
                                                               ChangeStageStatusRequest request) {
         return ResponseEntity.ok(iprApplicationFacade.changeIprStageStatus(iprId, stageId, request));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN')")
+    public ResponseEntity<InternProgressResponse> calculateIprProgress(String iprId) {
+        return ResponseEntity.ok(iprApplicationFacade.calculateIprProgress(iprId));
     }
 }

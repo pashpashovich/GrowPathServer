@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "properties": {
+    "stageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Stage identifier"
+    },
+    "stageTitle": {
+      "type": "string",
+      "description": "Stage title"
+    },
+    "progressPercentage": {
+      "type": "number",
+      "format": "double",
+      "description": "Stage completion percentage (0-100)",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "completedTasks": {
+      "type": "integer",
+      "description": "Number of completed tasks in this stage"
+    },
+    "totalTasks": {
+      "type": "integer",
+      "description": "Total number of tasks in this stage"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Stage start date"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Stage end date"
+    },
+    "status": {
+      "type": "string",
+      "description": "Stage status"
+    }
+  },
+  "required": [
+    "stageId",
+    "stageTitle",
+    "progressPercentage",
+    "completedTasks",
+    "totalTasks",
+    "startDate",
+    "endDate",
+    "status"
+  ]
+}

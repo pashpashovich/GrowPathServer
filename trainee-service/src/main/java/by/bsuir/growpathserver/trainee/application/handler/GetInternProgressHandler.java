@@ -1,5 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.handler;
 
+import java.util.ArrayList;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +26,8 @@ public class GetInternProgressHandler {
         final Long userId;
         try {
             userId = Long.parseLong(query.internId());
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid intern ID format: " + query.internId());
         }
 
@@ -43,25 +46,22 @@ public class GetInternProgressHandler {
         long completedTasks = allTasks.getContent().stream()
                 .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
                 .count();
-        long inProgressTasks = allTasks.getContent().stream()
-                .filter(task -> task.getStatus() == TaskStatus.IN_PROGRESS)
-                .count();
-        long pendingTasks = allTasks.getContent().stream()
-                .filter(task -> task.getStatus() == TaskStatus.PENDING)
-                .count();
 
-        double completionRate = totalTasks > 0 ? (double) completedTasks / totalTasks * 100.0 : 0.0;
+        double overallProgress = totalTasks > 0 ? (double) completedTasks / totalTasks * 100.0 : 0.0;
 
         InternProgressResponse response = new InternProgressResponse();
+        response.setIprId(null);
         response.setInternId(userId);
         response.setTotalTasks((int) totalTasks);
         response.setCompletedTasks((int) completedTasks);
-        response.setInProgressTasks((int) inProgressTasks);
-        response.setPendingTasks((int) pendingTasks);
-        response.setCompletionRate(completionRate);
-        response.setAverageTaskTime(0.0); // TODO: Calculate from task completion times
-        response.setStagesCompleted(0); // TODO: Calculate from stages
-        response.setTotalStages(0); // TODO: Get from internship program
+        response.setOverallProgress(overallProgress);
+        response.setCompletedStages(0);
+        response.setTotalStages(0);
+        response.setStatus(InternProgressResponse.StatusEnum.ON_TRACK);
+        response.setEstimatedCompletionDate(null);
+        response.setPlannedEndDate(null);
+        response.setStageProgress(new ArrayList<>());
+        response.setAverageTaskRating(0.0);
 
         return response;
     }

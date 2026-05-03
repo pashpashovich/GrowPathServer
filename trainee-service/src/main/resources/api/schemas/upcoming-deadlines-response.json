@@ -1,0 +1,128 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "integer"
+        },
+        "mentorId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "internId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        }
+      }
+    },
+    "totalDeadlines": {
+      "type": "integer"
+    },
+    "criticalDeadlines": {
+      "type": "integer",
+      "description": "Number of critical priority deadlines"
+    },
+    "overdueTasks": {
+      "type": "integer",
+      "description": "Number of tasks already overdue"
+    },
+    "deadlines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "submitted", "on_review", "completed", "cancelled"]
+          },
+          "assigneeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mentorId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": ["taskId", "title", "dueDate", "priority", "status"]
+      }
+    },
+    "deadlinesByDay": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "dueDate": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["pending", "in_progress", "submitted", "on_review", "completed", "cancelled"]
+                },
+                "assigneeId": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "mentorId": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              },
+              "required": ["taskId", "title", "dueDate", "priority", "status"]
+            }
+          }
+        }
+      },
+      "description": "Deadlines grouped by day"
+    }
+  },
+  "required": [
+    "totalDeadlines",
+    "deadlines"
+  ]
+}

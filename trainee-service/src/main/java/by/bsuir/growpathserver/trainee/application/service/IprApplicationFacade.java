@@ -19,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 import by.bsuir.growpathserver.dto.model.ChangeStageStatusRequest;
 import by.bsuir.growpathserver.dto.model.CreateIprRequest;
 import by.bsuir.growpathserver.dto.model.CreateStageRequest;
+import by.bsuir.growpathserver.dto.model.InternProgressResponse;
+import by.bsuir.growpathserver.dto.model.InternProgressResponseStageProgressInner;
 import by.bsuir.growpathserver.dto.model.IprListResponse;
 import by.bsuir.growpathserver.dto.model.IprResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
@@ -27,6 +29,7 @@ import by.bsuir.growpathserver.dto.model.StageListResponse;
 import by.bsuir.growpathserver.dto.model.StageResponse;
 import by.bsuir.growpathserver.dto.model.UpdateIprRequest;
 import by.bsuir.growpathserver.dto.model.UpdateStageRequest;
+import by.bsuir.growpathserver.trainee.application.dto.InternProgressDto;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.IprEntity;
@@ -57,6 +60,7 @@ public class IprApplicationFacade {
     private final RoadmapStageRepository roadmapStageRepository;
     private final UserRepository userRepository;
     private final CurrentApplicationUserResolver currentUserResolver;
+    private final InternProgressCalculationService progressCalculationService;
 
     @Transactional(readOnly = true)
     public IprListResponse listIprs(Long mentorId, Long internId, Long programId, Long templateId) {
@@ -527,5 +531,46 @@ public class IprApplicationFacade {
         IprListResponse response = new IprListResponse();
         response.setData(new ArrayList<>());
         return response;
+    }
+
+    @Transactional(readOnly = true)
+    public InternProgressResponse calculateIprProgress(String iprId) {
+        long id = parseLongId(iprId, "iprId");
+        requireIprViewable(id);
+
+        InternProgressDto progressDto = progressCalculationService.calculateProgress(id);
+
+        InternProgressResponse response = new InternProgressResponse();
+        response.setIprId(progressDto.getIprId());
+        response.setInternId(progressDto.getInternId());
+        response.setOverallProgress(progressDto.getOverallProgress());
+        response.setCompletedTasks(progressDto.getCompletedTasks());
+        response.setTotalTasks(progressDto.getTotalTasks());
+        response.setCompletedStages(progressDto.getCompletedStages());
+        response.setTotalStages(progressDto.getTotalStages());
+        response.setStatus(InternProgressResponse.StatusEnum.fromValue(progressDto.getStatus().name()));
+        response.setEstimatedCompletionDate(progressDto.getEstimatedCompletionDate());
+        response.setPlannedEndDate(progressDto.getPlannedEndDate());
+        response.setAverageTaskRating(progressDto.getAverageTaskRating());
+
+        List<InternProgressResponseStageProgressInner> stageProgressItems = progressDto.getStageProgress().stream()
+                .map(this::toStageProgressItem)
+                .collect(Collectors.toList());
+        response.setStageProgress(stageProgressItems);
+
+        return response;
+    }
+
+    private InternProgressResponseStageProgressInner toStageProgressItem(InternProgressDto.StageProgressDto dto) {
+        InternProgressResponseStageProgressInner item = new InternProgressResponseStageProgressInner();
+        item.setStageId(dto.getStageId());
+        item.setStageTitle(dto.getStageTitle());
+        item.setProgressPercentage(dto.getProgressPercentage());
+        item.setCompletedTasks(dto.getCompletedTasks());
+        item.setTotalTasks(dto.getTotalTasks());
+        item.setStartDate(dto.getStartDate());
+        item.setEndDate(dto.getEndDate());
+        item.setStatus(dto.getStatus());
+        return item;
     }
 }

@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date of the data point"
+    },
+    "value": {
+      "type": "number",
+      "format": "double",
+      "description": "Value at this point"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label (e.g., 'May 1', 'Week 18')"
+    }
+  },
+  "required": [
+    "date",
+    "value"
+  ]
+}

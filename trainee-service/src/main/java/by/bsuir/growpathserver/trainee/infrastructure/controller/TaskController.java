@@ -26,6 +26,7 @@ import by.bsuir.growpathserver.dto.model.ReorderTasksRequest;
 import by.bsuir.growpathserver.dto.model.ReviewTaskRequest;
 import by.bsuir.growpathserver.dto.model.SubmitTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
+import by.bsuir.growpathserver.dto.model.TaskRecommendationResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
 import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
@@ -217,5 +218,10 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                 request.getSizeBytes()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    public ResponseEntity<java.util.List<TaskRecommendationResponse>> getRecommendedTasks(Integer limit) {
+        return ResponseEntity.ok(taskFacade.getRecommendedTasks(limit != null ? limit : 10));
     }
 }
