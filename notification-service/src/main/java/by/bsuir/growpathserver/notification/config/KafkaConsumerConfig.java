@@ -15,6 +15,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import by.bsuir.growpathserver.common.model.kafka.ApplicationCreatedEvent;
 import by.bsuir.growpathserver.common.model.kafka.PasswordResetRequestedEvent;
 import by.bsuir.growpathserver.common.model.kafka.TaskCompletedEvent;
+import by.bsuir.growpathserver.common.model.kafka.UserBlockedEvent;
 import by.bsuir.growpathserver.common.model.kafka.UserInvitedEvent;
 
 @Configuration
@@ -79,6 +80,18 @@ public class KafkaConsumerConfig {
         DefaultKafkaConsumerFactory<String, PasswordResetRequestedEvent> cf =
                 new DefaultKafkaConsumerFactory<>(props);
         ConcurrentKafkaListenerContainerFactory<String, PasswordResetRequestedEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(cf);
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UserBlockedEvent> userBlockedListenerFactory() {
+        Map<String, Object> props = new HashMap<>(baseConsumerConfig());
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, UserBlockedEvent.class.getName());
+        DefaultKafkaConsumerFactory<String, UserBlockedEvent> cf =
+                new DefaultKafkaConsumerFactory<>(props);
+        ConcurrentKafkaListenerContainerFactory<String, UserBlockedEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(cf);
         return factory;

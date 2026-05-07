@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import by.bsuir.growpathserver.common.model.kafka.ApplicationCreatedEvent;
 import by.bsuir.growpathserver.common.model.kafka.PasswordResetRequestedEvent;
 import by.bsuir.growpathserver.common.model.kafka.TaskCompletedEvent;
+import by.bsuir.growpathserver.common.model.kafka.UserBlockedEvent;
 import by.bsuir.growpathserver.common.model.kafka.UserInvitedEvent;
 import by.bsuir.growpathserver.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -132,6 +133,33 @@ public class NotificationListener {
                 event.getEmail(),
                 "Задача выполнена",
                 "task-completed",
+                variables
+        );
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topic.user-blocked}",
+            groupId = "notification-service-group",
+            containerFactory = "userBlockedListenerFactory"
+    )
+    public void onUserBlocked(UserBlockedEvent event) {
+        log.info("Received UserBlockedEvent for user id={}, email={}", event.getUserId(), event.getEmail());
+        if (event.getEmail() == null) {
+            return;
+        }
+        String fullName = Stream.of(event.getLastName(), event.getFirstName(), event.getPatronymicName())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "))
+                .trim();
+        String greeting = StringUtils.isNotBlank(fullName) ? "Здравствуйте, " + fullName + "!" : "Здравствуйте!";
+        Map<String, Object> variables = Map.of(
+                "greeting", greeting,
+                "email", event.getEmail()
+        );
+        notificationService.sendEmail(
+                event.getEmail(),
+                "Блокировка учетной записи GrowPath",
+                "user-blocked",
                 variables
         );
     }

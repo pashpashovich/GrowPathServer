@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ForgetPasswordHandler {
 
-    @Value("${kafka.topic.password-reset-requested:PASSWORDRESETREQUESTED}")
+    @Value("${kafka.topic.password-reset-requested:PASSWORD_RESET_REQUESTED}")
     private String topicPasswordResetRequested;
 
     private final UserRepository userRepository;

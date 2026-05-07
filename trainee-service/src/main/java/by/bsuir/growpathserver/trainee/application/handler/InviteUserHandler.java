@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class InviteUserHandler {
 
-    @Value("${kafka.topic.user-invited:USERINVITED}")
+    @Value("${kafka.topic.user-invited:USER_INVITED}")
     private String topicUserInvited;
 
     private final UserRepository userRepository;

@@ -174,17 +174,7 @@ public class TaskFacade {
 
     @Transactional
     public TaskStatusResponse reviewTask(String id, ReviewTaskRequest request) {
-        ChangeTaskStatusRequest body = new ChangeTaskStatusRequest();
-        if (request.getStatus() == ReviewTaskRequest.StatusEnum.COMPLETED) {
-            body.setTo(ChangeTaskStatusRequest.ToEnum.COMPLETED);
-            body.setRating(request.getRating());
-            body.setComment(request.getComment());
-        }
-        else {
-            body.setTo(ChangeTaskStatusRequest.ToEnum.NEEDS_REWORK);
-            body.setFeedback(StringUtils.trimToNull(request.getComment()));
-            body.setComment(request.getComment());
-        }
+        ChangeTaskStatusRequest body = buildStatusChangeRequest(request);
         return changeTaskStatus(id, body);
     }
 
@@ -196,31 +186,64 @@ public class TaskFacade {
         Long userId = resolveCurrentUserId();
         TaskStatus target = resolveTransitionTarget(request);
 
+        applyTransition(task, userId, target, request);
+        taskRepository.save(task);
+        sendReviewNotificationIfNeeded(task, previous);
+
+        return toStatusResponse(task);
+    }
+
+    private ChangeTaskStatusRequest buildStatusChangeRequest(ReviewTaskRequest request) {
+        ChangeTaskStatusRequest body = new ChangeTaskStatusRequest();
+
+        if (ReviewTaskRequest.StatusEnum.COMPLETED.equals(request.getStatus())) {
+            body.setTo(ChangeTaskStatusRequest.ToEnum.COMPLETED);
+            body.setRating(request.getRating());
+        }
+        else {
+            body.setTo(ChangeTaskStatusRequest.ToEnum.NEEDS_REWORK);
+            body.setFeedback(StringUtils.trimToNull(request.getComment()));
+        }
+
+        body.setComment(request.getComment());
+        return body;
+    }
+
+    private void applyTransition(TaskEntity task, Long userId, TaskStatus target,
+                                 ChangeTaskStatusRequest request) {
         switch (target) {
             case IN_PROGRESS -> applyTransitionToInProgress(task, userId);
             case ON_REVIEW -> applyTransitionToOnReview(task, userId);
             case NEEDS_REWORK -> applyTransitionToNeedsRework(task, userId, request);
             case COMPLETED -> applyTransitionToCompleted(task, userId, request);
-            default -> throw new ResponseStatusException(HttpStatus.CONFLICT,
-                                                         "Transition to \"" + target.getValue()
-                                                                 + "\" is not supported through this endpoint");
+            default -> throw unsupportedTransition(target);
         }
+    }
 
-        taskRepository.save(task);
+    private ResponseStatusException unsupportedTransition(TaskStatus target) {
+        return new ResponseStatusException(HttpStatus.CONFLICT,
+                                           "Transition to \"" + target.getValue()
+                                                   + "\" is not supported through this endpoint");
+    }
 
-        if ((previous == TaskStatus.ON_REVIEW || previous == TaskStatus.SUBMITTED)
-                && (task.getStatus() == TaskStatus.COMPLETED || task.getStatus() == TaskStatus.NEEDS_REWORK)) {
-            taskReviewNotificationService.notifyReviewResult(new TaskReviewResultEvent(
-                    task.getId(),
-                    task.getAssigneeId(),
-                    task.getStatus().getValue(),
-                    task.getRating(),
-                    task.getReviewComment(),
-                    task.getReviewedAt()
-            ));
+    private void sendReviewNotificationIfNeeded(TaskEntity task, TaskStatus previous) {
+        if (isReviewCompleted(previous, task.getStatus())) {
+            taskReviewNotificationService.notifyReviewResult(
+                    new TaskReviewResultEvent(
+                            task.getId(),
+                            task.getAssigneeId(),
+                            task.getStatus().getValue(),
+                            task.getRating(),
+                            task.getReviewComment(),
+                            task.getReviewedAt()
+                    )
+            );
         }
+    }
 
-        return toStatusResponse(task);
+    private boolean isReviewCompleted(TaskStatus previous, TaskStatus current) {
+        return (TaskStatus.ON_REVIEW.equals(previous) || TaskStatus.SUBMITTED.equals(previous))
+                && (TaskStatus.COMPLETED.equals(current) || TaskStatus.NEEDS_REWORK.equals(current));
     }
 
     @Transactional
