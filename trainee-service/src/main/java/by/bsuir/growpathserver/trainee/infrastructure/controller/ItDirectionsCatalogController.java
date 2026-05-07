@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+@PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
 public class ItDirectionsCatalogController extends BaseController implements ItDirectionsApi {
 
     private final ItDirectionCatalogService itDirectionCatalogService;

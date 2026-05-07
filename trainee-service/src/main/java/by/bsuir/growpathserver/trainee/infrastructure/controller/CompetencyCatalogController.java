@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+@PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
 public class CompetencyCatalogController extends BaseController implements CompetenciesApi {
 
     private final CompetencyCatalogService competencyCatalogService;

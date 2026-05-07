@@ -50,6 +50,10 @@
       {
         "name": "MENTOR",
         "description": "Mentor role for guiding interns"
+      },
+      {
+        "name": "DEPARTMENT_HEAD",
+        "description": "Department Head role for managing department operations"
       }
     ]
   },
@@ -260,6 +264,22 @@
         }
       ],
       "realmRoles": ["MENTOR"]
+    },
+    {
+      "username": "department_head",
+      "enabled": true,
+      "email": "dept_head@growpath.com",
+      "firstName": "Department",
+      "lastName": "Head",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "depthead123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["DEPARTMENT_HEAD"]
     }
   ]
 }

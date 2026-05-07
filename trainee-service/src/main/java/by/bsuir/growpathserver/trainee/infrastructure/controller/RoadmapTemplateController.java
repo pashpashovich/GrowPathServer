@@ -27,51 +27,51 @@ public class RoadmapTemplateController extends BaseController implements Roadmap
     private final RoadmapApplicationFacade roadmapApplicationFacade;
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<RoadmapTemplateListResponse> listRoadmapTemplates(Long programId, Long mentorId) {
         return ResponseEntity.ok(roadmapApplicationFacade.listRoadmapTemplates(mentorId, programId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<RoadmapTemplateResponse> createRoadmapTemplate(CreateRoadmapTemplateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roadmapApplicationFacade.createRoadmapTemplate(request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<RoadmapTemplateResponse> getRoadmapTemplateById(String templateId) {
         return ResponseEntity.ok(roadmapApplicationFacade.getRoadmapTemplateById(templateId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<RoadmapTemplateResponse> updateRoadmapTemplate(String templateId,
                                                                          UpdateRoadmapTemplateRequest request) {
         return ResponseEntity.ok(roadmapApplicationFacade.updateRoadmapTemplate(templateId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> deleteRoadmapTemplate(String templateId) {
         return ResponseEntity.ok(roadmapApplicationFacade.deleteRoadmapTemplate(templateId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageListResponse> getRoadmapTemplateStages(String templateId) {
         return ResponseEntity.ok(roadmapApplicationFacade.getRoadmapTemplateStages(templateId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> createRoadmapTemplateStage(String templateId, CreateStageRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(roadmapApplicationFacade.createRoadmapTemplateStage(templateId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> updateRoadmapTemplateStage(String templateId,
                                                                     String stageId,
                                                                     UpdateStageRequest request) {
@@ -79,20 +79,20 @@ public class RoadmapTemplateController extends BaseController implements Roadmap
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> deleteRoadmapTemplateStage(String templateId, String stageId) {
         return ResponseEntity.ok(roadmapApplicationFacade.deleteRoadmapTemplateStage(templateId, stageId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> reorderRoadmapTemplateStages(String templateId,
                                                                         ReorderStagesRequest request) {
         return ResponseEntity.ok(roadmapApplicationFacade.reorderRoadmapTemplateStages(templateId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> changeRoadmapTemplateStageStatus(String templateId,
                                                                           String stageId,
                                                                           ChangeStageStatusRequest request) {

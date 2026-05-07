@@ -9,7 +9,8 @@ public enum UserRole {
     ADMIN("admin"),
     HR("hr"),
     MENTOR("mentor"),
-    INTERN("intern");
+    INTERN("intern"),
+    DEPARTMENT_HEAD("department_head");
 
     private final String value;
 

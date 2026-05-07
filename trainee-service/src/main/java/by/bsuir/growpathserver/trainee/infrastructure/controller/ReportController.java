@@ -24,13 +24,13 @@ public class ReportController extends BaseController implements ReportsApi {
     private final ReportFacade reportFacade;
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MentorWorkloadResponse> getMentorWorkload(String mentorId) {
         return ResponseEntity.ok(reportFacade.getMentorWorkload(mentorId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<ReportListResponse> getReports(String programId,
                                                          String mentorId,
                                                          String period,
@@ -40,7 +40,7 @@ public class ReportController extends BaseController implements ReportsApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<Resource> exportReportsCsv(@RequestParam(name = "programId", required = false) String programId,
                                                      @RequestParam(name = "mentorId", required = false) String mentorId,
                                                      @RequestParam(name = "period", required = false) String period,
@@ -55,7 +55,7 @@ public class ReportController extends BaseController implements ReportsApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<Resource> exportMentorWorkloadCsv(@RequestParam(name = "mentorId", required = false) String mentorId) {
         byte[] csv = reportFacade.exportMentorWorkloadCsv(mentorId);
         Resource resource = new ByteArrayResource(csv);

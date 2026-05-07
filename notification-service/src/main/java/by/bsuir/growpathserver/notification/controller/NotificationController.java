@@ -41,7 +41,7 @@ public class NotificationController {
 
 
     @GetMapping("/hr")
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<Map<String, String>> hrEndpoint() {
         return ResponseEntity.ok(Map.of("message", "HR Manager access granted for notifications"));
     }

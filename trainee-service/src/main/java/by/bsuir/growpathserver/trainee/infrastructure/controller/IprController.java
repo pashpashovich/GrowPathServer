@@ -28,13 +28,13 @@ public class IprController extends BaseController implements IprsApi {
     private final IprApplicationFacade iprApplicationFacade;
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<IprListResponse> listIprs(Long mentorId, Long internId, Long programId, Long templateId) {
         return ResponseEntity.ok(iprApplicationFacade.listIprs(mentorId, internId, programId, templateId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<IprResponse> createIpr(CreateIprRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(iprApplicationFacade.createIpr(request));
     }
@@ -46,55 +46,55 @@ public class IprController extends BaseController implements IprsApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<IprResponse> getIprById(String iprId) {
         return ResponseEntity.ok(iprApplicationFacade.getIprById(iprId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<IprResponse> updateIpr(String iprId, UpdateIprRequest updateIprRequest) {
         return ResponseEntity.ok(iprApplicationFacade.updateIpr(iprId, updateIprRequest));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> deleteIpr(String iprId) {
         return ResponseEntity.ok(iprApplicationFacade.deleteIpr(iprId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageListResponse> getIprStages(String iprId) {
         return ResponseEntity.ok(iprApplicationFacade.getIprStages(iprId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> createIprStage(String iprId, CreateStageRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(iprApplicationFacade.createIprStage(iprId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> updateIprStage(String iprId, String stageId, UpdateStageRequest request) {
         return ResponseEntity.ok(iprApplicationFacade.updateIprStage(iprId, stageId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> deleteIprStage(String iprId, String stageId) {
         return ResponseEntity.ok(iprApplicationFacade.deleteIprStage(iprId, stageId));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> reorderIprStages(String iprId, ReorderStagesRequest request) {
         return ResponseEntity.ok(iprApplicationFacade.reorderIprStages(iprId, request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<StageResponse> changeIprStageStatus(String iprId,
                                                               String stageId,
                                                               ChangeStageStatusRequest request) {
@@ -102,7 +102,7 @@ public class IprController extends BaseController implements IprsApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternProgressResponse> calculateIprProgress(String iprId) {
         return ResponseEntity.ok(iprApplicationFacade.calculateIprProgress(iprId));
     }

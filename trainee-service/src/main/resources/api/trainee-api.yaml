@@ -290,7 +290,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ admin, hr, mentor, intern ]
+            enum: [ admin, hr, mentor, intern, department_head ]
         - name: status
           in: query
           description: Filter by status
@@ -4439,7 +4439,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [ admin, hr, mentor, intern ]
+            enum: [ admin, hr, mentor, intern, department_head ]
         - name: dateFrom
           in: query
           description: Start date for filtering statistics (ISO 8601 format)

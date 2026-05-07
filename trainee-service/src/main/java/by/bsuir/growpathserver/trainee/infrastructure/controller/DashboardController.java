@@ -44,7 +44,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     private final GetUpcomingDeadlinesHandler getUpcomingDeadlinesHandler;
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<DashboardResponse> getDashboard(
             String role,
             LocalDateTime dateFrom,
@@ -57,7 +57,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternsStatsResponse> getInternsStats(
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -73,7 +73,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
     public ResponseEntity<TasksStatsResponse> getTasksStats(
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -91,7 +91,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MentorsStatsResponse> getMentorsStats(
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -105,7 +105,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<ProgramsStatsResponse> getProgramsStats(
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -119,7 +119,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
     public ResponseEntity<TrendsResponse> getTrends(
             String metric,
             LocalDateTime dateFrom,

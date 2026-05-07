@@ -23,26 +23,26 @@ public class InternshipProgramController extends BaseController implements Inter
     private final InternshipProgramsApplicationFacade internshipProgramsApplicationFacade;
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternshipProgramResponse> createInternshipProgram(CreateInternshipProgramRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(internshipProgramsApplicationFacade.createInternshipProgram(request));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<MessageResponse> deleteInternshipProgram(String id) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.deleteInternshipProgram(id));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternshipProgramResponse> getInternshipProgramById(String id) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.getInternshipProgramById(id));
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternshipProgramListResponse> getInternshipPrograms(Integer page,
                                                                                Integer limit,
                                                                                String status,
@@ -60,7 +60,7 @@ public class InternshipProgramController extends BaseController implements Inter
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternshipProgramResponse> updateInternshipProgram(String id,
                                                                              UpdateInternshipProgramRequest request) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.updateInternshipProgram(id, request));

@@ -11,7 +11,8 @@
         "admin",
         "hr",
         "mentor",
-        "intern"
+        "intern",
+        "department_head"
       ]
     },
     "updatedAt": {
