@@ -21,7 +21,7 @@ public class JwtUtils {
      * Keycloak also assigns composite/system roles (e.g. default-roles-*, offline_access, uma_authorization); those are omitted.
      */
     private static final Set<String> APPLICATION_REALM_ROLES = Set.of(
-            "INTERN", "MENTOR", "HR_MANAGER", "ADMIN"
+            "INTERN", "MENTOR", "HR_MANAGER", "ADMIN", "DEPARTMENT_HEAD"
     );
 
     private static boolean isApplicationRealmRole(String realmRole) {
