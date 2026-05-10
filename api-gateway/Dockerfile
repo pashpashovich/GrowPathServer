@@ -1,16 +1,3 @@
-FROM gradle:8.5-jdk21 AS build
-
-WORKDIR /app
-
-COPY build.gradle settings.gradle ./
-COPY api-gateway/build.gradle ./api-gateway/
-COPY common/build.gradle ./common/
-
-COPY common/src ./common/src
-COPY api-gateway/src ./api-gateway/src
-
-RUN gradle :api-gateway:bootJar --no-daemon
-
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
@@ -18,7 +5,7 @@ WORKDIR /app
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=build /app/api-gateway/build/libs/*.jar app.jar
+COPY api-gateway/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
