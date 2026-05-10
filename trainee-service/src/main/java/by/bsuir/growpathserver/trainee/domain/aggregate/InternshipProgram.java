@@ -55,12 +55,14 @@ public class InternshipProgram {
 
     private static List<ProgramRequirement> mapRequirementRefs(InternshipProgramEntity entity) {
         return entity.getRequirementDefinitions().stream()
+                .filter(Objects::nonNull)
                 .map(r -> new ProgramRequirement(r.getId(), r.getRequirementText()))
                 .toList();
     }
 
     private static List<InternshipProgramGoalItem> mapGoals(InternshipProgramEntity entity) {
         return entity.getGoalDefinitions().stream()
+                .filter(Objects::nonNull)
                 .map(g -> new InternshipProgramGoalItem(g.getId(), g.getTitle(), g.getDescription()))
                 .toList();
     }
@@ -75,20 +77,23 @@ public class InternshipProgram {
     private static List<InternshipProgramStageItem> mapSelectionStages(InternshipProgramEntity entity) {
         List<SelectionStageDefinitionEntity> ordered = entity.getSelectionStageDefinitions();
         List<InternshipProgramStageItem> out = new ArrayList<>();
-        for (int i = 0; i < ordered.size(); i++) {
-            SelectionStageDefinitionEntity s = ordered.get(i);
-            out.add(new InternshipProgramStageItem(
-                    s.getId(),
-                    s.getName(),
-                    s.getDescription(),
-                    i + 1,
-                    s.isActive()));
+        int position = 1;
+        for (SelectionStageDefinitionEntity s : ordered) {
+            if (Objects.nonNull(s)) {
+                out.add(new InternshipProgramStageItem(
+                        s.getId(),
+                        s.getName(),
+                        s.getDescription(),
+                        position++,
+                        s.isActive()));
+            }
         }
         return List.copyOf(out);
     }
 
     private static List<ProgramCompetency> mapCompetencies(Set<CompetencyEntity> set) {
         return set.stream()
+                .filter(Objects::nonNull)
                 .map(c -> new ProgramCompetency(c.getId(), c.getName()))
                 .sorted(Comparator.comparing(ProgramCompetency::id))
                 .toList();
