@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-  <changeSet id="001-create-email-templates-table" author="growpath">
+  <changeSet id="001-create-email-templates-table" author="Kasovich Pavel">
     <createTable tableName="email_template">
       <column name="email_template_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -22,7 +22,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-email-template-attachments-table" author="growpath">
+  <changeSet id="001-create-email-template-attachments-table" author="Kasovich Pavel">
     <createTable tableName="email_template_attachment">
       <column name="email_template_attachment_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -40,7 +40,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-distribution-groups-table" author="growpath">
+  <changeSet id="001-create-distribution-groups-table" author="Kasovich Pavel">
     <createTable tableName="distribution_group">
       <column name="distribution_group_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -54,7 +54,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-recipients-table" author="growpath">
+  <changeSet id="001-create-recipients-table" author="Kasovich Pavel">
     <createTable tableName="recipient">
       <column name="recipient_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -74,7 +74,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-recipient-distribution-groups-table" author="growpath">
+  <changeSet id="001-create-recipient-distribution-groups-table" author="Kasovich Pavel">
     <createTable tableName="recipient_distribution_group">
       <column name="recipient_id" type="BIGINT">
         <constraints nullable="false" foreignKeyName="fk_rdg_recipient" references="recipient(recipient_id)"/>
@@ -87,7 +87,7 @@
     <addPrimaryKey tableName="recipient_distribution_group" columnNames="recipient_id,distribution_group_id"/>
   </changeSet>
 
-  <changeSet id="001-create-mailings-table" author="growpath">
+  <changeSet id="001-create-mailings-table" author="Kasovich Pavel">
     <createTable tableName="mailing">
       <column name="mailing_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -120,7 +120,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-mailing-schedules-table" author="growpath">
+  <changeSet id="001-create-mailing-schedules-table" author="Kasovich Pavel">
     <createTable tableName="mailing_schedule">
       <column name="schedule_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -137,7 +137,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-mailing-history-table" author="growpath">
+  <changeSet id="001-create-mailing-history-table" author="Kasovich Pavel">
     <createTable tableName="mailing_history">
       <column name="id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -160,7 +160,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-mailing-recipient-groups-table" author="growpath">
+  <changeSet id="001-create-mailing-recipient-groups-table" author="Kasovich Pavel">
     <createTable tableName="mailing_recipient_group">
       <column name="mailing_id" type="BIGINT">
         <constraints nullable="false" foreignKeyName="fk_mrg_mailing" references="mailing(mailing_id)"/>
@@ -173,7 +173,7 @@
     <addPrimaryKey tableName="mailing_recipient_group" columnNames="mailing_id,distribution_group_id"/>
   </changeSet>
 
-  <changeSet id="001-create-password-expiry-notices-table" author="growpath">
+  <changeSet id="001-create-password-expiry-notices-table" author="Kasovich Pavel">
     <createTable tableName="password_expiry_notice">
       <column name="password_expiry_notice_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -190,7 +190,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-in-app-notifications-table" author="growpath">
+  <changeSet id="001-create-in-app-notifications-table" author="Kasovich Pavel">
     <createTable tableName="in_app_notifications">
       <column name="notification_id" type="BIGSERIAL">
         <constraints primaryKey="true" nullable="false"/>
@@ -219,7 +219,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="001-create-indexes" author="growpath">
+  <changeSet id="001-create-indexes" author="Kasovich Pavel">
     <createIndex indexName="idx_email_template_name" tableName="email_template">
       <column name="email_template_name"/>
     </createIndex>

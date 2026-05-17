@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="002-mailing-is-deleted-not-null" author="Kasovich Pavel">
+    <sql>UPDATE mailing
+         SET is_deleted = false
+         WHERE is_deleted IS NULL</sql>
+    <addNotNullConstraint tableName="mailing" columnName="is_deleted" columnDataType="BOOLEAN"
+                          defaultNullValue="false"/>
+  </changeSet>
+
+  <changeSet id="002-uk-recipient-email-ci" author="Kasovich Pavel">
+    <sql dbms="postgresql">
+      CREATE UNIQUE INDEX uk_recipient_email_ci ON recipient (LOWER(recipient_email))
+    </sql>
+    <rollback>
+      <sql dbms="postgresql">DROP INDEX IF EXISTS uk_recipient_email_ci</sql>
+    </rollback>
+  </changeSet>
+
+  <changeSet id="002-fk-attachment-template-cascade" author="Kasovich Pavel">
+    <dropForeignKeyConstraint baseTableName="email_template_attachment"
+                              constraintName="fk_attachment_template"/>
+    <addForeignKeyConstraint baseTableName="email_template_attachment"
+                             baseColumnNames="email_template_id"
+                             constraintName="fk_attachment_template"
+                             referencedTableName="email_template"
+                             referencedColumnNames="email_template_id"
+                             onDelete="CASCADE"/>
+  </changeSet>
+
+  <changeSet id="002-additional-indexes" author="Kasovich Pavel">
+    <createIndex indexName="idx_mailing_execute_at" tableName="mailing">
+      <column name="mailing_status"/>
+      <column name="mailing_type"/>
+      <column name="mailing_execute_at"/>
+    </createIndex>
+    <createIndex indexName="idx_mailing_email_template_id" tableName="mailing">
+      <column name="email_template_id"/>
+    </createIndex>
+    <createIndex indexName="idx_mailing_schedule_mailing_id" tableName="mailing_schedule">
+      <column name="mailing_id"/>
+    </createIndex>
+    <createIndex indexName="idx_mailing_history_mailing_id" tableName="mailing_history">
+      <column name="mailing_id"/>
+    </createIndex>
+    <createIndex indexName="idx_email_template_attachment_template_id" tableName="email_template_attachment">
+      <column name="email_template_id"/>
+    </createIndex>
+    <createIndex indexName="idx_password_expiry_notice_user_email" tableName="password_expiry_notice">
+      <column name="user_email"/>
+    </createIndex>
+    <createIndex indexName="uk_password_expiry_notice_user_interval" tableName="password_expiry_notice" unique="true">
+      <column name="user_email"/>
+      <column name="interval_days"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

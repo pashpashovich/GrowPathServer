@@ -264,7 +264,6 @@ services:
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-growpath}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_NOTIFICATION_GROUP_ID: ${KAFKA_NOTIFICATION_GROUP_ID:-notification-service-group}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
       MAIL_HOST: ${MAIL_HOST:-mailhog}
       MAIL_PORT: ${MAIL_PORT:-1025}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
