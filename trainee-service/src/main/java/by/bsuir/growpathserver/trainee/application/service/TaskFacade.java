@@ -8,6 +8,8 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -130,24 +132,17 @@ public class TaskFacade {
         return enrich(taskMapper.toTaskResponse(task), taskId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public TaskListResponse getTasks(GetTasksQuery query) {
-        Long meId = currentApplicationUserResolver.resolveCurrentUserDatabaseId()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
-        Page<Task> tasksPage = getTasksHandler.handle(resolveGetTasksQuery(query, meId));
+        Long meId = currentApplicationUserResolver.resolveCurrentUserDatabaseId().orElse(null);
+        return toTaskListResponse(getTasksHandler.handle(resolveGetTasksQuery(query, meId)));
+    }
 
-        TaskListResponse response = new TaskListResponse();
-        response.setData(tasksPage.getContent().stream()
-                                 .map(task -> enrich(taskMapper.toTaskResponse(task), task.getId()))
-                                 .toList());
-
-        PaginationResponse pagination = new PaginationResponse();
-        pagination.setPage(tasksPage.getNumber() + 1);
-        pagination.setLimit(tasksPage.getSize());
-        pagination.setTotal((int) tasksPage.getTotalElements());
-        pagination.setTotalPages(tasksPage.getTotalPages());
-        response.setPagination(pagination);
-        return response;
+    @Transactional(readOnly = true)
+    public TaskListResponse getTaskProfile(GetTasksQuery filters) {
+        Long userId = resolveCurrentUserId();
+        GetTasksQuery query = buildProfileScopedQuery(filters, userId);
+        return toTaskListResponse(getTasksHandler.handle(query));
     }
 
     @Transactional
@@ -382,6 +377,41 @@ public class TaskFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
     }
 
+    private TaskListResponse toTaskListResponse(Page<Task> tasksPage) {
+        TaskListResponse response = new TaskListResponse();
+        response.setData(tasksPage.getContent().stream()
+                                 .map(task -> enrich(taskMapper.toTaskResponse(task), task.getId()))
+                                 .toList());
+
+        PaginationResponse pagination = new PaginationResponse();
+        pagination.setPage(tasksPage.getNumber() + 1);
+        pagination.setLimit(tasksPage.getSize());
+        pagination.setTotal((int) tasksPage.getTotalElements());
+        pagination.setTotalPages(tasksPage.getTotalPages());
+        response.setPagination(pagination);
+        return response;
+    }
+
+    private GetTasksQuery buildProfileScopedQuery(GetTasksQuery filters, Long userId) {
+        var builder = GetTasksQuery.builder()
+                .page(filters.page())
+                .limit(filters.limit())
+                .status(filters.status())
+                .priority(filters.priority())
+                .internshipId(filters.internshipId());
+
+        if (isIntern()) {
+            builder.assignee(String.valueOf(userId));
+        }
+        else if (isMentor()) {
+            builder.mentorId(String.valueOf(userId));
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only mentors and interns can use this endpoint");
+        }
+        return builder.build();
+    }
+
     private GetTasksQuery resolveGetTasksQuery(GetTasksQuery query, Long meId) {
         if (query.internshipId() != null && "me".equalsIgnoreCase(query.internshipId().trim())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "internshipId=me is not supported");
@@ -389,12 +419,15 @@ public class TaskFacade {
         String assignee = query.assignee();
         String mentorId = query.mentorId();
         if (query.scope() != null && "assigned_to_me".equalsIgnoreCase(query.scope().trim())) {
+            if (meId == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+            }
             assignee = String.valueOf(meId);
         }
-        else if (assignee != null && "me".equalsIgnoreCase(assignee.trim())) {
+        else if (assignee != null && meId != null && "me".equalsIgnoreCase(assignee.trim())) {
             assignee = String.valueOf(meId);
         }
-        if (mentorId != null && "me".equalsIgnoreCase(mentorId.trim())) {
+        if (mentorId != null && meId != null && "me".equalsIgnoreCase(mentorId.trim())) {
             mentorId = String.valueOf(meId);
         }
         return GetTasksQuery.builder()
@@ -407,6 +440,22 @@ public class TaskFacade {
                 .mentorId(mentorId)
                 .scope(query.scope())
                 .build();
+    }
+
+    private boolean isMentor() {
+        return hasAuthority("MENTOR");
+    }
+
+    private boolean isIntern() {
+        return hasAuthority("INTERN");
+    }
+
+    private boolean hasAuthority(String role) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return false;
+        }
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
 
     private TaskStatus resolveTransitionTarget(ChangeTaskStatusRequest request) {

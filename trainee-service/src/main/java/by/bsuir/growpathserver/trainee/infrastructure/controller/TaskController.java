@@ -107,6 +107,22 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
     }
 
     @Override
+    public ResponseEntity<TaskListResponse> getTaskProfile(Integer page,
+                                                           Integer limit,
+                                                           String status,
+                                                           String priority,
+                                                           String internshipId) {
+        GetTasksQuery query = GetTasksQuery.builder()
+                .page(page)
+                .limit(limit)
+                .status(status != null ? TaskStatus.fromString(status) : null)
+                .priority(priority != null ? TaskPriority.fromString(priority) : null)
+                .internshipId(internshipId)
+                .build();
+        return ResponseEntity.ok(taskFacade.getTaskProfile(query));
+    }
+
+    @Override
     public ResponseEntity<TaskListResponse> listMyTasks(Integer page,
                                                         Integer limit,
                                                         String status,
@@ -116,13 +132,10 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                 .page(page)
                 .limit(limit)
                 .status(status != null ? TaskStatus.fromString(status) : null)
-                .assignee(null)
                 .priority(priority != null ? TaskPriority.fromString(priority) : null)
                 .internshipId(internshipId)
-                .mentorId(null)
-                .scope("assigned_to_me")
                 .build();
-        return ResponseEntity.ok(taskFacade.getTasks(query));
+        return ResponseEntity.ok(taskFacade.getTaskProfile(query));
     }
 
     @Override
