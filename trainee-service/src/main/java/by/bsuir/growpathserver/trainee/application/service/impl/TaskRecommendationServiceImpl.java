@@ -1,93 +1,106 @@
 package by.bsuir.growpathserver.trainee.application.service.impl;
 
-import by.bsuir.growpathserver.trainee.application.dto.TaskRecommendationDto;
-import by.bsuir.growpathserver.trainee.application.service.TaskRecommendationService;
-import by.bsuir.growpathserver.trainee.domain.entity.*;
-import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
-import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
-import by.bsuir.growpathserver.trainee.infrastructure.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
+import by.bsuir.growpathserver.trainee.application.dto.TaskRecommendationDto;
+import by.bsuir.growpathserver.trainee.application.service.InternCompetencyProfileService;
+import by.bsuir.growpathserver.trainee.application.service.TaskRecommendationService;
+import by.bsuir.growpathserver.trainee.domain.entity.IprEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.IprStageEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.TaskCompetencyEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
+import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
+import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.IprRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskCompetencyRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Реализация алгоритма формирования персонализированных рекомендаций по задачам.
- *
+ * <p>
  * АЛГОРИТМ 2: ФОРМИРОВАНИЕ ПЕРСОНАЛИЗИРОВАННЫХ РЕКОМЕНДАЦИЙ ПО ЗАДАЧАМ
- *
+ * <p>
  * Описание алгоритма по шагам:
- *
+ * <p>
  * Шаг 1: Получение данных стажера
- *   - Загрузить информацию о стажере из базы данных
- *   - Проверить существование стажера
- *   - Получить активный ИПР стажера
- *
+ * - Загрузить информацию о стажере из базы данных
+ * - Проверить существование стажера
+ * - Получить активный ИПР стажера
+ * <p>
  * Шаг 2: Анализ истории выполнения задач
- *   2.1. Получить все завершенные задачи стажера
- *   2.2. Извлечь компетенции из завершенных задач
- *   2.3. Рассчитать уровень владения каждой компетенцией:
- *        competencyLevel = (completedTasksWithCompetency / totalTasksWithCompetency) * avgRating
- *   2.4. Создать профиль компетенций стажера
- *
+ * 2.1. Получить все завершенные задачи стажера
+ * 2.2. Извлечь компетенции из завершенных задач
+ * 2.3. Рассчитать уровень владения каждой компетенцией:
+ * competencyLevel = (completedTasksWithCompetency / totalTasksWithCompetency) * avgRating
+ * 2.4. Создать профиль компетенций стажера
+ * <p>
  * Шаг 3: Получение доступных задач
- *   3.1. Загрузить все задачи из ИПР стажера
- *   3.2. Отфильтровать задачи со статусом PENDING или IN_PROGRESS
- *   3.3. Исключить задачи, уже назначенные другим стажерам
- *   3.4. Получить компетенции для каждой задачи
- *
+ * 3.1. Загрузить все задачи из ИПР стажера
+ * 3.2. Отфильтровать задачи со статусом PENDING или IN_PROGRESS
+ * 3.3. Исключить задачи, уже назначенные другим стажерам
+ * 3.4. Получить компетенции для каждой задачи
+ * <p>
  * Шаг 4: Расчет оценки релевантности для каждой задачи
- *   Для каждой доступной задачи:
- *   4.1. Рассчитать соответствие компетенций (0-40 баллов):
- *        - Для каждой компетенции задачи проверить уровень владения стажера
- *        - competencyScore = sum(internCompetencyLevels) / taskCompetenciesCount * 40
- *   4.2. Рассчитать приоритетный балл (0-30 баллов):
- *        - HIGH → 30 баллов
- *        - MEDIUM → 20 баллов
- *        - LOW → 10 баллов
- *   4.3. Рассчитать срочность (0-20 баллов):
- *        - Если дедлайн < 3 дней → 20 баллов
- *        - Если дедлайн < 7 дней → 15 баллов
- *        - Если дедлайн < 14 дней → 10 баллов
- *        - Иначе → 5 баллов
- *   4.4. Рассчитать балл последовательности (0-10 баллов):
- *        - Если задача из текущего активного этапа → 10 баллов
- *        - Если задача из следующего этапа → 5 баллов
- *        - Иначе → 0 баллов
- *   4.5. Итоговая оценка релевантности:
- *        relevanceScore = competencyScore + priorityScore + urgencyScore + sequenceScore
- *
+ * Для каждой доступной задачи:
+ * 4.1. Рассчитать соответствие компетенций (0-40 баллов):
+ * - Для каждой компетенции задачи проверить уровень владения стажера
+ * - competencyScore = sum(internCompetencyLevels) / taskCompetenciesCount * 40
+ * 4.2. Рассчитать приоритетный балл (0-30 баллов):
+ * - HIGH → 30 баллов
+ * - MEDIUM → 20 баллов
+ * - LOW → 10 баллов
+ * 4.3. Рассчитать срочность (0-20 баллов):
+ * - Если дедлайн < 3 дней → 20 баллов
+ * - Если дедлайн < 7 дней → 15 баллов
+ * - Если дедлайн < 14 дней → 10 баллов
+ * - Иначе → 5 баллов
+ * 4.4. Рассчитать балл последовательности (0-10 баллов):
+ * - Если задача из текущего активного этапа → 10 баллов
+ * - Если задача из следующего этапа → 5 баллов
+ * - Иначе → 0 баллов
+ * 4.5. Итоговая оценка релевантности:
+ * relevanceScore = competencyScore + priorityScore + urgencyScore + sequenceScore
+ * <p>
  * Шаг 5: Определение сложности задачи
- *   5.1. Подсчитать количество компетенций задачи
- *   5.2. Определить уровень сложности (1-5):
- *        - 1 компетенция → уровень 1
- *        - 2 компетенции → уровень 2
- *        - 3 компетенции → уровень 3
- *        - 4 компетенции → уровень 4
- *        - 5+ компетенций → уровень 5
- *
+ * 5.1. Подсчитать количество компетенций задачи
+ * 5.2. Определить уровень сложности (1-5):
+ * - 1 компетенция → уровень 1
+ * - 2 компетенции → уровень 2
+ * - 3 компетенции → уровень 3
+ * - 4 компетенции → уровень 4
+ * - 5+ компетенций → уровень 5
+ * <p>
  * Шаг 6: Формирование причины рекомендации
- *   6.1. Определить основной фактор рекомендации (наибольший балл)
- *   6.2. Сформировать текстовое обоснование:
- *        - Высокое соответствие компетенций
- *        - Высокий приоритет
- *        - Приближающийся дедлайн
- *        - Следующая задача в последовательности
- *
+ * 6.1. Определить основной фактор рекомендации (наибольший балл)
+ * 6.2. Сформировать текстовое обоснование:
+ * - Высокое соответствие компетенций
+ * - Высокий приоритет
+ * - Приближающийся дедлайн
+ * - Следующая задача в последовательности
+ * <p>
  * Шаг 7: Сортировка и ограничение результатов
- *   7.1. Отсортировать задачи по убыванию relevanceScore
- *   7.2. Ограничить список до заданного лимита
- *   7.3. Для каждой задачи создать TaskRecommendationDto
- *
+ * 7.1. Отсортировать задачи по убыванию relevanceScore
+ * 7.2. Ограничить список до заданного лимита
+ * 7.3. Для каждой задачи создать TaskRecommendationDto
+ * <p>
  * Шаг 8: Формирование результата
- *   8.1. Создать список объектов TaskRecommendationDto
- *   8.2. Заполнить все поля для каждой рекомендации
- *   8.3. Вернуть отсортированный список
+ * 8.1. Создать список объектов TaskRecommendationDto
+ * 8.2. Заполнить все поля для каждой рекомендации
+ * 8.3. Вернуть отсортированный список
  */
 @Slf4j
 @Service
@@ -110,6 +123,7 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
     private final TaskRepository taskRepository;
     private final AssessmentRepository assessmentRepository;
     private final TaskCompetencyRepository taskCompetencyRepository;
+    private final InternCompetencyProfileService competencyProfileService;
 
     @Override
     @Transactional(readOnly = true)
@@ -126,7 +140,7 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
         log.debug("Found active IPR with id: {}", activeIpr.getId());
 
         // Шаг 2: Анализ истории выполнения задач
-        Map<Long, Double> internCompetencyProfile = buildInternCompetencyProfile(internId);
+        Map<Long, Double> internCompetencyProfile = competencyProfileService.buildNormalizedProfile(internId);
         log.debug("Built competency profile: {} competencies", internCompetencyProfile.size());
 
         // Шаг 3: Получение доступных задач
@@ -146,72 +160,10 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
     }
 
     /**
-     * Строит профиль компетенций стажера на основе истории выполнения задач.
-     *
-     * @param internId идентификатор стажера
-     * @return карта: competencyId -> уровень владения (0-1)
-     */
-    private Map<Long, Double> buildInternCompetencyProfile(Long internId) {
-        // Получаем все завершенные задачи стажера
-        List<TaskEntity> completedTasks = taskRepository.findByAssigneeIdAndStatus(
-                internId,
-                TaskStatus.COMPLETED
-        );
-
-        if (completedTasks.isEmpty()) {
-            return new HashMap<>();
-        }
-
-        // Получаем средний рейтинг стажера
-        Double averageRating = completedTasks.stream()
-                .filter(task -> task.getRating() != null)
-                .mapToInt(TaskEntity::getRating)
-                .average()
-                .orElse(3.0); // Средний рейтинг по умолчанию
-
-        // Подсчитываем частоту использования каждой компетенции
-        Map<Long, Long> competencyFrequency = new HashMap<>();
-        Map<Long, Long> totalCompetencyTasks = new HashMap<>();
-
-        for (TaskEntity task : completedTasks) {
-            List<TaskCompetencyEntity> taskCompetencies = taskCompetencyRepository.findByTaskId(task.getId());
-            for (TaskCompetencyEntity tc : taskCompetencies) {
-                Long competencyId = tc.getCompetency().getId();
-                competencyFrequency.merge(competencyId, 1L, Long::sum);
-            }
-        }
-
-        // Получаем общее количество задач с каждой компетенцией
-        List<TaskEntity> allTasks = taskRepository.findByAssigneeId(internId);
-        for (TaskEntity task : allTasks) {
-            List<TaskCompetencyEntity> taskCompetencies = taskCompetencyRepository.findByTaskId(task.getId());
-            for (TaskCompetencyEntity tc : taskCompetencies) {
-                Long competencyId = tc.getCompetency().getId();
-                totalCompetencyTasks.merge(competencyId, 1L, Long::sum);
-            }
-        }
-
-        // Рассчитываем уровень владения каждой компетенцией
-        Map<Long, Double> competencyProfile = new HashMap<>();
-        for (Map.Entry<Long, Long> entry : competencyFrequency.entrySet()) {
-            Long competencyId = entry.getKey();
-            Long completed = entry.getValue();
-            Long total = totalCompetencyTasks.getOrDefault(competencyId, 1L);
-
-            double completionRate = (double) completed / total;
-            double competencyLevel = (completionRate * averageRating) / 5.0; // Нормализация к [0, 1]
-
-            competencyProfile.put(competencyId, competencyLevel);
-        }
-
-        return competencyProfile;
-    }
-
-    /**
      * Получает список доступных задач для рекомендации.
      *
      * @param programId идентификатор программы стажировки
-     * @param internId идентификатор стажера
+     * @param internId  идентификатор стажера
      * @return список доступных задач
      */
     private List<TaskEntity> getAvailableTasks(Long programId, Long internId) {
@@ -226,9 +178,9 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
     /**
      * Формирует рекомендацию для задачи.
      *
-     * @param task задача
+     * @param task                    задача
      * @param internCompetencyProfile профиль компетенций стажера
-     * @param activeIpr активный ИПР
+     * @param activeIpr               активный ИПР
      * @return объект рекомендации
      */
     private TaskRecommendationDto buildRecommendation(
@@ -336,13 +288,17 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
 
         if (daysUntilDue < 0) {
             return URGENCY_WEIGHT; // Просроченная задача - максимальная срочность
-        } else if (daysUntilDue <= URGENT_THRESHOLD) {
+        }
+        else if (daysUntilDue <= URGENT_THRESHOLD) {
             return URGENCY_WEIGHT;
-        } else if (daysUntilDue <= HIGH_URGENCY_THRESHOLD) {
+        }
+        else if (daysUntilDue <= HIGH_URGENCY_THRESHOLD) {
             return URGENCY_WEIGHT * 0.75;
-        } else if (daysUntilDue <= MEDIUM_URGENCY_THRESHOLD) {
+        }
+        else if (daysUntilDue <= MEDIUM_URGENCY_THRESHOLD) {
             return URGENCY_WEIGHT * 0.5;
-        } else {
+        }
+        else {
             return URGENCY_WEIGHT * 0.25;
         }
     }
@@ -407,19 +363,24 @@ public class TaskRecommendationServiceImpl implements TaskRecommendationService 
             double sequenceScore
     ) {
         double maxScore = Math.max(Math.max(competencyScore, priorityScore),
-                Math.max(urgencyScore, sequenceScore));
+                                   Math.max(urgencyScore, sequenceScore));
 
         if (maxScore == urgencyScore && urgencyScore >= URGENCY_WEIGHT * 0.75) {
             return "Приближающийся дедлайн требует немедленного внимания";
-        } else if (maxScore == priorityScore && priorityScore >= PRIORITY_WEIGHT * 0.67) {
+        }
+        else if (maxScore == priorityScore && priorityScore >= PRIORITY_WEIGHT * 0.67) {
             return "Высокий приоритет задачи в рамках программы стажировки";
-        } else if (maxScore == competencyScore && competencyScore >= COMPETENCY_WEIGHT * 0.7) {
+        }
+        else if (maxScore == competencyScore && competencyScore >= COMPETENCY_WEIGHT * 0.7) {
             return "Отличное соответствие вашим текущим компетенциям";
-        } else if (maxScore == sequenceScore) {
+        }
+        else if (maxScore == sequenceScore) {
             return "Следующая задача в последовательности обучения";
-        } else if (competencyScore >= COMPETENCY_WEIGHT * 0.3 && competencyScore < COMPETENCY_WEIGHT * 0.7) {
+        }
+        else if (competencyScore >= COMPETENCY_WEIGHT * 0.3 && competencyScore < COMPETENCY_WEIGHT * 0.7) {
             return "Возможность развития новых компетенций";
-        } else {
+        }
+        else {
             return "Рекомендуется для расширения профессионального опыта";
         }
     }

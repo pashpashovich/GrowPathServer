@@ -2,8 +2,13 @@ package by.bsuir.growpathserver.trainee.infrastructure.controller;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.InternsApi;
@@ -31,6 +36,7 @@ import by.bsuir.growpathserver.trainee.application.query.GetInternByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternProgressQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternTasksQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsQuery;
+import by.bsuir.growpathserver.trainee.application.service.InternshipResultReportService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternMapper;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +53,7 @@ public class InternController extends BaseController implements InternsApi {
     private final GetInternTasksHandler getInternTasksHandler;
     private final GetInternAssessmentsHandler getInternAssessmentsHandler;
     private final GetInternProgressHandler getInternProgressHandler;
+    private final InternshipResultReportService internshipResultReportService;
     private final InternMapper internMapper;
 
     @Override
@@ -99,6 +106,24 @@ public class InternController extends BaseController implements InternsApi {
         }
         catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        }
+        catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('MENTOR', 'HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<Resource> downloadInternshipResultReport(String id) {
+        try {
+            Long internId = Long.parseLong(id);
+            byte[] pdf = internshipResultReportService.generatePdf(internId);
+            Resource resource = new ByteArrayResource(pdf);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"internship-result-report-" + internId + ".pdf\"")
+                    .body(resource);
         }
         catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();

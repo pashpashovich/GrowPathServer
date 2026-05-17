@@ -956,6 +956,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /interns/{id}/internship-result-report:
+    get:
+      tags:
+        - Interns
+      summary: Download internship results report (GP-RPT-1) as PDF
+      description: |
+        Aggregates intern IPR progress, competencies, completed tasks, assessments and mentor ratings
+        into a PDF report. Available to mentor of the intern, HR, department head and admin.
+      operationId: downloadInternshipResultReport
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF report file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern or IPR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /interns/{id}/assessments:
     get:
       tags:
