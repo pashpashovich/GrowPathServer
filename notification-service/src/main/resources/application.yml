@@ -74,12 +74,21 @@ springdoc:
     tagsSorter: alpha
     tryItOutEnabled: true
 
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  attachment-bucket-name: ${MINIO_EMAIL_ATTACHMENT_BUCKET_NAME:growpath-email-attachments}
+  gateway-url: ${MINIO_GATEWAY_URL:http://localhost:8080/api/v1/storage}
+
 mailersend:
   from-email: pavel.kosovich2004@gmail.com
 
 app:
   registration-base-url: ${REGISTRATION_BASE_URL:http://localhost:3000}
   password-reset-base-url: ${PASSWORD_RESET_BASE_URL:http://localhost:3000}
+  mailing:
+    scheduler-cron: ${MAILING_SCHEDULER_CRON:0 * * * * *}
 
 kafka:
   topic:

@@ -1,8 +1,8 @@
 package by.bsuir.growpathserver.notification.application.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import by.bsuir.growpathserver.notification.application.command.CreateEmailTemplateCommand;
+import by.bsuir.growpathserver.notification.application.exception.EmailTemplateAttachmentNotFoundException;
+import by.bsuir.growpathserver.notification.application.exception.EmailTemplateNotFoundException;
 import by.bsuir.growpathserver.notification.application.command.DeleteEmailTemplateCommand;
 import by.bsuir.growpathserver.notification.application.command.UpdateEmailTemplateCommand;
 import by.bsuir.growpathserver.notification.application.query.GetEmailTemplateByIdQuery;
@@ -27,6 +29,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     private final EmailTemplateRepository emailTemplateRepository;
     private final EmailTemplateAttachmentRepository emailTemplateAttachmentRepository;
+    private final EmailTemplateAttachmentStorageService attachmentStorageService;
 
     @Override
     @Transactional
@@ -60,7 +63,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Transactional
     public EmailTemplate updateEmailTemplate(UpdateEmailTemplateCommand command) {
         EmailTemplateEntity entity = emailTemplateRepository.findById(command.id())
-                .orElseThrow(() -> new NoSuchElementException("Email template not found with id: " + command.id()));
+                .orElseThrow(() -> new EmailTemplateNotFoundException(command.id()));
 
         if (command.name() != null) {
             entity.setName(command.name());
@@ -101,7 +104,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Transactional
     public void deleteEmailTemplate(DeleteEmailTemplateCommand command) {
         if (!emailTemplateRepository.existsById(command.id())) {
-            throw new NoSuchElementException("Email template not found with id: " + command.id());
+            throw new EmailTemplateNotFoundException(command.id());
         }
         emailTemplateRepository.deleteById(command.id());
     }
@@ -110,7 +113,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Transactional(readOnly = true)
     public EmailTemplate getEmailTemplateById(GetEmailTemplateByIdQuery query) {
         EmailTemplateEntity entity = emailTemplateRepository.findById(query.id())
-                .orElseThrow(() -> new NoSuchElementException("Email template not found with id: " + query.id()));
+                .orElseThrow(() -> new EmailTemplateNotFoundException(query.id()));
         return EmailTemplate.fromEntity(entity);
     }
 
@@ -123,5 +126,22 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
         Page<EmailTemplateEntity> entities = emailTemplateRepository.findAll(pageable);
         return entities.map(EmailTemplate::fromEntity);
+    }
+
+    @Override
+    public EmailTemplateAttachmentStorageService.PresignUploadResult presignAttachmentUpload(String fileName) {
+        return attachmentStorageService.createPresignedUpload(fileName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Resource downloadAttachment(Long templateId, Long attachmentId) {
+        if (!emailTemplateRepository.existsById(templateId)) {
+            throw new EmailTemplateNotFoundException(templateId);
+        }
+        EmailTemplateAttachmentEntity attachment = emailTemplateAttachmentRepository
+                .findByIdAndEmailTemplateId(attachmentId, templateId)
+                .orElseThrow(() -> new EmailTemplateAttachmentNotFoundException(templateId, attachmentId));
+        return attachmentStorageService.downloadFile(attachment.getToken());
     }
 }

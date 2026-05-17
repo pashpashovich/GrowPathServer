@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.notification.infrastructure.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,6 @@ public interface EmailTemplateAttachmentRepository extends JpaRepository<EmailTe
     List<EmailTemplateAttachmentEntity> findByEmailTemplateId(Long emailTemplateId);
 
     void deleteByEmailTemplateId(Long emailTemplateId);
+
+    Optional<EmailTemplateAttachmentEntity> findByIdAndEmailTemplateId(Long id, Long emailTemplateId);
 }

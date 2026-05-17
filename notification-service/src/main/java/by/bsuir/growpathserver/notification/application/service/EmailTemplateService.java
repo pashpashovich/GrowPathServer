@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.notification.application.service;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 
 import by.bsuir.growpathserver.notification.application.command.CreateEmailTemplateCommand;
@@ -7,6 +8,7 @@ import by.bsuir.growpathserver.notification.application.command.DeleteEmailTempl
 import by.bsuir.growpathserver.notification.application.command.UpdateEmailTemplateCommand;
 import by.bsuir.growpathserver.notification.application.query.GetEmailTemplateByIdQuery;
 import by.bsuir.growpathserver.notification.application.query.GetEmailTemplatesQuery;
+import by.bsuir.growpathserver.notification.application.service.EmailTemplateAttachmentStorageService.PresignUploadResult;
 import by.bsuir.growpathserver.notification.domain.aggregate.EmailTemplate;
 
 public interface EmailTemplateService {
@@ -19,4 +21,8 @@ public interface EmailTemplateService {
     EmailTemplate getEmailTemplateById(GetEmailTemplateByIdQuery query);
 
     Page<EmailTemplate> getEmailTemplates(GetEmailTemplatesQuery query);
+
+    PresignUploadResult presignAttachmentUpload(String fileName);
+
+    Resource downloadAttachment(Long templateId, Long attachmentId);
 }

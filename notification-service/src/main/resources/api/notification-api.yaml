@@ -144,6 +144,64 @@ paths:
         '401':
           description: Unauthorized
 
+  /email-templates/attachments/presign-upload:
+    post:
+      tags:
+        - Email Templates
+      summary: Get presigned URL for email template attachment upload
+      description: Returns objectKey (use as token when saving template) and presigned PUT URL for MinIO.
+      operationId: presignEmailTemplateAttachmentUpload
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresignEmailTemplateAttachmentUploadRequest'
+      responses:
+        '200':
+          description: Presigned URL generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignEmailTemplateAttachmentUploadResponse'
+        '401':
+          description: Unauthorized
+
+  /email-templates/{templateId}/attachments/{attachmentId}/download:
+    get:
+      tags:
+        - Email Templates
+      summary: Download email template attachment
+      description: Downloads attachment file from MinIO storage.
+      operationId: downloadEmailTemplateAttachment
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Attachment file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
   /mailings:
     get:
       tags:
@@ -824,10 +882,34 @@ components:
           type: string
         token:
           type: string
+          description: MinIO object key (from presign-upload)
+        downloadUrl:
+          type: string
+          description: Presigned GET URL for downloading the attachment
       required:
         - id
         - name
         - token
+
+    PresignEmailTemplateAttachmentUploadRequest:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: Original file name (used in object key)
+
+    PresignEmailTemplateAttachmentUploadResponse:
+      type: object
+      properties:
+        objectKey:
+          type: string
+          description: MinIO object key — pass as token when creating/updating template attachments
+        uploadUrl:
+          type: string
+          description: Presigned PUT URL (valid 15 minutes)
+      required:
+        - objectKey
+        - uploadUrl
 
     CreateEmailTemplateRequest:
       type: object
