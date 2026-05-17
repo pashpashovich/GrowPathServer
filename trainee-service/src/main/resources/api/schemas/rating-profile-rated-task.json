@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "taskId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "title": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "feedback": {
+      "type": "string",
+      "nullable": true
+    }
+  },
+  "required": [
+    "taskId",
+    "title",
+    "rating"
+  ]
+}

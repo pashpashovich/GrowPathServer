@@ -40,9 +40,9 @@ public class IprController extends BaseController implements IprsApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MENTOR', 'INTERN')")
-    public ResponseEntity<IprListResponse> listMyIprs() {
-        return ResponseEntity.ok(iprApplicationFacade.listMyIprs());
+    @PreAuthorize("hasRole('INTERN')")
+    public ResponseEntity<IprResponse> getMyIpr() {
+        return ResponseEntity.ok(iprApplicationFacade.getMyIpr());
     }
 
     @Override

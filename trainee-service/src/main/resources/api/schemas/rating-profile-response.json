@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "internId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "internName": {
+      "type": "string"
+    },
+    "internshipId": {
+      "type": "integer",
+      "format": "int64",
+      "nullable": true
+    },
+    "programName": {
+      "type": "string",
+      "nullable": true
+    },
+    "hasAssessment": {
+      "type": "boolean"
+    },
+    "current": {
+      "$ref": "./rating-profile-current.json"
+    },
+    "cohort": {
+      "$ref": "./rating-profile-cohort.json"
+    },
+    "tasks": {
+      "$ref": "./rating-profile-tasks.json"
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "$ref": "./rating-profile-history-point.json"
+      }
+    },
+    "recentRatedTasks": {
+      "type": "array",
+      "items": {
+        "$ref": "./rating-profile-rated-task.json"
+      }
+    }
+  },
+  "required": [
+    "internId",
+    "internName",
+    "hasAssessment",
+    "cohort",
+    "tasks",
+    "history",
+    "recentRatedTasks"
+  ]
+}

@@ -2,10 +2,8 @@ package by.bsuir.growpathserver.trainee.application.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -86,22 +84,15 @@ public class IprApplicationFacade {
     }
 
     @Transactional(readOnly = true)
-    public IprListResponse listMyIprs() {
-        Long uid = currentUserResolver.resolveCurrentUserDatabaseId()
+    public IprResponse getMyIpr() {
+        if (!isIntern()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        Long internId = currentUserResolver.resolveCurrentUserDatabaseId()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-        Set<Long> seen = new LinkedHashSet<>();
-        List<IprEntity> out = new ArrayList<>();
-        for (IprEntity item : iprRepository.findByMentorId(uid)) {
-            if (seen.add(item.getId()) && canView(item)) {
-                out.add(item);
-            }
-        }
-        for (IprEntity item : iprRepository.findByInternId(uid)) {
-            if (seen.add(item.getId()) && canView(item)) {
-                out.add(item);
-            }
-        }
-        return toIprListResponse(out);
+        IprEntity ipr = iprRepository.findActiveByInternId(internId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Active IPR not found"));
+        return toIprResponse(ipr);
     }
 
     @Transactional(readOnly = true)

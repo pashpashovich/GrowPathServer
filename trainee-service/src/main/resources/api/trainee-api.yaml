@@ -3543,8 +3543,9 @@ paths:
     get:
       tags:
         - IPR
-      summary: List IPRs for the current user
-      operationId: listMyIprs
+      summary: Get current intern IPR
+      description: Returns the active IPR of the authenticated intern (without roadmap data)
+      operationId: getMyIpr
       security:
         - bearerAuth: [ ]
       responses:
@@ -3553,9 +3554,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ipr-list-response'
+                $ref: '#/components/schemas/ipr-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden — only interns can access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Active IPR not found
           content:
             application/json:
               schema:
@@ -4238,6 +4251,56 @@ paths:
                 $ref: '#/components/schemas/rating-list-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /ratings/profile:
+    get:
+      tags:
+        - Ratings
+      summary: Get current intern rating profile
+      description: Aggregated rating data for the authenticated intern (my rating tab)
+      operationId: getRatingProfile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: historyLimit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+        - name: recentTasksLimit
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 20
+            default: 5
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rating-profile-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden — only interns can access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: User not found
           content:
             application/json:
               schema:
@@ -5131,6 +5194,18 @@ components:
       $ref: './schemas/rating-response.json'
     rating-list-response:
       $ref: './schemas/rating-list-response.json'
+    rating-profile-response:
+      $ref: './schemas/rating-profile-response.json'
+    rating-profile-current:
+      $ref: './schemas/rating-profile-current.json'
+    rating-profile-cohort:
+      $ref: './schemas/rating-profile-cohort.json'
+    rating-profile-tasks:
+      $ref: './schemas/rating-profile-tasks.json'
+    rating-profile-history-point:
+      $ref: './schemas/rating-profile-history-point.json'
+    rating-profile-rated-task:
+      $ref: './schemas/rating-profile-rated-task.json'
 
     # Report schemas
     report-list-response:

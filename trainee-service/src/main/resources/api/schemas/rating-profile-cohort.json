@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "rank": {
+      "type": "integer",
+      "nullable": true
+    },
+    "cohortSize": {
+      "type": "integer"
+    },
+    "averageOverallRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "deltaFromAverage": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    }
+  },
+  "required": [
+    "cohortSize"
+  ]
+}

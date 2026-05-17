@@ -1,24 +1,31 @@
 package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import by.bsuir.growpathserver.trainee.application.dto.RatingProfileDto;
 import by.bsuir.growpathserver.trainee.application.query.GetInternRatingQuery;
+import by.bsuir.growpathserver.trainee.application.query.GetRatingProfileQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetRatingsQuery;
 import by.bsuir.growpathserver.trainee.application.service.RatingService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Rating;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.IprEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.IprRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +37,8 @@ public class RatingServiceImpl implements RatingService {
     private final AssessmentRepository assessmentRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final InternshipProgramRepository internshipProgramRepository;
+    private final IprRepository iprRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -176,6 +185,211 @@ public class RatingServiceImpl implements RatingService {
         }
 
         return ratings;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RatingProfileDto getRatingProfile(GetRatingProfileQuery query) {
+        User intern = User.fromEntity(userRepository.findById(query.internId())
+                                              .orElseThrow(() -> new NoSuchElementException(
+                                                      "Intern not found with id: " + query.internId())));
+
+        List<AssessmentEntity> assessments =
+                assessmentRepository.findByInternIdOrderByUpdatedAtAsc(query.internId());
+        List<TaskEntity> tasks = taskRepository.findByAssigneeId(query.internId());
+
+        Long internshipId = resolveInternshipId(assessments, tasks, query.internId());
+        String programName = resolveProgramName(internshipId);
+
+        AssessmentEntity latest = assessments.isEmpty() ? null : assessments.get(assessments.size() - 1);
+        AssessmentEntity previous = assessments.size() < 2 ? null : assessments.get(assessments.size() - 2);
+
+        boolean hasAssessment = latest != null;
+        RatingProfileDto.CurrentAssessment current = hasAssessment
+                ? buildCurrentAssessment(latest, previous)
+                : null;
+
+        RatingProfileDto.TasksSummary tasksSummary = buildTasksSummary(tasks, query.internId());
+        List<RatingProfileDto.HistoryPoint> history = buildHistory(assessments, query.historyLimit());
+        List<RatingProfileDto.RatedTaskSummary> recentRatedTasks =
+                buildRecentRatedTasks(tasks, query.recentTasksLimit());
+
+        Double myOverall = hasAssessment ? latest.getOverallRating() : null;
+        RatingProfileDto.CohortContext cohort = buildCohort(internshipId, query.internId(), myOverall);
+
+        return RatingProfileDto.builder()
+                .internId(intern.getId())
+                .internName(intern.getDisplayName())
+                .internshipId(internshipId)
+                .programName(programName)
+                .hasAssessment(hasAssessment)
+                .current(current)
+                .cohort(cohort)
+                .tasks(tasksSummary)
+                .history(history)
+                .recentRatedTasks(recentRatedTasks)
+                .build();
+    }
+
+    private Long resolveInternshipId(List<AssessmentEntity> assessments, List<TaskEntity> tasks, Long internId) {
+        if (!assessments.isEmpty()) {
+            return assessments.get(assessments.size() - 1).getInternshipId();
+        }
+        if (!tasks.isEmpty()) {
+            return tasks.get(0).getInternshipId();
+        }
+        return iprRepository.findByInternId(internId).stream()
+                .map(IprEntity::getProgram)
+                .filter(Objects::nonNull)
+                .map(program -> program.getId())
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String resolveProgramName(Long internshipId) {
+        if (internshipId == null) {
+            return null;
+        }
+        return internshipProgramRepository.findById(internshipId)
+                .map(program -> program.getTitle())
+                .orElse(null);
+    }
+
+    private RatingProfileDto.CurrentAssessment buildCurrentAssessment(AssessmentEntity latest,
+                                                                      AssessmentEntity previous) {
+        Double previousRating = previous != null ? previous.getOverallRating() : null;
+        User mentor = userRepository.findById(latest.getMentorId())
+                .map(User::fromEntity)
+                .orElse(null);
+
+        return RatingProfileDto.CurrentAssessment.builder()
+                .assessmentId(latest.getId())
+                .overallRating(latest.getOverallRating())
+                .qualityRating(latest.getQualityRating())
+                .speedRating(latest.getSpeedRating())
+                .communicationRating(latest.getCommunicationRating())
+                .comment(latest.getComment())
+                .mentorId(latest.getMentorId())
+                .mentorName(mentor != null ? mentor.getDisplayName() : null)
+                .lastUpdated(latest.getUpdatedAt())
+                .trend(calculateTrend(latest.getOverallRating(), previousRating))
+                .previousRating(previousRating)
+                .build();
+    }
+
+    private RatingProfileDto.TasksSummary buildTasksSummary(List<TaskEntity> tasks, Long internId) {
+        int completed = (int) tasks.stream()
+                .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+                .count();
+
+        int onTime = (int) tasks.stream()
+                .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+                .filter(task -> task.getDueDate() != null && task.getCompletedAt() != null)
+                .filter(task -> !task.getCompletedAt().isAfter(task.getDueDate()))
+                .count();
+
+        double onTimePercent = completed > 0 ? (onTime * 100.0) / completed : 0.0;
+
+        double averageTaskTime = tasks.stream()
+                .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+                .filter(task -> task.getTakenAt() != null && task.getCompletedAt() != null)
+                .mapToLong(task -> Duration.between(task.getTakenAt(), task.getCompletedAt()).toHours())
+                .average()
+                .orElse(0.0);
+
+        int ratedTasksCount = (int) tasks.stream()
+                .filter(task -> task.getRating() != null)
+                .count();
+
+        Double averageTaskRating = taskRepository.getAverageRatingByAssigneeId(internId);
+
+        return RatingProfileDto.TasksSummary.builder()
+                .completed(completed)
+                .onTime(onTime)
+                .onTimePercent(onTimePercent)
+                .averageTaskTimeHours(averageTaskTime)
+                .averageTaskRating(averageTaskRating != null ? averageTaskRating : 0.0)
+                .ratedTasksCount(ratedTasksCount)
+                .build();
+    }
+
+    private List<RatingProfileDto.HistoryPoint> buildHistory(List<AssessmentEntity> assessments, int historyLimit) {
+        List<AssessmentEntity> slice = assessments;
+        if (assessments.size() > historyLimit) {
+            slice = assessments.subList(assessments.size() - historyLimit, assessments.size());
+        }
+        List<RatingProfileDto.HistoryPoint> history = new ArrayList<>();
+        for (AssessmentEntity assessment : slice) {
+            history.add(RatingProfileDto.HistoryPoint.builder()
+                                .assessmentId(assessment.getId())
+                                .date(assessment.getUpdatedAt())
+                                .overallRating(assessment.getOverallRating())
+                                .qualityRating(assessment.getQualityRating())
+                                .speedRating(assessment.getSpeedRating())
+                                .communicationRating(assessment.getCommunicationRating())
+                                .build());
+        }
+        return history;
+    }
+
+    private List<RatingProfileDto.RatedTaskSummary> buildRecentRatedTasks(List<TaskEntity> tasks, int limit) {
+        if (limit <= 0) {
+            return List.of();
+        }
+        return tasks.stream()
+                .filter(task -> task.getRating() != null)
+                .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+                .sorted(Comparator.comparing(
+                        TaskEntity::getCompletedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(limit)
+                .map(task -> RatingProfileDto.RatedTaskSummary.builder()
+                        .taskId(task.getId())
+                        .title(task.getTitle())
+                        .rating(task.getRating())
+                        .completedAt(task.getCompletedAt())
+                        .feedback(task.getReviewComment())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private RatingProfileDto.CohortContext buildCohort(Long internshipId, Long internId, Double myOverall) {
+        if (internshipId == null) {
+            return RatingProfileDto.CohortContext.builder()
+                    .rank(null)
+                    .cohortSize(0)
+                    .averageOverallRating(null)
+                    .deltaFromAverage(null)
+                    .build();
+        }
+
+        List<Rating> cohortRatings = getRatings(new GetRatingsQuery(internshipId, "overallRating", "desc"));
+        int cohortSize = cohortRatings.size();
+
+        Double averageOverall = cohortRatings.stream()
+                .map(Rating::getOverallRating)
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0);
+
+        Integer rank = cohortRatings.stream()
+                .filter(rating -> internId.equals(rating.getInternId()))
+                .map(Rating::getRank)
+                .findFirst()
+                .orElse(null);
+
+        Double deltaFromAverage = null;
+        if (myOverall != null && cohortSize > 0) {
+            deltaFromAverage = myOverall - averageOverall;
+        }
+
+        return RatingProfileDto.CohortContext.builder()
+                .rank(rank)
+                .cohortSize(cohortSize)
+                .averageOverallRating(cohortSize > 0 ? averageOverall : null)
+                .deltaFromAverage(deltaFromAverage)
+                .build();
     }
 
     private Comparator<Rating> getComparator(String sortBy) {

@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "properties": {
+    "assessmentId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "comment": {
+      "type": "string",
+      "nullable": true
+    },
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mentorName": {
+      "type": "string",
+      "nullable": true
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trend": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down",
+        "stable"
+      ]
+    },
+    "previousRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    }
+  },
+  "required": [
+    "assessmentId",
+    "overallRating",
+    "mentorId",
+    "lastUpdated",
+    "trend"
+  ]
+}

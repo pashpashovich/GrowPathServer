@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "assessmentId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "overallRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "qualityRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "speedRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    },
+    "communicationRating": {
+      "type": "number",
+      "format": "double",
+      "nullable": true
+    }
+  },
+  "required": [
+    "assessmentId",
+    "date",
+    "overallRating"
+  ]
+}

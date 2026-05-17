@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.trainee.infrastructure.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,8 @@ import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 public interface AssessmentRepository
         extends JpaRepository<AssessmentEntity, Long>, JpaSpecificationExecutor<AssessmentEntity> {
     Optional<AssessmentEntity> findById(Long id);
+
+    List<AssessmentEntity> findByInternIdOrderByUpdatedAtAsc(Long internId);
+
+    List<AssessmentEntity> findByInternshipId(Long internshipId);
 }

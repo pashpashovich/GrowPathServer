@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "completed": {
+      "type": "integer"
+    },
+    "onTime": {
+      "type": "integer"
+    },
+    "onTimePercent": {
+      "type": "number",
+      "format": "double"
+    },
+    "averageTaskTimeHours": {
+      "type": "number",
+      "format": "double"
+    },
+    "averageTaskRating": {
+      "type": "number",
+      "format": "double"
+    },
+    "ratedTasksCount": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "completed",
+    "onTime",
+    "onTimePercent",
+    "averageTaskTimeHours",
+    "averageTaskRating",
+    "ratedTasksCount"
+  ]
+}
