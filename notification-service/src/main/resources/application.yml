@@ -73,6 +73,7 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     tryItOutEnabled: true
+    persist-authorization: true
 
 minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
