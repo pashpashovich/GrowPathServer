@@ -1,9 +1,12 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -44,9 +47,11 @@ import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserRe
 import by.bsuir.growpathserver.trainee.application.query.GetTaskByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetTasksQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
+import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskArtifactEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskCommentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.events.TaskReviewResultEvent;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
@@ -54,6 +59,7 @@ import by.bsuir.growpathserver.trainee.infrastructure.mapper.TaskMapper;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskArtifactRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskCommentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -73,6 +79,7 @@ public class TaskFacade {
     private final TaskReviewNotificationService taskReviewNotificationService;
     private final TaskArtifactStorageService taskArtifactStorageService;
     private final TaskRecommendationService taskRecommendationService;
+    private final UserRepository userRepository;
 
     @Transactional
     public TaskStatusResponse completeTask(String id) {
@@ -303,6 +310,13 @@ public class TaskFacade {
     }
 
     private TaskResponse enrich(TaskResponse response, Long taskId) {
+        return enrich(response, taskId, Map.of());
+    }
+
+    private TaskResponse enrich(TaskResponse response, Long taskId, Map<Long, String> userNames) {
+        response.setAssigneeName(resolveUserDisplayName(response.getAssigneeId(), userNames));
+        response.setMentorName(resolveUserDisplayName(response.getMentorId(), userNames));
+
         List<Object> files = taskArtifactRepository.findAllByTaskId(taskId).stream().map(a -> {
             FileResponse file = new FileResponse();
             file.setId(a.getId());
@@ -377,10 +391,42 @@ public class TaskFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
     }
 
+    private Map<Long, String> loadUserDisplayNames(List<Task> tasks) {
+        Set<Long> userIds = new HashSet<>();
+        for (Task task : tasks) {
+            if (task.getAssigneeId() != null) {
+                userIds.add(task.getAssigneeId());
+            }
+            if (task.getMentorId() != null) {
+                userIds.add(task.getMentorId());
+            }
+        }
+        if (userIds.isEmpty()) {
+            return Map.of();
+        }
+        return userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(UserEntity::getId, entity -> User.fromEntity(entity).getDisplayName()));
+    }
+
+    private String resolveUserDisplayName(Long userId, Map<Long, String> cachedNames) {
+        if (userId == null) {
+            return null;
+        }
+        if (cachedNames.containsKey(userId)) {
+            return cachedNames.get(userId);
+        }
+        return userRepository.findById(userId)
+                .map(entity -> User.fromEntity(entity).getDisplayName())
+                .orElse(null);
+    }
+
     private TaskListResponse toTaskListResponse(Page<Task> tasksPage) {
+        List<Task> tasks = tasksPage.getContent();
+        Map<Long, String> userNames = loadUserDisplayNames(tasks);
+
         TaskListResponse response = new TaskListResponse();
-        response.setData(tasksPage.getContent().stream()
-                                 .map(task -> enrich(taskMapper.toTaskResponse(task), task.getId()))
+        response.setData(tasks.stream()
+                                 .map(task -> enrich(taskMapper.toTaskResponse(task), task.getId(), userNames))
                                  .toList());
 
         PaginationResponse pagination = new PaginationResponse();
