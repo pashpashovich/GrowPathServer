@@ -1089,6 +1089,9 @@ components:
 
     CreateRecipientRequest:
       type: object
+      description: |
+        For type `user` only `userId` is required — email and fullName are loaded from trainee-service.
+        For type `external` `email` and `fullName` are required; `userId` must be omitted.
       properties:
         email:
           type: string
@@ -1096,12 +1099,11 @@ components:
           type: string
         userId:
           type: string
+          description: Required when type is user
         type:
           type: string
           enum: [user, external]
       required:
-        - email
-        - fullName
         - type
 
     UpdateRecipientRequest:

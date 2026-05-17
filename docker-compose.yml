@@ -274,6 +274,7 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_GATEWAY_URL: http://localhost:8080/api/v1/storage
       MINIO_EMAIL_ATTACHMENT_BUCKET_NAME: ${MINIO_EMAIL_ATTACHMENT_BUCKET_NAME:-growpath-email-attachments}
+      TRAINEE_SERVICE_URL: http://trainee-service:8081
     depends_on:
       notification-db:
         condition: service_healthy
@@ -283,6 +284,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+      trainee-service:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/actuator/health || exit 1"]
       interval: 30s

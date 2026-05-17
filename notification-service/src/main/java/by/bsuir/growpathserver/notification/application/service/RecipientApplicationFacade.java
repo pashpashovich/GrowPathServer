@@ -7,7 +7,6 @@ import by.bsuir.growpathserver.dto.model.CreateRecipientRequest;
 import by.bsuir.growpathserver.dto.model.RecipientListResponse;
 import by.bsuir.growpathserver.dto.model.RecipientResponse;
 import by.bsuir.growpathserver.dto.model.UpdateRecipientRequest;
-import by.bsuir.growpathserver.notification.application.command.CreateRecipientCommand;
 import by.bsuir.growpathserver.notification.application.command.DeleteRecipientCommand;
 import by.bsuir.growpathserver.notification.application.command.UpdateRecipientCommand;
 import by.bsuir.growpathserver.notification.application.handler.CreateRecipientHandler;
@@ -31,16 +30,11 @@ public class RecipientApplicationFacade {
     private final GetRecipientsHandler getRecipientsHandler;
     private final UpdateRecipientHandler updateRecipientHandler;
     private final DeleteRecipientHandler deleteRecipientHandler;
+    private final RecipientCommandFactory recipientCommandFactory;
     private final RecipientMapper recipientMapper;
 
     public RecipientResponse createRecipient(CreateRecipientRequest request) {
-        Recipient recipient = createRecipientHandler.handle(CreateRecipientCommand.builder()
-                                                                    .email(request.getEmail())
-                                                                    .fullName(request.getFullName())
-                                                                    .userId(NotificationIds.parseOptional(
-                                                                            request.getUserId(), "userId"))
-                                                                    .type(request.getType().getValue())
-                                                                    .build());
+        Recipient recipient = createRecipientHandler.handle(recipientCommandFactory.buildCreateCommand(request));
         return recipientMapper.toRecipientResponse(recipient);
     }
 

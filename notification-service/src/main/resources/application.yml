@@ -89,6 +89,8 @@ app:
   password-reset-base-url: ${PASSWORD_RESET_BASE_URL:http://localhost:3000}
   mailing:
     scheduler-cron: ${MAILING_SCHEDULER_CRON:0 * * * * *}
+  trainee-service:
+    url: ${TRAINEE_SERVICE_URL:http://localhost:8081}
 
 kafka:
   topic:
