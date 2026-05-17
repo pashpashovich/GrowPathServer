@@ -3087,6 +3087,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /internship-programs/{id}/internship-efficiency-report:
+    get:
+      tags:
+        - Internship Programs
+      summary: Download internship efficiency report (GP-RPT-2) as PDF
+      description: |
+        Mentor workload, intern progress and deadline analysis for the internship program.
+        Available to HR, department head and admin.
+      operationId: downloadInternshipEfficiencyReport
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF report file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /internship-programs/{programId}/roadmap-templates:
     get:
       tags:
