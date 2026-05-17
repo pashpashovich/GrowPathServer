@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import by.bsuir.growpathserver.notification.application.command.AddRecipientToGroupCommand;
-import by.bsuir.growpathserver.notification.application.exception.DistributionGroupNotFoundException;
-import by.bsuir.growpathserver.notification.application.exception.InvalidDistributionGroupDataException;
-import by.bsuir.growpathserver.notification.application.exception.RecipientNotFoundException;
 import by.bsuir.growpathserver.notification.application.command.CreateDistributionGroupCommand;
 import by.bsuir.growpathserver.notification.application.command.DeleteDistributionGroupCommand;
 import by.bsuir.growpathserver.notification.application.command.RemoveRecipientFromGroupCommand;
 import by.bsuir.growpathserver.notification.application.command.UpdateDistributionGroupCommand;
+import by.bsuir.growpathserver.notification.application.exception.DistributionGroupNotFoundException;
+import by.bsuir.growpathserver.notification.application.exception.InvalidDistributionGroupDataException;
+import by.bsuir.growpathserver.notification.application.exception.RecipientNotFoundException;
 import by.bsuir.growpathserver.notification.application.query.GetDistributionGroupByIdQuery;
 import by.bsuir.growpathserver.notification.application.query.GetDistributionGroupsQuery;
 import by.bsuir.growpathserver.notification.application.service.DistributionGroupService;
@@ -57,8 +57,13 @@ public class DistributionGroupServiceImpl implements DistributionGroupService {
     @Override
     @Transactional
     public void deleteDistributionGroup(DeleteDistributionGroupCommand command) {
-        DistributionGroupEntity entity = requireGroup(command.id());
-        distributionGroupRepository.delete(entity);
+        Long groupId = command.id();
+        if (!distributionGroupRepository.existsById(groupId)) {
+            throw new DistributionGroupNotFoundException(groupId);
+        }
+        distributionGroupRepository.deleteRecipientMemberships(groupId);
+        distributionGroupRepository.deleteMailingMemberships(groupId);
+        distributionGroupRepository.deleteById(groupId);
     }
 
     @Override

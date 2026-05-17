@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.notification.application.service.impl;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -100,7 +101,7 @@ public class MailingServiceImpl implements MailingService {
             entity.setExecuteAt(command.executeAt());
         }
         if (command.distributionGroupIds() != null && !command.distributionGroupIds().isEmpty()) {
-            entity.setDistributionGroups(requireGroups(command.distributionGroupIds()));
+            entity.setDistributionGroups(new LinkedHashSet<>(requireGroups(command.distributionGroupIds())));
         }
 
         MailingEntity saved = mailingRepository.save(entity);

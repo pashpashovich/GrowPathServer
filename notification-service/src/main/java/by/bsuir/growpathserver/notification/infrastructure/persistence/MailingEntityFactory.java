@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.notification.infrastructure.persistence;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public class MailingEntityFactory {
         entity.setStatus(mailing.getStatus());
         entity.setTemplate(template);
         entity.setExecuteAt(mailing.getExecuteAt());
-        entity.setDistributionGroups(groups);
+        entity.setDistributionGroups(new LinkedHashSet<>(groups));
         mailing.getScheduleDefinitions().forEach(definition -> {
             MailingScheduleEntity schedule = new MailingScheduleEntity();
             schedule.setWeekDay(definition.weekDay());

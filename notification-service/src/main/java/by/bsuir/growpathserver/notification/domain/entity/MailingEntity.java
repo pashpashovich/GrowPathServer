@@ -2,7 +2,9 @@ package by.bsuir.growpathserver.notification.domain.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
@@ -84,7 +86,7 @@ public class MailingEntity {
             joinColumns = @JoinColumn(name = "mailing_id"),
             inverseJoinColumns = @JoinColumn(name = "distribution_group_id")
     )
-    private List<DistributionGroupEntity> distributionGroups = new ArrayList<>();
+    private Set<DistributionGroupEntity> distributionGroups = new LinkedHashSet<>();
 
     @PrePersist
     void onCreate() {
