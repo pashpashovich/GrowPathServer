@@ -6,6 +6,8 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
   <changeSet id="030-intern-profile-status" author="Kasovich Pavel">
+    <modifyDataType tableName="intern_hiring_decisions" columnName="decision" newDataType="VARCHAR(32)"/>
+
     <addColumn tableName="users">
       <column name="intern_profile_status" type="VARCHAR(32)">
         <constraints nullable="true"/>

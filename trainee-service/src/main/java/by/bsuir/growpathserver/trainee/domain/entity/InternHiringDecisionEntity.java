@@ -39,7 +39,7 @@ public class InternHiringDecisionEntity {
     private InternshipProgramEntity program;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 32)
     private HiringDecisionType decision;
 
     @Column(columnDefinition = "TEXT")
