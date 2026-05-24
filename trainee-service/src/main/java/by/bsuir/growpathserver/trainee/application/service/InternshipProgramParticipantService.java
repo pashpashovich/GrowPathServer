@@ -36,8 +36,16 @@ public class InternshipProgramParticipantService {
     }
 
     @Transactional(readOnly = true)
-    public List<InternshipProgramParticipantEntity> listInterns(Long programId) {
+    public List<InternshipProgramParticipantEntity> listInterns(Long programId, Long mentorId) {
         requireProgram(programId);
+        if (Objects.nonNull(mentorId)) {
+            if (!isMentorOnProgram(programId, mentorId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                                  "Mentor is not assigned to this internship program");
+            }
+            return participantRepository.findByProgramIdAndRoleAndMentor_Id(
+                    programId, ProgramParticipantRole.INTERN, mentorId);
+        }
         return participantRepository.findByProgramIdAndRole(programId, ProgramParticipantRole.INTERN);
     }
 

@@ -83,10 +83,11 @@ public class InternshipProgramController extends BaseController implements Inter
                                                                                Integer maxPlacesMin,
                                                                                Integer maxPlacesMax,
                                                                                Long competencyId,
-                                                                               Boolean includeArchived) {
+                                                                               Boolean includeArchived,
+                                                                               Long mentorId) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.getInternshipPrograms(
                 page, limit, status, search, itDirection, startDateFrom, startDateTo,
-                maxPlacesMin, maxPlacesMax, competencyId, includeArchived));
+                maxPlacesMin, maxPlacesMax, competencyId, includeArchived, mentorId));
     }
 
     @Override
@@ -114,8 +115,8 @@ public class InternshipProgramController extends BaseController implements Inter
 
     @Override
     @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD', 'MENTOR')")
-    public ResponseEntity<ProgramParticipantListResponse> listProgramInterns(String programId) {
-        return ResponseEntity.ok(participantsApplicationFacade.listProgramInterns(programId));
+    public ResponseEntity<ProgramParticipantListResponse> listProgramInterns(String programId, Long mentorId) {
+        return ResponseEntity.ok(participantsApplicationFacade.listProgramInterns(programId, mentorId));
     }
 
     @Override

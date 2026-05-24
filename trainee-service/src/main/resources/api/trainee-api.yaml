@@ -2924,6 +2924,15 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: mentorId
+          in: query
+          required: false
+          description: >
+            Return only programs where this user is assigned as mentor.
+            For the MENTOR role, defaults to the current user when omitted.
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Successful response
@@ -2933,6 +2942,12 @@ paths:
                 $ref: '#/components/schemas/internship-program-list-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -3226,6 +3241,15 @@ paths:
           required: true
           schema:
             type: string
+        - name: mentorId
+          in: query
+          required: false
+          description: >
+            Return only interns supervised by this mentor on the program.
+            For the MENTOR role, defaults to the current user when omitted.
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Successful response
@@ -3235,6 +3259,12 @@ paths:
                 $ref: '#/components/schemas/program-participant-list-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:

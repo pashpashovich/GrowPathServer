@@ -44,6 +44,7 @@ public class InternshipProgramsApplicationFacade {
     private final InternshipProgramMapper internshipProgramMapper;
     private final ObjectMapper objectMapper;
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
+    private final MentorQueryScopeResolver mentorQueryScopeResolver;
 
     public InternshipProgramResponse createInternshipProgram(CreateInternshipProgramRequest request) {
         Long createdBy = currentApplicationUserResolver.resolveCurrentUserDatabaseId().orElse(null);
@@ -92,7 +93,9 @@ public class InternshipProgramsApplicationFacade {
                                                                Integer maxPlacesMin,
                                                                Integer maxPlacesMax,
                                                                Long competencyId,
-                                                               Boolean includeArchived) {
+                                                               Boolean includeArchived,
+                                                               Long mentorId) {
+        Long effectiveMentorId = mentorQueryScopeResolver.resolveOptionalMentorFilter(mentorId);
         GetInternshipProgramsQuery query = GetInternshipProgramsQuery.builder()
                 .page(page)
                 .limit(limit)
@@ -105,6 +108,7 @@ public class InternshipProgramsApplicationFacade {
                 .maxPlacesMax(maxPlacesMax)
                 .competencyId(competencyId)
                 .includeArchived(includeArchived)
+                .mentorId(effectiveMentorId)
                 .build();
         Page<InternshipProgram> programsPage = getInternshipProgramsHandler.handle(query);
         InternshipProgramListResponse response = new InternshipProgramListResponse();

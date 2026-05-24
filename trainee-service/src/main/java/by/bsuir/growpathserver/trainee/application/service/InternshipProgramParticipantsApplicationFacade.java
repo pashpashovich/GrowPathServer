@@ -16,15 +16,17 @@ public class InternshipProgramParticipantsApplicationFacade {
 
     private final InternshipProgramParticipantService participantService;
     private final ProgramParticipantMapper programParticipantMapper;
+    private final MentorQueryScopeResolver mentorQueryScopeResolver;
 
     public ProgramParticipantListResponse listProgramMentors(String programId) {
         return programParticipantMapper.toProgramParticipantListResponse(
                 participantService.listMentors(parseProgramId(programId)));
     }
 
-    public ProgramParticipantListResponse listProgramInterns(String programId) {
+    public ProgramParticipantListResponse listProgramInterns(String programId, Long mentorId) {
+        Long effectiveMentorId = mentorQueryScopeResolver.resolveOptionalMentorFilter(mentorId);
         return programParticipantMapper.toProgramParticipantListResponse(
-                participantService.listInterns(parseProgramId(programId)));
+                participantService.listInterns(parseProgramId(programId), effectiveMentorId));
     }
 
     public ProgramParticipantResponse assignProgramMentor(String programId, AssignProgramMentorRequest request) {

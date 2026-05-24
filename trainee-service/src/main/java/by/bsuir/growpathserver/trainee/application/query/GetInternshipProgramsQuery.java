@@ -17,6 +17,7 @@ public record GetInternshipProgramsQuery(
         Integer maxPlacesMin,
         Integer maxPlacesMax,
         Long competencyId,
-        Boolean includeArchived
+        Boolean includeArchived,
+        Long mentorId
 ) {
 }

@@ -16,6 +16,12 @@ public interface InternshipProgramParticipantRepository
     List<InternshipProgramParticipantEntity> findByProgramIdAndRole(Long programId, ProgramParticipantRole role);
 
     @EntityGraph(attributePaths = { "user", "mentor", "program" })
+    List<InternshipProgramParticipantEntity> findByProgramIdAndRoleAndMentor_Id(
+            Long programId,
+            ProgramParticipantRole role,
+            Long mentorId);
+
+    @EntityGraph(attributePaths = { "user", "mentor", "program" })
     Optional<InternshipProgramParticipantEntity> findByProgramIdAndUserId(Long programId, Long userId);
 
     boolean existsByProgramIdAndUserId(Long programId, Long userId);

@@ -14,11 +14,14 @@ import by.bsuir.growpathserver.trainee.application.query.GetInternshipProgramsQu
 import by.bsuir.growpathserver.trainee.domain.aggregate.InternshipProgram;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramParticipantEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.ItDirectionEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
+import by.bsuir.growpathserver.trainee.domain.valueobject.ProgramParticipantRole;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -45,7 +48,8 @@ public class GetInternshipProgramsHandler {
                         startDateToSpecification(query),
                         maxPlacesMinSpecification(query),
                         maxPlacesMaxSpecification(query),
-                        competencySpecification(query)
+                        competencySpecification(query),
+                        mentorSpecification(query)
                 )
                 .flatMap(Optional::stream)
                 .reduce(Specification::and)
@@ -131,6 +135,23 @@ public class GetInternshipProgramsHandler {
                     Join<InternshipProgramEntity, CompetencyEntity> join =
                             root.join("competencies", JoinType.INNER);
                     return cb.equal(join.get("id"), competencyId);
+                });
+    }
+
+    private static Optional<Specification<InternshipProgramEntity>> mentorSpecification(
+            GetInternshipProgramsQuery query
+    ) {
+        return Optional.ofNullable(query.mentorId())
+                .map(mentorId -> (Specification<InternshipProgramEntity>) (root, cq, cb) -> {
+                    Subquery<Long> subquery = cq.subquery(Long.class);
+                    var participant = subquery.from(InternshipProgramParticipantEntity.class);
+                    subquery.select(cb.literal(1L));
+                    subquery.where(
+                            cb.equal(participant.get("program"), root),
+                            cb.equal(participant.get("user").get("id"), mentorId),
+                            cb.equal(participant.get("role"), ProgramParticipantRole.MENTOR)
+                    );
+                    return cb.exists(subquery);
                 });
     }
 }
