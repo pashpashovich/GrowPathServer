@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
@@ -52,7 +51,7 @@ public class ProgramRoadmapTemplateService {
     public RoadmapEntity buildEmptyTemplate(InternshipProgramEntity program, UserEntity mentor) {
         RoadmapEntity entity = new RoadmapEntity();
         entity.setProgram(program);
-        entity.setTitle(defaultTitle(program, mentor));
+        entity.setTitle(defaultTemplateTitle(program));
         entity.setDescription(null);
         entity.setStartDate(program.getStartDate());
         entity.setEndDate(program.getStartDate().plusDays(Math.max(1, program.getDuration()) - 1L));
@@ -61,7 +60,7 @@ public class ProgramRoadmapTemplateService {
         return entity;
     }
 
-    private String defaultTitle(InternshipProgramEntity program, UserEntity mentor) {
-        return program.getTitle() + " — " + User.fromEntity(mentor).getDisplayName();
+    private String defaultTemplateTitle(InternshipProgramEntity program) {
+        return program.getTitle();
     }
 }

@@ -29,6 +29,7 @@ import by.bsuir.growpathserver.dto.model.UpdateIprRequest;
 import by.bsuir.growpathserver.dto.model.UpdateStageRequest;
 import by.bsuir.growpathserver.trainee.application.dto.InternProgressDto;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
+import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.IprEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.IprStageEntity;
@@ -134,7 +135,7 @@ public class IprApplicationFacade {
         ipr.setProgram(program);
         ipr.setRoadmapTemplate(template);
         ipr.setIntern(intern);
-        ipr.setTitle(Objects.nonNull(request.getTitle()) ? request.getTitle() : template.getTitle());
+        ipr.setTitle(Objects.nonNull(request.getTitle()) ? request.getTitle() : defaultIprTitle(program, intern));
         ipr.setDescription(
                 Objects.nonNull(request.getDescription()) ? request.getDescription() : template.getDescription());
         ipr.setStartDate(request.getStartDate());
@@ -426,6 +427,10 @@ public class IprApplicationFacade {
 
     private boolean isIntern() {
         return hasAuthority("INTERN");
+    }
+
+    private String defaultIprTitle(InternshipProgramEntity program, UserEntity intern) {
+        return program.getTitle() + " — " + User.fromEntity(intern).getDisplayName();
     }
 
     private Long resolveMentorIdForIpr(Long requestedMentorId, RoadmapEntity template) {
