@@ -25,6 +25,7 @@ public class InternshipProgramParticipantService {
 
     private final InternshipProgramRepository internshipProgramRepository;
     private final InternshipProgramParticipantRepository participantRepository;
+    private final ProgramRoadmapTemplateService programRoadmapTemplateService;
     private final UserRepository userRepository;
     private final IprRepository iprRepository;
 
@@ -54,7 +55,9 @@ public class InternshipProgramParticipantService {
         participant.setProgram(program);
         participant.setUser(user);
         participant.setRole(ProgramParticipantRole.MENTOR);
-        return participantRepository.save(participant);
+        InternshipProgramParticipantEntity saved = participantRepository.save(participant);
+        programRoadmapTemplateService.createEmptyTemplateForMentor(program, user);
+        return saved;
     }
 
     @Transactional
@@ -68,6 +71,7 @@ public class InternshipProgramParticipantService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                                               "Cannot remove mentor while interns are assigned to them on this program");
         }
+        programRoadmapTemplateService.removeEmptyTemplateForMentor(programId, userId);
         participantRepository.delete(participant);
     }
 

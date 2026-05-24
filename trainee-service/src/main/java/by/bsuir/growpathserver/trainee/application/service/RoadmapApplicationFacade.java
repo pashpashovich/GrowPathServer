@@ -49,6 +49,7 @@ public class RoadmapApplicationFacade {
     private final RoadmapStageRepository roadmapStageRepository;
     private final InternshipProgramRepository internshipProgramRepository;
     private final InternshipProgramParticipantService internshipProgramParticipantService;
+    private final ProgramRoadmapTemplateService programRoadmapTemplateService;
     private final UserRepository userRepository;
     private final CurrentApplicationUserResolver currentUserResolver;
     private final RoadmapMapper roadmapMapper;
@@ -196,19 +197,26 @@ public class RoadmapApplicationFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Long mentorId = resolveMentorIdForRoadmap(request.getMentorId());
         UserEntity mentor = internshipProgramParticipantService.requireMentorOnProgram(program.getId(), mentorId);
+        RoadmapEntity entity;
         if (roadmapRepository.existsByProgram_IdAndMentor_Id(program.getId(), mentorId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                                              "Roadmap template for this mentor already exists on the program");
+            entity = roadmapRepository.findByProgram_IdAndMentor_Id(program.getId(), mentorId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
+                                                                   "Roadmap template for this mentor already exists"));
+            if (Objects.nonNull(request.getTitle())) {
+                entity.setTitle(request.getTitle());
+            }
+            if (Objects.nonNull(request.getDescription())) {
+                entity.setDescription(request.getDescription());
+            }
+            entity = roadmapRepository.save(entity);
         }
-        RoadmapEntity entity = new RoadmapEntity();
-        entity.setProgram(program);
-        entity.setTitle(request.getTitle());
-        entity.setDescription(request.getDescription());
-        entity.setStartDate(program.getStartDate());
-        entity.setEndDate(program.getStartDate().plusDays(Math.max(1, program.getDuration()) - 1L));
-        entity.setStatus(RoadmapLifecycleStatus.DRAFT);
-        entity.setMentor(mentor);
-        RoadmapEntity saved = roadmapRepository.save(entity);
+        else {
+            entity = programRoadmapTemplateService.buildEmptyTemplate(program, mentor);
+            entity.setTitle(request.getTitle());
+            entity.setDescription(request.getDescription());
+            entity = roadmapRepository.save(entity);
+        }
+        RoadmapEntity saved = entity;
         return roadmapMapper.toRoadmapTemplateResponse(
                 roadmapRepository.findWithMentorAndInternsById(saved.getId()).orElse(saved));
     }
