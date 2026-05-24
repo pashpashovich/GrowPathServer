@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="028-fix-roadmap-end-dates-use-program-duration-months" author="Kasovich Pavel">
+    <sql dbms="postgresql">
+      UPDATE roadmaps r
+      SET end_date = (ip.start_date + (ip.duration || ' months')::interval)::date
+      FROM internship_programs ip
+      WHERE r.program_id = ip.id
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

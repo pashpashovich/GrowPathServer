@@ -1,5 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
+import java.time.LocalDate;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,7 @@ public class ProgramRoadmapTemplateService {
         entity.setTitle(defaultTemplateTitle(program));
         entity.setDescription(null);
         entity.setStartDate(program.getStartDate());
-        entity.setEndDate(program.getStartDate().plusDays(Math.max(1, program.getDuration()) - 1L));
+        entity.setEndDate(resolveProgramEndDate(program));
         entity.setStatus(RoadmapLifecycleStatus.DRAFT);
         entity.setMentor(mentor);
         return entity;
@@ -62,5 +64,9 @@ public class ProgramRoadmapTemplateService {
 
     private String defaultTemplateTitle(InternshipProgramEntity program) {
         return program.getTitle();
+    }
+
+    LocalDate resolveProgramEndDate(InternshipProgramEntity program) {
+        return program.getStartDate().plusMonths(program.getDuration());
     }
 }
