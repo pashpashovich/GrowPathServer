@@ -1,5 +1,6 @@
 package by.bsuir.growpathserver.trainee.infrastructure.mapper;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import by.bsuir.growpathserver.dto.model.RoadmapTemplateListResponse;
 import by.bsuir.growpathserver.dto.model.RoadmapTemplateResponse;
 import by.bsuir.growpathserver.dto.model.StageListResponse;
 import by.bsuir.growpathserver.dto.model.StageResponse;
+import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapInternEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.RoadmapStageEntity;
@@ -32,6 +34,8 @@ public interface RoadmapMapper {
 
     @Mapping(target = "programId", source = "program.id")
     @Mapping(target = "mentorId", source = "mentor.id")
+    @Mapping(target = "startDate", expression = "java(resolveRoadmapStartDate(entity))")
+    @Mapping(target = "endDate", expression = "java(resolveRoadmapEndDate(entity))")
     @Mapping(target = "status", expression = "java(toRoadmapTemplateStatus(entity))")
     RoadmapTemplateResponse toRoadmapTemplateResponse(RoadmapEntity entity);
 
@@ -82,6 +86,30 @@ public interface RoadmapMapper {
 
     default RoadmapTemplateResponse.StatusEnum toRoadmapTemplateStatus(RoadmapEntity entity) {
         return RoadmapTemplateResponse.StatusEnum.fromValue(entity.getStatus().getValue());
+    }
+
+    default LocalDate resolveRoadmapStartDate(RoadmapEntity entity) {
+        if (Objects.nonNull(entity.getStartDate())) {
+            return entity.getStartDate();
+        }
+        InternshipProgramEntity program = entity.getProgram();
+        if (Objects.nonNull(program)) {
+            return program.getStartDate();
+        }
+        return null;
+    }
+
+    default LocalDate resolveRoadmapEndDate(RoadmapEntity entity) {
+        if (Objects.nonNull(entity.getEndDate())) {
+            return entity.getEndDate();
+        }
+        InternshipProgramEntity program = entity.getProgram();
+        if (Objects.nonNull(program)
+                && Objects.nonNull(program.getStartDate())
+                && Objects.nonNull(program.getDuration())) {
+            return program.getStartDate().plusMonths(program.getDuration());
+        }
+        return null;
     }
 
     default StageResponse.PriorityEnum toStagePriority(RoadmapStageEntity stage) {
