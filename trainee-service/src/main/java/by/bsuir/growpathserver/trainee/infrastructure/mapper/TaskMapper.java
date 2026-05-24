@@ -13,6 +13,7 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
 public interface TaskMapper {
     @Mapping(target = "assigneeName", ignore = true)
     @Mapping(target = "mentorName", ignore = true)
+    @Mapping(target = "iprId", ignore = true)
     @Mapping(target = "submissionFiles", ignore = true)
     @Mapping(target = "submissionLinks", ignore = true)
     @Mapping(target = "statusHistory", ignore = true)

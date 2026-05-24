@@ -30,12 +30,28 @@
     },
     "internshipId": {
       "type": "integer",
-      "format": "int64"
+      "format": "int64",
+      "description": "Internship program id"
+    },
+    "iprId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Optional IPR id; used to validate iprStageId"
+    },
+    "iprStageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR stage id (ipr_stages.id); preferred field for stage binding"
     },
     "stageId": {
-      "nullable": true,
       "type": "integer",
-      "format": "int64"
+      "format": "int64",
+      "description": "Alias for iprStageId (IPR stage id)"
+    },
+    "assigneeId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Single assignee; use instead of assigneeIds when creating one task"
     },
     "dueDate": {
       "type": "string",

@@ -20,6 +20,21 @@
       "type": "integer",
       "format": "int64"
     },
+    "iprId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Optional IPR id; used to validate iprStageId"
+    },
+    "iprStageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR stage id (ipr_stages.id)"
+    },
+    "stageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Alias for iprStageId (IPR stage id)"
+    },
     "dueDate": {
       "type": "string",
       "format": "date-time"

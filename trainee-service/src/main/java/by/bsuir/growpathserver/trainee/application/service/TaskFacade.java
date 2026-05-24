@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import by.bsuir.growpathserver.dto.model.ReorderTasksRequestItemsInner;
 import by.bsuir.growpathserver.dto.model.ReviewTaskRequest;
 import by.bsuir.growpathserver.dto.model.SubmitTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
+import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskRecommendationResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
@@ -56,6 +58,7 @@ import by.bsuir.growpathserver.trainee.domain.events.TaskReviewResultEvent;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.TaskMapper;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.IprStageRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskArtifactRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskCommentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
@@ -79,6 +82,8 @@ public class TaskFacade {
     private final TaskReviewNotificationService taskReviewNotificationService;
     private final TaskArtifactStorageService taskArtifactStorageService;
     private final TaskRecommendationService taskRecommendationService;
+    private final TaskIprStageBindingService taskIprStageBindingService;
+    private final IprStageRepository iprStageRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -96,12 +101,16 @@ public class TaskFacade {
     @Transactional
     public TaskResponse createTask(CreateTaskRequest createTaskRequest) {
         Long mentorId = currentApplicationUserResolver.resolveCurrentUserDatabaseId().orElse(null);
-        Long stageId = createTaskRequest.getStageId();
         Long internshipId = createTaskRequest.getInternshipId();
+        Long iprId = createTaskRequest.getIprId();
+        Long resolvedStageId = taskIprStageBindingService.resolveStageId(
+                createTaskRequest.getIprStageId(), createTaskRequest.getStageId());
         LocalDateTime date = createTaskRequest.getDueDate();
+        List<Long> assigneeIds = resolveAssigneeIds(createTaskRequest);
 
         Task firstCreated = null;
-        for (Long assigneeId : createTaskRequest.getAssigneeIds()) {
+        for (Long assigneeId : assigneeIds) {
+            taskIprStageBindingService.validateStageBinding(resolvedStageId, iprId, internshipId, assigneeId);
             CreateTaskCommand command = CreateTaskCommand.builder()
                     .title(createTaskRequest.getTitle())
                     .description(createTaskRequest.getDescription())
@@ -109,7 +118,7 @@ public class TaskFacade {
                     .assigneeId(assigneeId)
                     .mentorId(mentorId)
                     .internshipId(internshipId)
-                    .stageId(stageId)
+                    .stageId(resolvedStageId)
                     .dueDate(date)
                     .build();
             Task created = createTaskHandler.handle(command);
@@ -156,6 +165,29 @@ public class TaskFacade {
     public TaskResponse updateTask(UpdateTaskCommand command) {
         Task task = updateTaskHandler.handle(command);
         return enrich(taskMapper.toTaskResponse(task), task.getId());
+    }
+
+    @Transactional
+    public TaskResponse updateTaskStructure(Long taskId, UpdateTaskRequest request) {
+        TaskEntity existing = getTaskEntity(taskId);
+        Long assigneeId = Objects.nonNull(request.getAssigneeId()) ? request.getAssigneeId() : existing.getAssigneeId();
+        Long resolvedStageId = taskIprStageBindingService.resolveStageId(request.getIprStageId(), request.getStageId());
+        if (Objects.nonNull(resolvedStageId) || Objects.nonNull(request.getIprId())) {
+            taskIprStageBindingService.validateStageBinding(
+                    resolvedStageId, request.getIprId(), existing.getInternshipId(), assigneeId);
+        }
+        UpdateTaskCommand command = UpdateTaskCommand.builder()
+                .id(taskId)
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .status(null)
+                .priority(Objects.nonNull(request.getPriority()) ?
+                                  TaskPriority.fromString(request.getPriority().getValue()) : null)
+                .assigneeId(request.getAssigneeId())
+                .stageId(resolvedStageId)
+                .dueDate(request.getDueDate())
+                .build();
+        return updateTask(command);
     }
 
     @Transactional
@@ -313,9 +345,30 @@ public class TaskFacade {
         return enrich(response, taskId, Map.of());
     }
 
+    private List<Long> resolveAssigneeIds(CreateTaskRequest createTaskRequest) {
+        if (CollectionUtils.isNotEmpty(createTaskRequest.getAssigneeIds())) {
+            return createTaskRequest.getAssigneeIds();
+        }
+        if (Objects.nonNull(createTaskRequest.getAssigneeId())) {
+            return List.of(createTaskRequest.getAssigneeId());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "assigneeId or assigneeIds is required");
+    }
+
+    private void applyIprId(TaskResponse response) {
+        if (Objects.isNull(response.getStageId())) {
+            return;
+        }
+        iprStageRepository.findLoadedById(response.getStageId())
+                .map(stage -> stage.getIpr())
+                .filter(Objects::nonNull)
+                .ifPresent(ipr -> response.setIprId(ipr.getId()));
+    }
+
     private TaskResponse enrich(TaskResponse response, Long taskId, Map<Long, String> userNames) {
         response.setAssigneeName(resolveUserDisplayName(response.getAssigneeId(), userNames));
         response.setMentorName(resolveUserDisplayName(response.getMentorId(), userNames));
+        applyIprId(response);
 
         List<Object> files = taskArtifactRepository.findAllByTaskId(taskId).stream().map(a -> {
             FileResponse file = new FileResponse();

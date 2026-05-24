@@ -54,7 +54,14 @@
     "stageId": {
       "nullable": true,
       "type": "integer",
-      "format": "int64"
+      "format": "int64",
+      "description": "Bound IPR stage id (ipr_stages.id)"
+    },
+    "iprId": {
+      "nullable": true,
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR id derived from the bound stage"
     },
     "dueDate": {
       "type": "string",

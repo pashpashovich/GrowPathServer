@@ -30,7 +30,6 @@ import by.bsuir.growpathserver.dto.model.TaskRecommendationResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
 import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
-import by.bsuir.growpathserver.trainee.application.command.UpdateTaskCommand;
 import by.bsuir.growpathserver.trainee.application.query.GetTasksQuery;
 import by.bsuir.growpathserver.trainee.application.service.TaskFacade;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
@@ -154,20 +153,11 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                 || updateTaskRequest.getDescription() != null
                 || updateTaskRequest.getPriority() != null
                 || updateTaskRequest.getAssigneeId() != null
-                || updateTaskRequest.getDueDate() != null;
+                || updateTaskRequest.getDueDate() != null
+                || updateTaskRequest.getStageId() != null
+                || updateTaskRequest.getIprStageId() != null;
         if (structural) {
-            UpdateTaskCommand command = UpdateTaskCommand.builder()
-                    .id(taskId)
-                    .title(updateTaskRequest.getTitle())
-                    .description(updateTaskRequest.getDescription())
-                    .status(null)
-                    .priority(updateTaskRequest.getPriority() != null ?
-                                      TaskPriority.fromString(updateTaskRequest.getPriority().getValue()) : null)
-                    .assigneeId(updateTaskRequest.getAssigneeId())
-                    .stageId(null)
-                    .dueDate(updateTaskRequest.getDueDate())
-                    .build();
-            taskFacade.updateTask(command);
+            taskFacade.updateTaskStructure(taskId, updateTaskRequest);
         }
 
         if (updateTaskRequest.getStatus() != null) {
