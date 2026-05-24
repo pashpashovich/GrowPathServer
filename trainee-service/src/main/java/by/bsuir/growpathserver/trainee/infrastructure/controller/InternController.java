@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import by.bsuir.growpathserver.dto.api.InternsApi;
 import by.bsuir.growpathserver.dto.model.AssessmentListResponse;
 import by.bsuir.growpathserver.dto.model.CreateInternRequest;
+import by.bsuir.growpathserver.dto.model.HiringDecisionResponse;
 import by.bsuir.growpathserver.dto.model.InternListResponse;
 import by.bsuir.growpathserver.dto.model.InternProgressResponse;
 import by.bsuir.growpathserver.dto.model.InternResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
+import by.bsuir.growpathserver.dto.model.RecordHiringDecisionRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
 import by.bsuir.growpathserver.dto.model.UpdateInternRequest;
 import by.bsuir.growpathserver.trainee.application.command.CreateInternCommand;
@@ -36,6 +38,7 @@ import by.bsuir.growpathserver.trainee.application.query.GetInternByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternProgressQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternTasksQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsQuery;
+import by.bsuir.growpathserver.trainee.application.service.InternHiringDecisionService;
 import by.bsuir.growpathserver.trainee.application.service.InternshipResultReportService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternMapper;
@@ -54,6 +57,7 @@ public class InternController extends BaseController implements InternsApi {
     private final GetInternAssessmentsHandler getInternAssessmentsHandler;
     private final GetInternProgressHandler getInternProgressHandler;
     private final InternshipResultReportService internshipResultReportService;
+    private final InternHiringDecisionService internHiringDecisionService;
     private final InternMapper internMapper;
 
     @Override
@@ -108,6 +112,47 @@ public class InternController extends BaseController implements InternsApi {
             return ResponseEntity.notFound().build();
         }
         catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<HiringDecisionResponse> getInternHiringDecision(String id, Long programId) {
+        try {
+            Long internId = Long.parseLong(id);
+            HiringDecisionResponse response = internHiringDecisionService.getDecision(internId, programId);
+            return ResponseEntity.ok(response);
+        }
+        catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<HiringDecisionResponse> recordInternHiringDecision(
+            String id,
+            RecordHiringDecisionRequest recordHiringDecisionRequest) {
+        try {
+            Long internId = Long.parseLong(id);
+            HiringDecisionResponse response = internHiringDecisionService.recordDecision(
+                    internId, recordHiringDecisionRequest);
+            return ResponseEntity.ok(response);
+        }
+        catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+        catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }

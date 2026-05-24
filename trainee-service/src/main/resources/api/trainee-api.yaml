@@ -1000,6 +1000,109 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /interns/{id}/hiring-decision:
+    get:
+      tags:
+        - Interns
+      summary: Get hiring decision for an intern on an internship program
+      description: |
+        Returns the recorded hire/reject decision after internship completion.
+        Available to HR manager, department head and admin.
+      operationId: getInternHiringDecision
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: programId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Hiring decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hiring-decision-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern, program or decision not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    put:
+      tags:
+        - Interns
+      summary: Record or update hiring decision for an intern
+      description: |
+        Records hire or reject decision for an intern on a specific internship program.
+        Upserts by intern and program. Requires an IPR on the program.
+        Available to HR manager, department head and admin.
+      operationId: recordInternHiringDecision
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/record-hiring-decision-request'
+      responses:
+        '200':
+          description: Decision recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hiring-decision-response'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern or program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /interns/{id}/assessments:
     get:
       tags:
@@ -5466,6 +5569,10 @@ components:
       $ref: './schemas/intern-progress-response.json'
     stage-progress-item:
       $ref: './schemas/stage-progress-item.json'
+    record-hiring-decision-request:
+      $ref: './schemas/record-hiring-decision-request.json'
+    hiring-decision-response:
+      $ref: './schemas/hiring-decision-response.json'
 
     # Mentor schemas
     mentor-response:

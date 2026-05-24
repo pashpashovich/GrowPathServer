@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "programId",
+    "decision"
+  ],
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "hire",
+        "reject"
+      ]
+    },
+    "comment": {
+      "type": "string"
+    }
+  }
+}

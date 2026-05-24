@@ -33,5 +33,6 @@
   <include file="/db/changelog/changes/026-add-department-id-to-users.xml"/>
   <include file="db/changelog/changes/027-create-internship-program-participants.xml"/>
   <include file="db/changelog/changes/028-fix-roadmap-end-dates-use-program-duration-months.xml"/>
+  <include file="db/changelog/changes/029-create-intern-hiring-decisions.xml"/>
 
 </databaseChangeLog>

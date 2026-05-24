@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "internId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programTitle": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "hire",
+        "reject"
+      ]
+    },
+    "comment": {
+      "type": "string"
+    },
+    "decidedByUserId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "decidedByName": {
+      "type": "string"
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "internId",
+    "programId",
+    "decision",
+    "decidedByUserId",
+    "decidedAt"
+  ]
+}
