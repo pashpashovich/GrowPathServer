@@ -163,6 +163,12 @@ spring:
                 - Path=/api/v1/distribution-groups/**
               filters:
                 - StripPrefix=2
+            - id: mailing-history
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/v1/mailing-history/**
+              filters:
+                - StripPrefix=2
             - id: in-app-notifications-service
               uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
               predicates:

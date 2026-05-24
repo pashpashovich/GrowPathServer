@@ -361,6 +361,72 @@ paths:
         '401':
           description: Unauthorized
 
+  /mailing-history:
+    get:
+      tags:
+        - Mailing History
+      summary: Get mailing send history
+      operationId: getMailingHistory
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - name: mailingId
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [immediate, scheduled, recurring]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingHistoryListResponse'
+        '401':
+          description: Unauthorized
+
+  /mailing-history/{id}:
+    get:
+      tags:
+        - Mailing History
+      summary: Get mailing history record by ID
+      operationId: getMailingHistoryById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingHistoryResponse'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+
   /recipients:
     get:
       tags:
@@ -1057,6 +1123,42 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MailingResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+
+    MailingHistoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        mailingId:
+          type: string
+        name:
+          type: string
+        templateName:
+          type: string
+        type:
+          type: string
+          enum: [immediate, scheduled, recurring]
+        sentAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - mailingId
+        - type
+        - sentAt
+
+    MailingHistoryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailingHistoryResponse'
         pagination:
           $ref: '#/components/schemas/PaginationResponse'
       required:
