@@ -12,12 +12,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.InternshipProgramsApi;
+import by.bsuir.growpathserver.dto.model.AssignProgramInternRequest;
+import by.bsuir.growpathserver.dto.model.AssignProgramMentorRequest;
 import by.bsuir.growpathserver.dto.model.CreateInternshipProgramRequest;
 import by.bsuir.growpathserver.dto.model.InternshipProgramListResponse;
 import by.bsuir.growpathserver.dto.model.InternshipProgramResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
+import by.bsuir.growpathserver.dto.model.ProgramParticipantListResponse;
+import by.bsuir.growpathserver.dto.model.ProgramParticipantResponse;
 import by.bsuir.growpathserver.dto.model.UpdateInternshipProgramRequest;
 import by.bsuir.growpathserver.trainee.application.service.InternshipEfficiencyReportService;
+import by.bsuir.growpathserver.trainee.application.service.InternshipProgramParticipantsApplicationFacade;
 import by.bsuir.growpathserver.trainee.application.service.InternshipProgramsApplicationFacade;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class InternshipProgramController extends BaseController implements InternshipProgramsApi {
 
     private final InternshipProgramsApplicationFacade internshipProgramsApplicationFacade;
+    private final InternshipProgramParticipantsApplicationFacade participantsApplicationFacade;
     private final InternshipEfficiencyReportService internshipEfficiencyReportService;
 
     @Override
@@ -88,5 +94,47 @@ public class InternshipProgramController extends BaseController implements Inter
     public ResponseEntity<InternshipProgramResponse> updateInternshipProgram(String id,
                                                                              UpdateInternshipProgramRequest request) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.updateInternshipProgram(id, request));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<ProgramParticipantResponse> assignProgramIntern(String programId,
+                                                                          AssignProgramInternRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(participantsApplicationFacade.assignProgramIntern(programId, request));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<ProgramParticipantResponse> assignProgramMentor(String programId,
+                                                                          AssignProgramMentorRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(participantsApplicationFacade.assignProgramMentor(programId, request));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD', 'MENTOR')")
+    public ResponseEntity<ProgramParticipantListResponse> listProgramInterns(String programId) {
+        return ResponseEntity.ok(participantsApplicationFacade.listProgramInterns(programId));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD', 'MENTOR')")
+    public ResponseEntity<ProgramParticipantListResponse> listProgramMentors(String programId) {
+        return ResponseEntity.ok(participantsApplicationFacade.listProgramMentors(programId));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<Void> unassignProgramIntern(String programId, String userId) {
+        participantsApplicationFacade.unassignProgramIntern(programId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<Void> unassignProgramMentor(String programId, String userId) {
+        participantsApplicationFacade.unassignProgramMentor(programId, userId);
+        return ResponseEntity.noContent().build();
     }
 }

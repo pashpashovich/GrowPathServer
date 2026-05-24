@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "assignedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mentorName": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "userId",
+    "name",
+    "email",
+    "assignedAt"
+  ]
+}

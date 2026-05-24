@@ -1,6 +1,8 @@
 spring:
   application:
     name: trainee-service
+  jackson:
+    time-zone: ${APP_TIMEZONE:Europe/Minsk}
   datasource:
     url: ${TRAINEE_DB_URL:jdbc:postgresql://localhost:5432/TRAINEE_DB}
     username: ${TRAINEE_DB_USERNAME:postgres}
@@ -16,6 +18,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: ${JPA_FORMAT_SQL:true}
+        jdbc:
+          time_zone: ${APP_TIMEZONE:Europe/Minsk}
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: true

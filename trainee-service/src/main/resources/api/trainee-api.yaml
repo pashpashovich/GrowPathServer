@@ -3087,6 +3087,256 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /internship-programs/{programId}/mentors:
+    get:
+      tags:
+        - Internship Program Participants
+      summary: List mentors assigned to the program
+      operationId: listProgramMentors
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-participant-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Internship Program Participants
+      summary: Assign mentor to the program
+      operationId: assignProgramMentor
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/assign-program-mentor-request'
+      responses:
+        '201':
+          description: Mentor assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-participant-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: User already assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internship-programs/{programId}/mentors/{userId}:
+    delete:
+      tags:
+        - Internship Program Participants
+      summary: Remove mentor from the program
+      operationId: unassignProgramMentor
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Mentor removed
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program or participant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Mentor still supervises interns on the program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internship-programs/{programId}/interns:
+    get:
+      tags:
+        - Internship Program Participants
+      summary: List interns assigned to the program
+      operationId: listProgramInterns
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-participant-list-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+    post:
+      tags:
+        - Internship Program Participants
+      summary: Assign intern to the program with a supervising mentor
+      operationId: assignProgramIntern
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/assign-program-intern-request'
+      responses:
+        '201':
+          description: Intern assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/program-participant-response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Intern already assigned or no places left
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
+  /internship-programs/{programId}/interns/{userId}:
+    delete:
+      tags:
+        - Internship Program Participants
+      summary: Remove intern from the program
+      operationId: unassignProgramIntern
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Intern removed
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Program or participant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Intern has an IPR on this program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /internship-programs/{id}/internship-efficiency-report:
     get:
       tags:
@@ -5236,6 +5486,15 @@ components:
       $ref: './schemas/internship-program-response.json'
     internship-program-list-response:
       $ref: './schemas/internship-program-list-response.json'
+    program-participant-response:
+      $ref: './schemas/program-participant-response.json'
+    program-participant-list-response:
+      $ref: './schemas/program-participant-list-response.json'
+    assign-program-mentor-request:
+      $ref: './schemas/assign-program-mentor-request.json'
+    assign-program-intern-request:
+      $ref: './schemas/assign-program-intern-request.json'
+
     create-internship-program-request:
       $ref: './schemas/create-internship-program-request.json'
     update-internship-program-request:

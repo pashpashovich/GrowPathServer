@@ -1,6 +1,8 @@
 spring:
   application:
     name: api-gateway
+  jackson:
+    time-zone: ${APP_TIMEZONE:Europe/Minsk}
   cloud:
     gateway:
       server:

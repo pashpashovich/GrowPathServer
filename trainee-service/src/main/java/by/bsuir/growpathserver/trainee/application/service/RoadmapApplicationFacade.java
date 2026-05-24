@@ -48,6 +48,7 @@ public class RoadmapApplicationFacade {
     private final RoadmapRepository roadmapRepository;
     private final RoadmapStageRepository roadmapStageRepository;
     private final InternshipProgramRepository internshipProgramRepository;
+    private final InternshipProgramParticipantService internshipProgramParticipantService;
     private final UserRepository userRepository;
     private final CurrentApplicationUserResolver currentUserResolver;
     private final RoadmapMapper roadmapMapper;
@@ -193,6 +194,12 @@ public class RoadmapApplicationFacade {
     public RoadmapTemplateResponse createRoadmapTemplate(CreateRoadmapTemplateRequest request) {
         InternshipProgramEntity program = internshipProgramRepository.findById(request.getProgramId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Long mentorId = resolveMentorIdForRoadmap(request.getMentorId());
+        UserEntity mentor = internshipProgramParticipantService.requireMentorOnProgram(program.getId(), mentorId);
+        if (roadmapRepository.existsByProgram_IdAndMentor_Id(program.getId(), mentorId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                              "Roadmap template for this mentor already exists on the program");
+        }
         RoadmapEntity entity = new RoadmapEntity();
         entity.setProgram(program);
         entity.setTitle(request.getTitle());
@@ -200,11 +207,7 @@ public class RoadmapApplicationFacade {
         entity.setStartDate(program.getStartDate());
         entity.setEndDate(program.getStartDate().plusDays(Math.max(1, program.getDuration()) - 1L));
         entity.setStatus(RoadmapLifecycleStatus.DRAFT);
-        if (Objects.nonNull(request.getMentorId())) {
-            UserEntity mentor = userRepository.findById(request.getMentorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-            entity.setMentor(mentor);
-        }
+        entity.setMentor(mentor);
         RoadmapEntity saved = roadmapRepository.save(entity);
         return roadmapMapper.toRoadmapTemplateResponse(
                 roadmapRepository.findWithMentorAndInternsById(saved.getId()).orElse(saved));
@@ -227,8 +230,9 @@ public class RoadmapApplicationFacade {
             entity.setStatus(targetStatus);
         }
         if (Objects.nonNull(request.getMentorId())) {
-            UserEntity mentor = userRepository.findById(request.getMentorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+            Long mentorId = resolveMentorIdForRoadmap(request.getMentorId());
+            UserEntity mentor = internshipProgramParticipantService.requireMentorOnProgram(
+                    entity.getProgram().getId(), mentorId);
             entity.setMentor(mentor);
         }
         roadmapRepository.save(entity);
@@ -381,12 +385,32 @@ public class RoadmapApplicationFacade {
         }
     }
 
+    private Long resolveMentorIdForRoadmap(Long requestedMentorId) {
+        Long currentUserId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
+        if (isMentor() && !isHrOrAdmin()) {
+            if (Objects.isNull(currentUserId)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            }
+            if (Objects.nonNull(requestedMentorId) && !Objects.equals(requestedMentorId, currentUserId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                                  "Mentor can only manage their own roadmap template");
+            }
+            return currentUserId;
+        }
+        if (Objects.isNull(requestedMentorId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "mentorId is required");
+        }
+        return requestedMentorId;
+    }
+
     private void validateRoadmapActivation(RoadmapEntity roadmap) {
         if (Objects.isNull(roadmap.getMentor())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mentor must be assigned before activation");
         }
-        if (roadmap.getInterns().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one intern must be assigned");
+        if (!internshipProgramParticipantService.isMentorOnProgram(
+                roadmap.getProgram().getId(), roadmap.getMentor().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              "Mentor must be assigned to the internship program");
         }
         List<RoadmapStageEntity> stages = roadmapStageRepository.findByRoadmapIdOrderByStageOrderAsc(roadmap.getId());
         if (stages.isEmpty()) {

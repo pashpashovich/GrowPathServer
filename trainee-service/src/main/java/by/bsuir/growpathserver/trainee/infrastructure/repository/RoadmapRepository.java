@@ -21,6 +21,8 @@ public interface RoadmapRepository extends JpaRepository<RoadmapEntity, Long>, J
 
     List<RoadmapEntity> findByProgramId(Long programId);
 
+    boolean existsByProgram_IdAndMentor_Id(Long programId, Long mentorId);
+
     List<RoadmapEntity> findByMentorId(Long mentorId);
 
     @Query("SELECT DISTINCT r FROM RoadmapEntity r JOIN r.interns i WHERE i.user.id = :userId")

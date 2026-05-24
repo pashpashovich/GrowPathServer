@@ -54,6 +54,7 @@ public class IprApplicationFacade {
     private final IprRepository iprRepository;
     private final IprStageRepository iprStageRepository;
     private final InternshipProgramRepository internshipProgramRepository;
+    private final InternshipProgramParticipantService internshipProgramParticipantService;
     private final RoadmapRepository roadmapRepository;
     private final RoadmapStageRepository roadmapStageRepository;
     private final UserRepository userRepository;
@@ -120,6 +121,15 @@ public class IprApplicationFacade {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Template does not belong to program");
         }
 
+        Long mentorId = resolveMentorIdForIpr(request.getMentorId(), template);
+        UserEntity mentor = internshipProgramParticipantService.requireMentorOnProgram(program.getId(), mentorId);
+        internshipProgramParticipantService.requireInternOnProgramWithMentor(
+                program.getId(), intern.getId(), mentorId);
+        if (Objects.isNull(template.getMentor()) || !Objects.equals(template.getMentor().getId(), mentorId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              "IPR must use the roadmap template of the supervising mentor");
+        }
+
         IprEntity ipr = new IprEntity();
         ipr.setProgram(program);
         ipr.setRoadmapTemplate(template);
@@ -130,14 +140,7 @@ public class IprApplicationFacade {
         ipr.setStartDate(request.getStartDate());
         ipr.setEndDate(request.getEndDate());
         ipr.setStatus(RoadmapLifecycleStatus.DRAFT);
-        if (Objects.nonNull(request.getMentorId())) {
-            ipr.setMentor(userRepository.findById(request.getMentorId())
-                                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                                                                 "Mentor not found")));
-        }
-        else {
-            ipr.setMentor(template.getMentor());
-        }
+        ipr.setMentor(mentor);
         validateIprDateRange(ipr.getStartDate(), ipr.getEndDate());
         IprEntity saved = iprRepository.save(ipr);
         copyTemplateStages(saved, template);
@@ -423,6 +426,27 @@ public class IprApplicationFacade {
 
     private boolean isIntern() {
         return hasAuthority("INTERN");
+    }
+
+    private Long resolveMentorIdForIpr(Long requestedMentorId, RoadmapEntity template) {
+        Long currentUserId = currentUserResolver.resolveCurrentUserDatabaseId().orElse(null);
+        if (isMentor() && !isHrOrAdmin()) {
+            if (Objects.isNull(currentUserId)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            }
+            if (Objects.nonNull(requestedMentorId) && !Objects.equals(requestedMentorId, currentUserId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                                  "Mentor can only create IPR for their own interns");
+            }
+            return currentUserId;
+        }
+        if (Objects.nonNull(requestedMentorId)) {
+            return requestedMentorId;
+        }
+        if (Objects.isNull(template.getMentor())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "mentorId is required");
+        }
+        return template.getMentor().getId();
     }
 
     private static Specification<IprEntity> buildIprSpec(Long programId,

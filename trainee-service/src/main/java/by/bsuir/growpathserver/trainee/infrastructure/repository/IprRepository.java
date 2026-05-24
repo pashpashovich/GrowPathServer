@@ -28,4 +28,6 @@ public interface IprRepository extends JpaRepository<IprEntity, Long>, JpaSpecif
     @EntityGraph(attributePaths = { "program", "roadmapTemplate", "intern", "mentor", "stages" })
     @Query("SELECT i FROM IprEntity i WHERE i.intern.id = :internId AND i.status = 'ACTIVE'")
     Optional<IprEntity> findActiveByInternId(@Param("internId") Long internId);
+
+    boolean existsByProgram_IdAndIntern_Id(Long programId, Long internId);
 }

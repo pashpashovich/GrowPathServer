@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="027-create-internship-program-participants" author="Kasovich Pavel">
+    <createTable tableName="internship_program_participants">
+      <column name="id" type="BIGSERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="internship_program_id" type="BIGINT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_program_participant_program"
+                     references="internship_programs(id)"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_program_participant_user"
+                     references="users(id)"/>
+      </column>
+      <column name="role" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mentor_id" type="BIGINT">
+        <constraints nullable="true"
+                     foreignKeyName="fk_program_participant_mentor"
+                     references="users(id)"/>
+      </column>
+      <column name="assigned_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="internship_program_participants"
+                         columnNames="internship_program_id, user_id"
+                         constraintName="uq_program_participant_user"/>
+    <createIndex indexName="idx_program_participant_program_role"
+                 tableName="internship_program_participants">
+      <column name="internship_program_id"/>
+      <column name="role"/>
+    </createIndex>
+    <createIndex indexName="idx_program_participant_mentor"
+                 tableName="internship_program_participants">
+      <column name="mentor_id"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

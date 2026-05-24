@@ -62,6 +62,7 @@ services:
       - "${KAFKA_PORT:-9092}:9092"
       - "9093:9093"
     environment:
+      TZ: ${APP_TIMEZONE:-Europe/Minsk}
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093

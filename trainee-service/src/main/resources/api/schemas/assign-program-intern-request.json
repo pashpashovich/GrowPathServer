@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "required": [
+    "userId",
+    "mentorId"
+  ],
+  "properties": {
+    "userId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    }
+  }
+}
