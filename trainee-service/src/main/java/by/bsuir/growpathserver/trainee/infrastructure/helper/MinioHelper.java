@@ -13,6 +13,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,22 @@ public class MinioHelper {
 
     public String getGetPresignedUrl(String bucket, String key, int expirationInSeconds) {
         return getPresignedUrl(bucket, key, expirationInSeconds, Method.GET);
+    }
+
+    public void upload(String bucket, String key, InputStream stream, long size, String contentType) {
+        try {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(key)
+                            .stream(stream, size, -1)
+                            .contentType(contentType)
+                            .build());
+        }
+        catch (Exception exception) {
+            log.error("Error uploading file to {}/{}", bucket, key, exception);
+            throw new IllegalStateException("Error uploading file to MinIO", exception);
+        }
     }
 
     public Resource download(String bucket, String key) {

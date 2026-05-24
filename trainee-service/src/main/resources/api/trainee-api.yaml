@@ -5482,6 +5482,8 @@ components:
       $ref: './schemas/task-list-response.json'
     create-task-request:
       $ref: './schemas/create-task-request.json'
+    create-task-assignment:
+      $ref: './schemas/create-task-assignment.json'
     update-task-request:
       $ref: './schemas/update-task-request.json'
     submit-task-request:

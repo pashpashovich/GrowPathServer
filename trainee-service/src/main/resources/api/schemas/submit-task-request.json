@@ -1,20 +1,16 @@
 {
   "type": "object",
   "properties": {
-    "files": {
-      "type": "array",
-      "items": {
-        "$ref": "./file-response.json"
-      }
-    },
     "links": {
       "type": "array",
+      "description": "External links saved as submission artifacts",
       "items": {
         "type": "string"
       }
     },
     "comment": {
-      "type": "string"
+      "type": "string",
+      "description": "Submission comment stored on the task"
     }
   }
 }

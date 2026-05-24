@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "internId"
+  ],
+  "properties": {
+    "internId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Intern user id (assignee)"
+    },
+    "iprStageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR stage id for this intern (ipr_stages.id)"
+    },
+    "stageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Alias for iprStageId"
+    }
+  }
+}

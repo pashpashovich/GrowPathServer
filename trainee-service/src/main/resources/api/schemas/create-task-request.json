@@ -21,8 +21,16 @@
         "high"
       ]
     },
+    "assignments": {
+      "type": "array",
+      "description": "Per-intern assignee and IPR stage. Preferred when creating tasks for multiple interns.",
+      "items": {
+        "$ref": "./create-task-assignment.json"
+      }
+    },
     "assigneeIds": {
       "type": "array",
+      "description": "Legacy: same iprStageId/stageId for every assignee. Do not combine with assignments.",
       "items": {
         "type": "integer",
         "format": "int64"

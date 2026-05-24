@@ -202,7 +202,8 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
 
     @Override
     public ResponseEntity<FileResponse> uploadTaskFile(String id, MultipartFile file) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        FileResponse response = taskFacade.uploadTaskFile(Long.parseLong(id), file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override

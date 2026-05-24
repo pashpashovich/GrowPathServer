@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +17,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import by.bsuir.growpathserver.dto.model.ChangeTaskStatusRequest;
 import by.bsuir.growpathserver.dto.model.CommentListResponse;
 import by.bsuir.growpathserver.dto.model.CommentResponse;
 import by.bsuir.growpathserver.dto.model.CreateCommentRequest;
+import by.bsuir.growpathserver.dto.model.CreateTaskAssignment;
 import by.bsuir.growpathserver.dto.model.CreateTaskRequest;
 import by.bsuir.growpathserver.dto.model.FileResponse;
 import by.bsuir.growpathserver.dto.model.PaginationResponse;
@@ -63,6 +66,9 @@ import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskArtifactRep
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskCommentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -85,6 +91,7 @@ public class TaskFacade {
     private final TaskIprStageBindingService taskIprStageBindingService;
     private final IprStageRepository iprStageRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public TaskStatusResponse completeTask(String id) {
@@ -103,22 +110,21 @@ public class TaskFacade {
         Long mentorId = currentApplicationUserResolver.resolveCurrentUserDatabaseId().orElse(null);
         Long internshipId = createTaskRequest.getInternshipId();
         Long iprId = createTaskRequest.getIprId();
-        Long resolvedStageId = taskIprStageBindingService.resolveStageId(
-                createTaskRequest.getIprStageId(), createTaskRequest.getStageId());
         LocalDateTime date = createTaskRequest.getDueDate();
-        List<Long> assigneeIds = resolveAssigneeIds(createTaskRequest);
+        List<InternStageAssignment> assignments = resolveAssignments(createTaskRequest);
 
         Task firstCreated = null;
-        for (Long assigneeId : assigneeIds) {
-            taskIprStageBindingService.validateStageBinding(resolvedStageId, iprId, internshipId, assigneeId);
+        for (InternStageAssignment assignment : assignments) {
+            taskIprStageBindingService.validateStageBinding(
+                    assignment.iprStageId(), iprId, internshipId, assignment.internId());
             CreateTaskCommand command = CreateTaskCommand.builder()
                     .title(createTaskRequest.getTitle())
                     .description(createTaskRequest.getDescription())
                     .priority(TaskPriority.fromString(createTaskRequest.getPriority().getValue()))
-                    .assigneeId(assigneeId)
+                    .assigneeId(assignment.internId())
                     .mentorId(mentorId)
                     .internshipId(internshipId)
-                    .stageId(resolvedStageId)
+                    .stageId(assignment.iprStageId())
                     .dueDate(date)
                     .build();
             Task created = createTaskHandler.handle(command);
@@ -247,7 +253,7 @@ public class TaskFacade {
                                  ChangeTaskStatusRequest request) {
         switch (target) {
             case IN_PROGRESS -> applyTransitionToInProgress(task, userId);
-            case ON_REVIEW -> applyTransitionToOnReview(task, userId);
+            case ON_REVIEW -> applyTransitionToOnReview(task, userId, request);
             case NEEDS_REWORK -> applyTransitionToNeedsRework(task, userId, request);
             case COMPLETED -> applyTransitionToCompleted(task, userId, request);
             default -> throw unsupportedTransition(target);
@@ -345,14 +351,60 @@ public class TaskFacade {
         return enrich(response, taskId, Map.of());
     }
 
-    private List<Long> resolveAssigneeIds(CreateTaskRequest createTaskRequest) {
+    private List<InternStageAssignment> resolveAssignments(CreateTaskRequest createTaskRequest) {
+        if (CollectionUtils.isNotEmpty(createTaskRequest.getAssignments())) {
+            if (CollectionUtils.isNotEmpty(createTaskRequest.getAssigneeIds())
+                    || Objects.nonNull(createTaskRequest.getAssigneeId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                  "Use assignments or assigneeId/assigneeIds, not both");
+            }
+            List<InternStageAssignment> result = new ArrayList<>();
+            Set<Long> seenInternIds = new HashSet<>();
+            for (Object assignmentItem : createTaskRequest.getAssignments()) {
+                CreateTaskAssignment assignment = parseAssignment(assignmentItem);
+                if (Objects.isNull(assignment.getInternId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                      "internId is required in each assignment");
+                }
+                if (!seenInternIds.add(assignment.getInternId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                      "Duplicate internId in assignments");
+                }
+                result.add(new InternStageAssignment(
+                        assignment.getInternId(),
+                        taskIprStageBindingService.resolveStageId(
+                                assignment.getIprStageId(), assignment.getStageId())));
+            }
+            return result;
+        }
+
+        Long sharedStageId = taskIprStageBindingService.resolveStageId(
+                createTaskRequest.getIprStageId(), createTaskRequest.getStageId());
+        List<Long> assigneeIds = resolveLegacyAssigneeIds(createTaskRequest);
+        return assigneeIds.stream()
+                .map(assigneeId -> new InternStageAssignment(assigneeId, sharedStageId))
+                .toList();
+    }
+
+    private List<Long> resolveLegacyAssigneeIds(CreateTaskRequest createTaskRequest) {
         if (CollectionUtils.isNotEmpty(createTaskRequest.getAssigneeIds())) {
             return createTaskRequest.getAssigneeIds();
         }
         if (Objects.nonNull(createTaskRequest.getAssigneeId())) {
             return List.of(createTaskRequest.getAssigneeId());
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "assigneeId or assigneeIds is required");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                          "assignments or assigneeId/assigneeIds is required");
+    }
+
+    private record InternStageAssignment(Long internId, Long iprStageId) {
+    }
+
+    private CreateTaskAssignment parseAssignment(Object item) {
+        if (item instanceof CreateTaskAssignment assignment) {
+            return assignment;
+        }
+        return objectMapper.convertValue(item, CreateTaskAssignment.class);
     }
 
     private void applyIprId(TaskResponse response) {
@@ -385,6 +437,33 @@ public class TaskFacade {
                 taskArtifactRepository.findAllByTaskId(taskId).stream().map(TaskArtifactEntity::getUrl).toList());
         response.setComments(getTaskComments(taskId.toString()).getData());
         return response;
+    }
+
+    @Transactional
+    public FileResponse uploadTaskFile(Long taskId, MultipartFile file) {
+        if (Objects.isNull(file) || file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is required");
+        }
+        TaskEntity task = getTaskEntity(taskId);
+        String originalName = StringUtils.defaultIfBlank(file.getOriginalFilename(), "artifact.bin");
+        String safeName = originalName.replace(" ", "_");
+        String objectKey = "tasks/%d/%d_%s".formatted(task.getId(), System.currentTimeMillis(), safeName);
+        try {
+            taskArtifactStorageService.upload(
+                    objectKey,
+                    file.getInputStream(),
+                    file.getSize(),
+                    StringUtils.defaultIfBlank(file.getContentType(), "application/octet-stream"));
+        }
+        catch (java.io.IOException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to read uploaded file");
+        }
+        return confirmUploadedArtifact(
+                taskId,
+                objectKey,
+                originalName,
+                file.getContentType(),
+                file.getSize());
     }
 
     @Transactional
@@ -594,15 +673,37 @@ public class TaskFacade {
         }
     }
 
-    private void applyTransitionToOnReview(TaskEntity task, Long userId) {
-        if (!Objects.equals(task.getMentorId(), userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only mentor can submit task for review");
+    private void applyTransitionToOnReview(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {
+        if (!Objects.equals(task.getAssigneeId(), userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only assignee can submit task for review");
         }
         if (!(TaskStatus.IN_PROGRESS.equals(task.getStatus()) || TaskStatus.NEEDS_REWORK.equals(task.getStatus()))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                                               "Cannot move to on_review from status " + task.getStatus().getValue());
         }
         task.setStatus(TaskStatus.ON_REVIEW);
+        task.setSubmittedAt(LocalDateTime.now());
+        task.setSubmissionComment(StringUtils.trimToNull(request.getComment()));
+        persistSubmissionLinks(task, userId, request.getLinks());
+    }
+
+    private void persistSubmissionLinks(TaskEntity task, Long userId, List<String> links) {
+        if (CollectionUtils.isEmpty(links)) {
+            return;
+        }
+        for (String link : links) {
+            if (StringUtils.isBlank(link)) {
+                continue;
+            }
+            String trimmed = link.trim();
+            TaskArtifactEntity artifact = new TaskArtifactEntity();
+            artifact.setTask(task);
+            artifact.setArtifactType("LINK");
+            artifact.setName(trimmed);
+            artifact.setUrl(trimmed);
+            artifact.setUploadedBy(userId);
+            taskArtifactRepository.save(artifact);
+        }
     }
 
     private void applyTransitionToNeedsRework(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {

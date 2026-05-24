@@ -1,5 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.service.impl;
 
+import java.io.InputStream;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +28,10 @@ public class TaskArtifactStorageServiceImpl implements TaskArtifactStorageServic
     @Override
     public String createPresignedDownloadUrl(String objectKey) {
         return minioHelper.getGetPresignedUrl(taskArtifactBucket, objectKey, 7 * 24 * 60 * 60);
+    }
+
+    @Override
+    public void upload(String objectKey, InputStream stream, long size, String contentType) {
+        minioHelper.upload(taskArtifactBucket, objectKey, stream, size, contentType);
     }
 }
