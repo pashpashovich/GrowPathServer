@@ -13,6 +13,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import by.bsuir.growpathserver.common.model.kafka.ApplicationCreatedEvent;
+import by.bsuir.growpathserver.common.model.kafka.InternHiringDecisionRecordedEvent;
 import by.bsuir.growpathserver.common.model.kafka.PasswordResetRequestedEvent;
 import by.bsuir.growpathserver.common.model.kafka.TaskCompletedEvent;
 import by.bsuir.growpathserver.common.model.kafka.UserBlockedEvent;
@@ -80,6 +81,18 @@ public class KafkaConsumerConfig {
         DefaultKafkaConsumerFactory<String, PasswordResetRequestedEvent> cf =
                 new DefaultKafkaConsumerFactory<>(props);
         ConcurrentKafkaListenerContainerFactory<String, PasswordResetRequestedEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(cf);
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, InternHiringDecisionRecordedEvent> hiringDecisionRecordedListenerFactory() {
+        Map<String, Object> props = new HashMap<>(baseConsumerConfig());
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, InternHiringDecisionRecordedEvent.class.getName());
+        DefaultKafkaConsumerFactory<String, InternHiringDecisionRecordedEvent> cf =
+                new DefaultKafkaConsumerFactory<>(props);
+        ConcurrentKafkaListenerContainerFactory<String, InternHiringDecisionRecordedEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(cf);
         return factory;

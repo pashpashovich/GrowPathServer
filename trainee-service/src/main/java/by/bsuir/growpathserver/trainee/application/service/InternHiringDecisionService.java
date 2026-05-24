@@ -11,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.dto.model.HiringDecisionResponse;
 import by.bsuir.growpathserver.dto.model.RecordHiringDecisionRequest;
 import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
+import by.bsuir.growpathserver.trainee.application.service.HiringRecommendationService.Recommendation;
 import by.bsuir.growpathserver.trainee.domain.entity.InternHiringDecisionEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.HiringDecisionType;
+import by.bsuir.growpathserver.trainee.domain.valueobject.InternProfileStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.ProgramParticipantRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternHiringDecisionMapper;
@@ -36,6 +38,8 @@ public class InternHiringDecisionService {
     private final IprRepository iprRepository;
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
     private final InternHiringDecisionMapper hiringDecisionMapper;
+    private final HiringRecommendationService hiringRecommendationService;
+    private final InternHiringDecisionNotificationService notificationService;
 
     @Transactional
     public HiringDecisionResponse recordDecision(Long internId, RecordHiringDecisionRequest request) {
@@ -71,21 +75,49 @@ public class InternHiringDecisionService {
         entity.setDecidedBy(decidedBy);
         entity.setUpdatedAt(LocalDateTime.now());
 
+        applyInternProfileStatus(intern, decision);
+
         InternHiringDecisionEntity saved = hiringDecisionRepository.save(entity);
-        return hiringDecisionMapper.toResponse(saved);
+        notificationService.notifyDecisionRecorded(saved);
+
+        Recommendation recommendation = hiringRecommendationService.recommend(internId, programId);
+        return hiringDecisionMapper.toView(saved, recommendation, resolveInternProfileStatus(intern));
     }
 
     @Transactional(readOnly = true)
-    public HiringDecisionResponse getDecision(Long internId, Long programId) {
-        requireIntern(internId);
+    public HiringDecisionResponse getDecisionView(Long internId, Long programId) {
+        UserEntity intern = requireIntern(internId);
         programRepository.findById(programId)
                 .orElseThrow(() -> new NoSuchElementException("Internship program not found: " + programId));
         verifyInternOnProgram(internId, programId);
+        if (!iprRepository.existsByProgram_IdAndIntern_Id(programId, internId)) {
+            throw new IllegalArgumentException(
+                    "Intern has no individual development plan on this internship program");
+        }
+
+        Recommendation recommendation = hiringRecommendationService.recommend(internId, programId);
+        InternProfileStatus internStatus = resolveInternProfileStatus(intern);
 
         return hiringDecisionRepository.findByIntern_IdAndProgram_Id(internId, programId)
-                .map(hiringDecisionMapper::toResponse)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Hiring decision not found for intern " + internId + " on program " + programId));
+                .map(entity -> hiringDecisionMapper.toView(entity, recommendation, internStatus))
+                .orElseGet(() -> hiringDecisionMapper.toPreview(
+                        internId,
+                        programId,
+                        programRepository.findById(programId).orElseThrow(),
+                        recommendation,
+                        internStatus));
+    }
+
+    private void applyInternProfileStatus(UserEntity intern, HiringDecisionType decision) {
+        intern.setInternProfileStatus(decision.toInternProfileStatus());
+        userRepository.save(intern);
+    }
+
+    private InternProfileStatus resolveInternProfileStatus(UserEntity intern) {
+        if (Objects.nonNull(intern.getInternProfileStatus())) {
+            return intern.getInternProfileStatus();
+        }
+        return InternProfileStatus.ACTIVE;
     }
 
     private UserEntity requireIntern(Long internId) {

@@ -8,8 +8,8 @@ import by.bsuir.growpathserver.dto.model.PaginationResponse;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetUsersQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
+import by.bsuir.growpathserver.trainee.domain.valueobject.InternProfileStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
-import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -21,12 +21,17 @@ public class GetInternsHandler {
     private final InternMapper internMapper;
 
     public InternListResponse handle(GetInternsQuery query) {
+        InternProfileStatus internProfileStatus = null;
+        if (query.status() != null && !query.status().isBlank()) {
+            internProfileStatus = InternProfileStatus.fromApiValue(query.status());
+        }
+
         GetUsersQuery getUsersQuery = GetUsersQuery.builder()
                 .page(query.page())
                 .limit(query.limit())
                 .search(query.search())
                 .role(UserRole.INTERN)
-                .status(query.status() != null ? UserStatus.fromString(query.status()) : null)
+                .internProfileStatus(internProfileStatus)
                 .build();
 
         Page<User> usersPage = getUsersHandler.handle(getUsersQuery);

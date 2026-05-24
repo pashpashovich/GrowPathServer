@@ -1004,9 +1004,9 @@ paths:
     get:
       tags:
         - Interns
-      summary: Get hiring decision for an intern on an internship program
+      summary: Get hiring decision view for an intern (UC-14)
       description: |
-        Returns the recorded hire/reject decision after internship completion.
+        Returns automatic system recommendation, current intern profile status and recorded decision if already approved.
         Available to HR manager, department head and admin.
       operationId: getInternHiringDecision
       security:
@@ -1043,7 +1043,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
         '404':
-          description: Intern, program or decision not found
+          description: Intern or program not found
           content:
             application/json:
               schema:
@@ -1051,9 +1051,10 @@ paths:
     put:
       tags:
         - Interns
-      summary: Record or update hiring decision for an intern
+      summary: Approve hiring decision for an intern (UC-14)
       description: |
-        Records hire or reject decision for an intern on a specific internship program.
+        Records final decision (recommended for hire, talent reserve, completed without hire)
+        or requests additional assessment. Updates intern profile status and sends notifications.
         Upserts by intern and program. Requires an IPR on the program.
         Available to HR manager, department head and admin.
       operationId: recordInternHiringDecision

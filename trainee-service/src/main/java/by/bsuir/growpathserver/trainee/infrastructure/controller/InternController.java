@@ -121,7 +121,7 @@ public class InternController extends BaseController implements InternsApi {
     public ResponseEntity<HiringDecisionResponse> getInternHiringDecision(String id, Long programId) {
         try {
             Long internId = Long.parseLong(id);
-            HiringDecisionResponse response = internHiringDecisionService.getDecision(internId, programId);
+            HiringDecisionResponse response = internHiringDecisionService.getDecisionView(internId, programId);
             return ResponseEntity.ok(response);
         }
         catch (NumberFormatException e) {

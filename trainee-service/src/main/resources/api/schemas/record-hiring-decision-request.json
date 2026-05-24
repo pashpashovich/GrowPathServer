@@ -12,12 +12,16 @@
     "decision": {
       "type": "string",
       "enum": [
-        "hire",
-        "reject"
-      ]
+        "recommended_for_hire",
+        "talent_reserve",
+        "completed_without_hire",
+        "additional_assessment"
+      ],
+      "description": "Финальное решение (UC-14) или запрос дополнительной оценки"
     },
     "comment": {
-      "type": "string"
+      "type": "string",
+      "description": "Обоснование решения"
     }
   }
 }

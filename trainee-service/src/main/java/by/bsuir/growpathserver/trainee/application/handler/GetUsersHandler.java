@@ -35,6 +35,11 @@ public class GetUsersHandler {
                                     criteriaBuilder.equal(root.get("status"), query.status()));
         }
 
+        if (query.internProfileStatus() != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                    criteriaBuilder.equal(root.get("internProfileStatus"), query.internProfileStatus()));
+        }
+
         if (query.search() != null && !query.search().isBlank()) {
             String searchPattern = "%" + query.search().toLowerCase() + "%";
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->

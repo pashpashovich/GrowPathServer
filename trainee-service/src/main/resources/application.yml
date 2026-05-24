@@ -82,6 +82,7 @@ kafka:
     user-invited: ${KAFKA_TOPIC_USER_INVITED:USER_INVITED}
     password-reset-requested: ${KAFKA_TOPIC_PASSWORD_RESET_REQUESTED:PASSWORD_RESET_REQUESTED}
     user-blocked: ${KAFKA_TOPIC_USER_BLOCKED:USER_BLOCKED}
+    hiring-decision-recorded: ${KAFKA_TOPIC_HIRING_DECISION_RECORDED:HIRING_DECISION_RECORDED}
 
 growpath:
   security:

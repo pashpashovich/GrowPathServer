@@ -10,6 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import by.bsuir.growpathserver.common.model.kafka.ApplicationCreatedEvent;
+import by.bsuir.growpathserver.common.model.kafka.InternHiringDecisionRecordedEvent;
 import by.bsuir.growpathserver.common.model.kafka.PasswordResetRequestedEvent;
 import by.bsuir.growpathserver.common.model.kafka.TaskCompletedEvent;
 import by.bsuir.growpathserver.common.model.kafka.UserBlockedEvent;
@@ -135,6 +136,65 @@ public class NotificationListener {
                 "task-completed",
                 variables
         );
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topic.hiring-decision-recorded}",
+            groupId = "notification-service-group",
+            containerFactory = "hiringDecisionRecordedListenerFactory"
+    )
+    public void onHiringDecisionRecorded(InternHiringDecisionRecordedEvent event) {
+        log.info("Received InternHiringDecisionRecordedEvent for internId={}, decision={}",
+                 event.getInternId(), event.getDecision());
+        if (StringUtils.isNotEmpty(event.getInternEmail())) {
+            String greeting = StringUtils.isNotBlank(event.getInternName())
+                    ? "Здравствуйте, " + event.getInternName() + "!"
+                    : "Здравствуйте!";
+            notificationService.sendEmail(
+                    event.getInternEmail(),
+                    "Результат прохождения стажировки",
+                    "hiring-decision-intern",
+                    Map.of(
+                            "greeting", greeting,
+                            "programTitle", event.getProgramTitle() != null ? event.getProgramTitle() : "",
+                            "decisionLabel", event.getDecisionLabel() != null ? event.getDecisionLabel() : ""
+                    )
+            );
+        }
+        if (event.getHrManagerEmails() != null) {
+            String template = "additional_assessment".equals(event.getDecision())
+                    ? "hiring-decision-additional-assessment"
+                    : "hiring-decision-hr";
+            Map<String, Object> hrVariables = Map.of(
+                    "internName", event.getInternName() != null ? event.getInternName() : "",
+                    "programTitle", event.getProgramTitle() != null ? event.getProgramTitle() : "",
+                    "decisionLabel", event.getDecisionLabel() != null ? event.getDecisionLabel() : ""
+            );
+            for (String hrEmail : event.getHrManagerEmails()) {
+                if (StringUtils.isNotEmpty(hrEmail)) {
+                    notificationService.sendEmail(
+                            hrEmail,
+                            "additional_assessment".equals(event.getDecision())
+                                    ? "Запрос дополнительной оценки стажёра"
+                                    : "Решение о найме стажёра",
+                            template,
+                            hrVariables
+                    );
+                }
+            }
+        }
+        if (StringUtils.isNotEmpty(event.getMentorEmail())) {
+            notificationService.sendEmail(
+                    event.getMentorEmail(),
+                    "Запрос дополнительной оценки стажёра",
+                    "hiring-decision-additional-assessment",
+                    Map.of(
+                            "internName", event.getInternName() != null ? event.getInternName() : "",
+                            "programTitle", event.getProgramTitle() != null ? event.getProgramTitle() : "",
+                            "decisionLabel", event.getDecisionLabel() != null ? event.getDecisionLabel() : ""
+                    )
+            );
+        }
     }
 
     @KafkaListener(

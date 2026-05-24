@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SoftDelete;
 
+import by.bsuir.growpathserver.trainee.domain.valueobject.InternProfileStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import jakarta.persistence.Column;
@@ -74,6 +75,10 @@ public class UserEntity {
     @Column(name = "department_id")
     private Long departmentId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "intern_profile_status", length = 32)
+    private InternProfileStatus internProfileStatus;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
@@ -81,6 +86,9 @@ public class UserEntity {
         }
         if (status == null) {
             status = UserStatus.PENDING;
+        }
+        if (role == UserRole.INTERN && internProfileStatus == null) {
+            internProfileStatus = InternProfileStatus.ACTIVE;
         }
     }
 }

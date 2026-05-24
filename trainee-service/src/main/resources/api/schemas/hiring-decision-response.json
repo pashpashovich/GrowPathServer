@@ -16,12 +16,41 @@
     "programTitle": {
       "type": "string"
     },
+    "recorded": {
+      "type": "boolean",
+      "description": "true если решение уже утверждено и сохранено"
+    },
     "decision": {
       "type": "string",
       "enum": [
-        "hire",
-        "reject"
+        "recommended_for_hire",
+        "talent_reserve",
+        "completed_without_hire",
+        "additional_assessment"
       ]
+    },
+    "systemRecommendation": {
+      "type": "string",
+      "enum": [
+        "recommended_for_hire",
+        "talent_reserve",
+        "completed_without_hire",
+        "additional_assessment"
+      ],
+      "description": "Автоматическая рекомендация на основе ИПР и оценок"
+    },
+    "systemRecommendationReason": {
+      "type": "string"
+    },
+    "internStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "additional_assessment",
+        "completed",
+        "paused"
+      ],
+      "description": "Текущий статус профиля стажёра"
     },
     "comment": {
       "type": "string"
@@ -43,11 +72,11 @@
     }
   },
   "required": [
-    "id",
     "internId",
     "programId",
-    "decision",
-    "decidedByUserId",
-    "decidedAt"
+    "recorded",
+    "systemRecommendation",
+    "systemRecommendationReason",
+    "internStatus"
   ]
 }

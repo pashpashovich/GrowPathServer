@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.Email;
+import by.bsuir.growpathserver.trainee.domain.valueobject.InternProfileStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class User {
     private final String avatarUrl;
     private final String phoneNumber;
     private final Long departmentId;
+    private final InternProfileStatus internProfileStatus;
 
     private User(UserEntity entity) {
         this.id = entity.getId();
@@ -44,6 +46,7 @@ public class User {
         this.avatarUrl = entity.getAvatarUrl();
         this.phoneNumber = entity.getPhoneNumber();
         this.departmentId = entity.getDepartmentId();
+        this.internProfileStatus = entity.getInternProfileStatus();
     }
 
     public static User fromEntity(UserEntity entity) {
@@ -66,6 +69,7 @@ public class User {
         entity.setAvatarUrl(this.avatarUrl);
         entity.setPhoneNumber(this.phoneNumber);
         entity.setDepartmentId(this.departmentId);
+        entity.setInternProfileStatus(this.internProfileStatus);
         return entity;
     }
 
