@@ -1,6 +1,7 @@
 package by.bsuir.growpathserver.trainee.application.service.impl;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import by.bsuir.growpathserver.trainee.application.command.CreateAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteAssessmentCommand;
 import by.bsuir.growpathserver.trainee.application.command.UpdateAssessmentCommand;
+import by.bsuir.growpathserver.trainee.application.service.AssessmentIprStageBindingService;
+import by.bsuir.growpathserver.trainee.application.service.AssessmentIprStageBindingService.ResolvedStageBinding;
 import by.bsuir.growpathserver.trainee.application.service.AssessmentService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
@@ -19,20 +22,31 @@ import lombok.RequiredArgsConstructor;
 public class AssessmentServiceImpl implements AssessmentService {
 
     private final AssessmentRepository assessmentRepository;
+    private final AssessmentIprStageBindingService assessmentIprStageBindingService;
 
     @Override
     @Transactional
     public Assessment createAssessment(CreateAssessmentCommand command) {
+        if (Objects.isNull(command.iprStageId())) {
+            throw new IllegalArgumentException("iprStageId is required");
+        }
+
+        ResolvedStageBinding binding = assessmentIprStageBindingService.resolveRequired(
+                command.iprStageId(),
+                command.internId(),
+                command.internshipId());
+
         Assessment assessment = Assessment.create(
                 command.internId(),
                 command.mentorId(),
-                command.internshipId(),
+                binding.internshipId(),
+                binding.iprId(),
+                command.iprStageId(),
                 command.overallRating(),
                 command.qualityRating(),
                 command.speedRating(),
                 command.communicationRating(),
-                command.comment()
-        );
+                command.comment());
 
         AssessmentEntity entity = assessment.toEntity();
         AssessmentEntity savedEntity = assessmentRepository.save(entity);

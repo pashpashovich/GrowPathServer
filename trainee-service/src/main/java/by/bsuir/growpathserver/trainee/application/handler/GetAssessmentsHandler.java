@@ -52,6 +52,16 @@ public class GetAssessmentsHandler {
             }
         }
 
+        if (query.iprId() != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                    criteriaBuilder.equal(root.get("iprId"), query.iprId()));
+        }
+
+        if (query.iprStageId() != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                    criteriaBuilder.equal(root.get("iprStageId"), query.iprStageId()));
+        }
+
         Page<AssessmentEntity> entityPage = assessmentRepository.findAll(spec, pageable);
         return entityPage.map(Assessment::fromEntity);
     }

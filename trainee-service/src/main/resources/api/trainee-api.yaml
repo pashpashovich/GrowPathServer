@@ -4591,6 +4591,16 @@ paths:
           in: query
           schema:
             type: string
+        - name: iprId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: iprStageId
+          in: query
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Successful response
@@ -4608,7 +4618,10 @@ paths:
     post:
       tags:
         - Assessments
-      summary: Create assessment
+      summary: Create assessment for an IPR stage
+      description: |
+        Creates a mentor assessment bound to a specific IPR stage.
+        One assessment per stage (unique iprStageId). internshipId must match the stage program.
       operationId: createAssessment
       security:
         - bearerAuth: [ ]
@@ -4633,6 +4646,12 @@ paths:
                 $ref: '#/components/schemas/error-response'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '409':
+          description: Assessment already exists for this IPR stage
           content:
             application/json:
               schema:

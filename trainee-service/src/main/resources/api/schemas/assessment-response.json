@@ -23,6 +23,17 @@
       "type": "integer",
       "format": "int64"
     },
+    "iprId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "iprStageId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "iprStageTitle": {
+      "type": "string"
+    },
     "overallRating": {
       "type": "number",
       "format": "double"

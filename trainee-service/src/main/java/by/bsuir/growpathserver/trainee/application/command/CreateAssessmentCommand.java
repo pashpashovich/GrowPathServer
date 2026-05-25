@@ -7,6 +7,7 @@ public record CreateAssessmentCommand(
         Long internId,
         Long mentorId,
         Long internshipId,
+        Long iprStageId,
         Double overallRating,
         Double qualityRating,
         Double speedRating,

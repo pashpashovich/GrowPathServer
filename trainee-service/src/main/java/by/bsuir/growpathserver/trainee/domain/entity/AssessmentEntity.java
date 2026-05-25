@@ -37,6 +37,12 @@ public class AssessmentEntity {
     @Column(name = "internship_id", nullable = false)
     private Long internshipId;
 
+    @Column(name = "ipr_id")
+    private Long iprId;
+
+    @Column(name = "ipr_stage_id")
+    private Long iprStageId;
+
     @Column(name = "overall_rating", nullable = false)
     private Double overallRating;
 

@@ -11,6 +11,8 @@ public class Assessment {
     private final Long internId;
     private final Long mentorId;
     private final Long internshipId;
+    private final Long iprId;
+    private final Long iprStageId;
     private final Double overallRating;
     private final Double qualityRating;
     private final Double speedRating;
@@ -24,6 +26,8 @@ public class Assessment {
         this.internId = entity.getInternId();
         this.mentorId = entity.getMentorId();
         this.internshipId = entity.getInternshipId();
+        this.iprId = entity.getIprId();
+        this.iprStageId = entity.getIprStageId();
         this.overallRating = entity.getOverallRating();
         this.qualityRating = entity.getQualityRating();
         this.speedRating = entity.getSpeedRating();
@@ -43,6 +47,8 @@ public class Assessment {
         entity.setInternId(this.internId);
         entity.setMentorId(this.mentorId);
         entity.setInternshipId(this.internshipId);
+        entity.setIprId(this.iprId);
+        entity.setIprStageId(this.iprStageId);
         entity.setOverallRating(this.overallRating);
         entity.setQualityRating(this.qualityRating);
         entity.setSpeedRating(this.speedRating);
@@ -54,12 +60,15 @@ public class Assessment {
     }
 
     public static Assessment create(Long internId, Long mentorId, Long internshipId,
+                                    Long iprId, Long iprStageId,
                                     Double overallRating, Double qualityRating,
                                     Double speedRating, Double communicationRating, String comment) {
         AssessmentEntity entity = new AssessmentEntity();
         entity.setInternId(internId);
         entity.setMentorId(mentorId);
         entity.setInternshipId(internshipId);
+        entity.setIprId(iprId);
+        entity.setIprStageId(iprStageId);
         entity.setOverallRating(overallRating);
         entity.setQualityRating(qualityRating);
         entity.setSpeedRating(speedRating);

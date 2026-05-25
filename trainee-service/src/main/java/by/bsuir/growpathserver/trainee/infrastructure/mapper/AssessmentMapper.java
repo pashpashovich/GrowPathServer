@@ -13,5 +13,6 @@ import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
 public interface AssessmentMapper {
     @Mapping(target = "internName", ignore = true)
     @Mapping(target = "mentorName", ignore = true)
+    @Mapping(target = "iprStageTitle", ignore = true)
     AssessmentResponse toAssessmentResponse(Assessment assessment);
 }

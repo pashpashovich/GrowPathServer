@@ -3,6 +3,7 @@
   "required": [
     "internId",
     "internshipId",
+    "iprStageId",
     "overallRating"
   ],
   "properties": {
@@ -13,6 +14,11 @@
     "internshipId": {
       "type": "integer",
       "format": "int64"
+    },
+    "iprStageId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "IPR stage being assessed (ipr_stages.id); one assessment per stage"
     },
     "overallRating": {
       "type": "number",

@@ -8,6 +8,8 @@ public record GetAssessmentsQuery(
         Integer limit,
         String internId,
         String mentorId,
-        String internshipId
+        String internshipId,
+        Long iprId,
+        Long iprStageId
 ) {
 }

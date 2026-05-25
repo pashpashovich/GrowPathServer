@@ -8,7 +8,7 @@ import by.bsuir.growpathserver.dto.model.PaginationResponse;
 import by.bsuir.growpathserver.trainee.application.query.GetAssessmentsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternAssessmentsQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
-import by.bsuir.growpathserver.trainee.infrastructure.mapper.AssessmentMapper;
+import by.bsuir.growpathserver.trainee.infrastructure.mapper.AssessmentResponseEnricher;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class GetInternAssessmentsHandler {
 
     private final GetAssessmentsHandler getAssessmentsHandler;
-    private final AssessmentMapper assessmentMapper;
+    private final AssessmentResponseEnricher assessmentResponseEnricher;
 
     public AssessmentListResponse handle(GetInternAssessmentsQuery query) {
         GetAssessmentsQuery getAssessmentsQuery = GetAssessmentsQuery.builder()
@@ -29,7 +29,7 @@ public class GetInternAssessmentsHandler {
 
         AssessmentListResponse response = new AssessmentListResponse();
         response.setData(assessmentsPage.getContent().stream()
-                                 .map(assessmentMapper::toAssessmentResponse)
+                                 .map(assessmentResponseEnricher::toAssessmentResponse)
                                  .toList());
 
         PaginationResponse pagination = new PaginationResponse();

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+  <changeSet id="031-assessment-ipr-stage-binding" author="Kasovich Pavel">
+    <addColumn tableName="assessments">
+      <column name="ipr_id" type="BIGINT">
+        <constraints nullable="true"
+                     foreignKeyName="fk_assessment_ipr"
+                     references="iprs(id)"/>
+      </column>
+      <column name="ipr_stage_id" type="BIGINT">
+        <constraints nullable="true"
+                     foreignKeyName="fk_assessment_ipr_stage"
+                     references="ipr_stages(id)"/>
+      </column>
+    </addColumn>
+
+    <addUniqueConstraint tableName="assessments"
+                         columnNames="ipr_stage_id"
+                         constraintName="uq_assessment_ipr_stage"/>
+
+    <createIndex indexName="idx_assessments_ipr_id" tableName="assessments">
+      <column name="ipr_id"/>
+    </createIndex>
+
+    <createIndex indexName="idx_assessments_ipr_stage_id" tableName="assessments">
+      <column name="ipr_stage_id"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

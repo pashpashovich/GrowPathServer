@@ -17,4 +17,10 @@ public interface AssessmentRepository
     List<AssessmentEntity> findByInternIdOrderByUpdatedAtAsc(Long internId);
 
     List<AssessmentEntity> findByInternshipId(Long internshipId);
+
+    List<AssessmentEntity> findByIprIdOrderByUpdatedAtAsc(Long iprId);
+
+    List<AssessmentEntity> findByIprStageId(Long iprStageId);
+
+    boolean existsByIprStageId(Long iprStageId);
 }

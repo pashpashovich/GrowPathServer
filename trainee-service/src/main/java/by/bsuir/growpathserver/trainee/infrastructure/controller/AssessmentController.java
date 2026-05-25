@@ -5,13 +5,9 @@ import java.util.NoSuchElementException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import by.bsuir.growpathserver.common.util.JwtUtils;
 import by.bsuir.growpathserver.dto.api.AssessmentsApi;
 import by.bsuir.growpathserver.dto.model.AssessmentListResponse;
 import by.bsuir.growpathserver.dto.model.AssessmentResponse;
@@ -27,10 +23,11 @@ import by.bsuir.growpathserver.trainee.application.handler.DeleteAssessmentHandl
 import by.bsuir.growpathserver.trainee.application.handler.GetAssessmentByIdHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetAssessmentsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.UpdateAssessmentHandler;
+import by.bsuir.growpathserver.trainee.application.port.CurrentApplicationUserResolver;
 import by.bsuir.growpathserver.trainee.application.query.GetAssessmentByIdQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetAssessmentsQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Assessment;
-import by.bsuir.growpathserver.trainee.infrastructure.mapper.AssessmentMapper;
+import by.bsuir.growpathserver.trainee.infrastructure.mapper.AssessmentResponseEnricher;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,30 +39,20 @@ public class AssessmentController implements AssessmentsApi {
     private final GetAssessmentByIdHandler getAssessmentByIdHandler;
     private final UpdateAssessmentHandler updateAssessmentHandler;
     private final DeleteAssessmentHandler deleteAssessmentHandler;
-    private final AssessmentMapper assessmentMapper;
+    private final CurrentApplicationUserResolver currentApplicationUserResolver;
+    private final AssessmentResponseEnricher assessmentResponseEnricher;
 
     @Override
     public ResponseEntity<AssessmentResponse> createAssessment(CreateAssessmentRequest createAssessmentRequest) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication instanceof JwtAuthenticationToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
-            Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
-            String mentorId = JwtUtils.getUserId(jwt);
-            if (mentorId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
-            Long internId = createAssessmentRequest.getInternId();
-            Long mentorIdLong = Long.parseLong(mentorId);
-            Long internshipId = createAssessmentRequest.getInternshipId();
+            Long mentorId = currentApplicationUserResolver.resolveCurrentUserDatabaseId()
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
             CreateAssessmentCommand command = CreateAssessmentCommand.builder()
-                    .internId(internId)
-                    .mentorId(mentorIdLong)
-                    .internshipId(internshipId)
+                    .internId(createAssessmentRequest.getInternId())
+                    .mentorId(mentorId)
+                    .internshipId(createAssessmentRequest.getInternshipId())
+                    .iprStageId(createAssessmentRequest.getIprStageId())
                     .overallRating(createAssessmentRequest.getOverallRating())
                     .qualityRating(createAssessmentRequest.getQualityRating())
                     .speedRating(createAssessmentRequest.getSpeedRating())
@@ -74,8 +61,11 @@ public class AssessmentController implements AssessmentsApi {
                     .build();
 
             Assessment assessment = createAssessmentHandler.handle(command);
-            AssessmentResponse response = assessmentMapper.toAssessmentResponse(assessment);
+            AssessmentResponse response = assessmentResponseEnricher.toAssessmentResponse(assessment);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
         }
         catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
@@ -104,7 +94,7 @@ public class AssessmentController implements AssessmentsApi {
             Long assessmentId = Long.parseLong(id);
             GetAssessmentByIdQuery query = new GetAssessmentByIdQuery(assessmentId);
             Assessment assessment = getAssessmentByIdHandler.handle(query);
-            AssessmentResponse response = assessmentMapper.toAssessmentResponse(assessment);
+            AssessmentResponse response = assessmentResponseEnricher.toAssessmentResponse(assessment);
             return ResponseEntity.ok(response);
         }
         catch (NoSuchElementException e) {
@@ -117,7 +107,9 @@ public class AssessmentController implements AssessmentsApi {
                                                                  Integer limit,
                                                                  String internId,
                                                                  String mentorId,
-                                                                 String internshipId) {
+                                                                 String internshipId,
+                                                                 Long iprId,
+                                                                 Long iprStageId) {
         try {
             GetAssessmentsQuery query = GetAssessmentsQuery.builder()
                     .page(page)
@@ -125,13 +117,15 @@ public class AssessmentController implements AssessmentsApi {
                     .internId(internId)
                     .mentorId(mentorId)
                     .internshipId(internshipId)
+                    .iprId(iprId)
+                    .iprStageId(iprStageId)
                     .build();
 
             Page<Assessment> assessmentsPage = getAssessmentsHandler.handle(query);
 
             AssessmentListResponse response = new AssessmentListResponse();
             response.setData(assessmentsPage.getContent().stream()
-                                     .map(assessmentMapper::toAssessmentResponse)
+                                     .map(assessmentResponseEnricher::toAssessmentResponse)
                                      .toList());
 
             PaginationResponse pagination = new PaginationResponse();
@@ -163,7 +157,7 @@ public class AssessmentController implements AssessmentsApi {
                     .build();
 
             Assessment assessment = updateAssessmentHandler.handle(command);
-            AssessmentResponse response = assessmentMapper.toAssessmentResponse(assessment);
+            AssessmentResponse response = assessmentResponseEnricher.toAssessmentResponse(assessment);
             return ResponseEntity.ok(response);
         }
         catch (NoSuchElementException e) {

@@ -35,5 +35,6 @@
   <include file="db/changelog/changes/028-fix-roadmap-end-dates-use-program-duration-months.xml"/>
   <include file="db/changelog/changes/029-create-intern-hiring-decisions.xml"/>
   <include file="db/changelog/changes/030-intern-profile-status-and-hiring-decisions.xml"/>
+  <include file="db/changelog/changes/031-assessment-ipr-stage-binding.xml"/>
 
 </databaseChangeLog>

@@ -118,10 +118,11 @@ public class InternshipResultReportPdfRenderer {
         document.add(tasksTable);
 
         addSectionTitle(document, "Промежуточные ассессменты", fonts.section());
-        PdfPTable assessmentTable = new PdfPTable(new float[] { 1.3f, 0.7f, 0.7f, 0.7f, 0.7f, 2f });
+        PdfPTable assessmentTable = new PdfPTable(new float[] { 1.1f, 1.4f, 0.6f, 0.6f, 0.6f, 0.6f, 1.8f });
         assessmentTable.setWidthPercentage(100);
         assessmentTable.setSpacingAfter(12f);
         addHeaderCell(assessmentTable, "Дата", fonts.tableHeader());
+        addHeaderCell(assessmentTable, "Этап ИПР", fonts.tableHeader());
         addHeaderCell(assessmentTable, "Общий", fonts.tableHeader());
         addHeaderCell(assessmentTable, "Качество", fonts.tableHeader());
         addHeaderCell(assessmentTable, "Скорость", fonts.tableHeader());
@@ -129,7 +130,7 @@ public class InternshipResultReportPdfRenderer {
         addHeaderCell(assessmentTable, "Комментарий", fonts.tableHeader());
         if (data.assessments().isEmpty()) {
             PdfPCell empty = new PdfPCell(new Phrase("Ассессменты отсутствуют", fonts.normal()));
-            empty.setColspan(6);
+            empty.setColspan(7);
             empty.setPadding(6f);
             assessmentTable.addCell(empty);
         }
@@ -138,6 +139,7 @@ public class InternshipResultReportPdfRenderer {
                 addCell(assessmentTable,
                         row.date() != null ? DATE_TIME_FORMAT.format(row.date()) : "—",
                         fonts.normal(), Element.ALIGN_CENTER);
+                addCell(assessmentTable, nullToDash(row.iprStageTitle()), fonts.normal(), Element.ALIGN_LEFT);
                 addCell(assessmentTable, formatRating(row.overallRating()), fonts.normal(), Element.ALIGN_CENTER);
                 addCell(assessmentTable, formatNullableRating(row.qualityRating()), fonts.normal(),
                         Element.ALIGN_CENTER);

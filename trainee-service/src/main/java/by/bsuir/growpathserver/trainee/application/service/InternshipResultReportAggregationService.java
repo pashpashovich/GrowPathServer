@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.CompetencyEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.IprEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.IprStageEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
@@ -36,6 +38,7 @@ import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.IprRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.IprStageRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskArtifactRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
@@ -53,6 +56,7 @@ public class InternshipResultReportAggregationService {
     private final InternProgressCalculationService progressCalculationService;
     private final InternCompetencyProfileService competencyProfileService;
     private final AssessmentRepository assessmentRepository;
+    private final IprStageRepository iprStageRepository;
     private final TaskRepository taskRepository;
     private final TaskArtifactRepository taskArtifactRepository;
     private final CurrentApplicationUserResolver currentApplicationUserResolver;
@@ -158,8 +162,15 @@ public class InternshipResultReportAggregationService {
             String mentorName = userRepository.findById(assessment.getMentorId())
                     .map(entity -> User.fromEntity(entity).getDisplayName())
                     .orElse("—");
+            String stageTitle = "—";
+            if (Objects.nonNull(assessment.getIprStageId())) {
+                stageTitle = iprStageRepository.findById(assessment.getIprStageId())
+                        .map(IprStageEntity::getTitle)
+                        .orElse("—");
+            }
             rows.add(new AssessmentRow(
                     assessment.getCreatedAt(),
+                    stageTitle,
                     assessment.getOverallRating(),
                     assessment.getQualityRating(),
                     assessment.getSpeedRating(),

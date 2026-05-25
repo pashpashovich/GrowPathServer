@@ -61,6 +61,7 @@ public record InternshipResultReportData(
 
     public record AssessmentRow(
             LocalDateTime date,
+            String iprStageTitle,
             double overallRating,
             Double qualityRating,
             Double speedRating,
