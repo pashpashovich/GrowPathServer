@@ -1339,13 +1339,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Internship program id (numeric). Matches tasks by program column or linked IPR stage.
-        - name: iprId
-          in: query
-          schema:
-            type: integer
-            format: int64
-          description: Individual development plan (IPR) id. Filters tasks bound to stages of that IPR.
+          description: Filters by tasks.internship_id (internship program id stored on the task).
         - name: mentorId
           in: query
           schema:
@@ -1443,13 +1437,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Internship program id (numeric). Matches tasks by program column or linked IPR stage.
-        - name: iprId
-          in: query
-          schema:
-            type: integer
-            format: int64
-          description: Individual development plan (IPR) id. Filters tasks bound to stages of that IPR.
+          description: Filters by tasks.internship_id (internship program id stored on the task).
       responses:
         '200':
           description: Successful response
@@ -2132,13 +2120,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Internship program id (numeric). Matches tasks by program column or linked IPR stage.
-        - name: iprId
-          in: query
-          schema:
-            type: integer
-            format: int64
-          description: Individual development plan (IPR) id. Filters tasks bound to stages of that IPR.
+          description: Filters by tasks.internship_id (internship program id stored on the task).
       responses:
         '200':
           description: Successful response

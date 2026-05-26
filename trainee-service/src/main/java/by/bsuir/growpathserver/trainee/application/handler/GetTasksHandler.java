@@ -12,7 +12,6 @@ import by.bsuir.growpathserver.trainee.application.query.GetTasksQuery;
 import by.bsuir.growpathserver.trainee.domain.aggregate.Task;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
-import by.bsuir.growpathserver.trainee.infrastructure.repository.spec.TaskQuerySpecifications;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -51,15 +50,12 @@ public class GetTasksHandler {
 
         if (StringUtils.isNotBlank(query.internshipId())) {
             try {
-                Long programId = Long.parseLong(query.internshipId().trim());
-                spec = spec.and(TaskQuerySpecifications.belongsToInternshipProgram(programId));
+                Long internshipId = Long.parseLong(query.internshipId().trim());
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                                        criteriaBuilder.equal(root.get("internshipId"), internshipId));
             }
             catch (NumberFormatException e) {
             }
-        }
-
-        if (query.iprId() != null) {
-            spec = spec.and(TaskQuerySpecifications.belongsToIpr(query.iprId()));
         }
 
         if (query.mentorId() != null && !query.mentorId().isBlank()) {

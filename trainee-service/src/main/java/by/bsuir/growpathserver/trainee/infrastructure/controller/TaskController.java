@@ -89,7 +89,6 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                                                      String assignee,
                                                      String priority,
                                                      String internshipId,
-                                                     Long iprId,
                                                      String mentorId,
                                                      String scope) {
         GetTasksQuery query = GetTasksQuery.builder()
@@ -99,7 +98,6 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                 .assignee(assignee)
                 .priority(priority != null ? TaskPriority.fromString(priority) : null)
                 .internshipId(internshipId)
-                .iprId(iprId)
                 .mentorId(mentorId)
                 .scope(scope)
                 .build();
@@ -112,15 +110,13 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                                                            Integer limit,
                                                            String status,
                                                            String priority,
-                                                           String internshipId,
-                                                           Long iprId) {
+                                                           String internshipId) {
         GetTasksQuery query = GetTasksQuery.builder()
                 .page(page)
                 .limit(limit)
                 .status(status != null ? TaskStatus.fromString(status) : null)
                 .priority(priority != null ? TaskPriority.fromString(priority) : null)
                 .internshipId(internshipId)
-                .iprId(iprId)
                 .build();
         return ResponseEntity.ok(taskFacade.getTaskProfile(query));
     }
@@ -130,15 +126,13 @@ public class TaskController extends BaseController implements TasksApi, MeApi {
                                                         Integer limit,
                                                         String status,
                                                         String priority,
-                                                        String internshipId,
-                                                        Long iprId) {
+                                                        String internshipId) {
         GetTasksQuery query = GetTasksQuery.builder()
                 .page(page)
                 .limit(limit)
                 .status(status != null ? TaskStatus.fromString(status) : null)
                 .priority(priority != null ? TaskPriority.fromString(priority) : null)
                 .internshipId(internshipId)
-                .iprId(iprId)
                 .build();
         return ResponseEntity.ok(taskFacade.getTaskProfile(query));
     }

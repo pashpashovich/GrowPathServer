@@ -591,8 +591,7 @@ public class TaskFacade {
                 .limit(filters.limit())
                 .status(filters.status())
                 .priority(filters.priority())
-                .internshipId(filters.internshipId())
-                .iprId(filters.iprId());
+                .internshipId(filters.internshipId());
 
         if (isIntern()) {
             builder.assignee(String.valueOf(userId));
@@ -631,7 +630,6 @@ public class TaskFacade {
                 .assignee(assignee)
                 .priority(query.priority())
                 .internshipId(query.internshipId())
-                .iprId(query.iprId())
                 .mentorId(mentorId)
                 .scope(query.scope())
                 .build();
