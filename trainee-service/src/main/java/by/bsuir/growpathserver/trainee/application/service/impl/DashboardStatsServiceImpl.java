@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import by.bsuir.growpathserver.dto.model.ChartBoxplotItem;
 import by.bsuir.growpathserver.dto.model.ChartDataPoint;
 import by.bsuir.growpathserver.dto.model.DashboardChartsResponse;
 import by.bsuir.growpathserver.dto.model.DashboardChartsResponseFilters;
@@ -51,6 +52,7 @@ import by.bsuir.growpathserver.trainee.application.query.GetProgramsStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetTasksStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetTrendsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetUpcomingDeadlinesQuery;
+import by.bsuir.growpathserver.trainee.application.service.BoxplotStatistics;
 import by.bsuir.growpathserver.trainee.application.service.DashboardStatsService;
 import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
@@ -416,6 +418,8 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
         response.setProgramCompletionRates(
                 new ArrayList<>(buildProgramCompletionChart(query.programId(), query.departmentId())));
         response.setInternProgressBuckets(buildInternProgressBuckets(scopedInterns));
+        response.setBoxplots(new ArrayList<>(buildBoxplots(
+                scopedTasks, scopedInterns, scopedMentors, dateFrom, dateTo, scopedInternIds, query.programId())));
 
         return response;
     }
@@ -901,6 +905,191 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
                     .collect(Collectors.toSet());
         }
         return internIds;
+    }
+
+    private List<ChartBoxplotItem> buildBoxplots(
+            List<TaskEntity> scopedTasks,
+            List<UserEntity> scopedInterns,
+            List<UserEntity> scopedMentors,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            Set<Long> scopedInternIds,
+            Long programIdFilter) {
+        List<ChartBoxplotItem> boxplots = new ArrayList<>();
+        Set<Long> programIds = resolveBoxplotProgramIds(scopedTasks, scopedInterns, programIdFilter);
+
+        for (Long programId : programIds) {
+            String programLabel = resolveProgramTitle(programId);
+            String groupKey = "program:" + programId;
+
+            boxplots.add(toBoxplotItem(
+                    ChartBoxplotItem.MetricEnum.TASK_RATING,
+                    groupKey,
+                    programLabel,
+                    collectTaskRatings(scopedTasks, programId, dateFrom, dateTo)));
+            boxplots.add(toBoxplotItem(
+                    ChartBoxplotItem.MetricEnum.TASK_COMPLETION_DAYS,
+                    groupKey,
+                    programLabel,
+                    collectTaskCompletionDays(scopedTasks, programId, dateFrom, dateTo)));
+            boxplots.add(toBoxplotItem(
+                    ChartBoxplotItem.MetricEnum.ASSESSMENT_OVERALL_RATING,
+                    groupKey,
+                    programLabel,
+                    collectAssessmentRatings(dateFrom, dateTo, programId, scopedInternIds)));
+            boxplots.add(toBoxplotItem(
+                    ChartBoxplotItem.MetricEnum.INTERN_PROGRESS_PERCENT,
+                    groupKey,
+                    programLabel,
+                    collectInternProgressPercents(scopedInterns, programId)));
+        }
+
+        for (UserEntity mentor : scopedMentors) {
+            String mentorLabel = mentor.getFirstName() + " " + mentor.getLastName();
+            boxplots.add(toBoxplotItem(
+                    ChartBoxplotItem.MetricEnum.TASK_RATING,
+                    "mentor:" + mentor.getId(),
+                    mentorLabel,
+                    collectTaskRatingsForMentor(scopedTasks, mentor.getId(), dateFrom, dateTo)));
+        }
+
+        boxplots.add(toBoxplotItem(
+                ChartBoxplotItem.MetricEnum.TASK_RATING,
+                "all",
+                "Все программы",
+                collectTaskRatings(scopedTasks, null, dateFrom, dateTo)));
+        boxplots.add(toBoxplotItem(
+                ChartBoxplotItem.MetricEnum.TASK_COMPLETION_DAYS,
+                "all",
+                "Все программы",
+                collectTaskCompletionDays(scopedTasks, null, dateFrom, dateTo)));
+        boxplots.add(toBoxplotItem(
+                ChartBoxplotItem.MetricEnum.ASSESSMENT_OVERALL_RATING,
+                "all",
+                "Все программы",
+                collectAssessmentRatings(dateFrom, dateTo, programIdFilter, scopedInternIds)));
+        boxplots.add(toBoxplotItem(
+                ChartBoxplotItem.MetricEnum.INTERN_PROGRESS_PERCENT,
+                "all",
+                "Все стажёры",
+                collectInternProgressPercents(scopedInterns, null)));
+
+        return boxplots.stream()
+                .filter(item -> item.getSampleSize() > 0)
+                .toList();
+    }
+
+    private Set<Long> resolveBoxplotProgramIds(
+            List<TaskEntity> scopedTasks,
+            List<UserEntity> scopedInterns,
+            Long programIdFilter) {
+        if (Objects.nonNull(programIdFilter)) {
+            return Set.of(programIdFilter);
+        }
+        Set<Long> programIds = new HashSet<>();
+        scopedTasks.stream()
+                .map(TaskEntity::getInternshipId)
+                .filter(Objects::nonNull)
+                .forEach(programIds::add);
+        scopedInterns.stream()
+                .map(UserEntity::getId)
+                .map(this::resolveInternProgramId)
+                .filter(Objects::nonNull)
+                .forEach(programIds::add);
+        return programIds;
+    }
+
+    private List<Double> collectTaskRatings(
+            List<TaskEntity> tasks,
+            Long programId,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo) {
+        return tasks.stream()
+                .filter(task -> TaskStatus.COMPLETED.equals(task.getStatus()))
+                .filter(task -> Objects.isNull(programId) || Objects.equals(task.getInternshipId(), programId))
+                .filter(task -> Objects.nonNull(task.getRating()))
+                .filter(task -> isCompletedInPeriod(task, dateFrom, dateTo))
+                .map(task -> task.getRating().doubleValue())
+                .toList();
+    }
+
+    private List<Double> collectTaskRatingsForMentor(
+            List<TaskEntity> tasks,
+            Long mentorId,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo) {
+        return tasks.stream()
+                .filter(task -> Objects.equals(task.getMentorId(), mentorId))
+                .filter(task -> TaskStatus.COMPLETED.equals(task.getStatus()))
+                .filter(task -> Objects.nonNull(task.getRating()))
+                .filter(task -> isCompletedInPeriod(task, dateFrom, dateTo))
+                .map(task -> task.getRating().doubleValue())
+                .toList();
+    }
+
+    private List<Double> collectTaskCompletionDays(
+            List<TaskEntity> tasks,
+            Long programId,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo) {
+        return tasks.stream()
+                .filter(task -> TaskStatus.COMPLETED.equals(task.getStatus()))
+                .filter(task -> Objects.isNull(programId) || Objects.equals(task.getInternshipId(), programId))
+                .filter(task -> Objects.nonNull(task.getCreatedAt()) && Objects.nonNull(task.getCompletedAt()))
+                .filter(task -> isCompletedInPeriod(task, dateFrom, dateTo))
+                .mapToDouble(task -> (double) ChronoUnit.DAYS.between(task.getCreatedAt(), task.getCompletedAt()))
+                .filter(days -> days >= 0)
+                .boxed()
+                .toList();
+    }
+
+    private List<Double> collectAssessmentRatings(
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            Long programId,
+            Set<Long> scopedInternIds) {
+        return assessmentRepository.findByUpdatedAtBetween(dateFrom, dateTo).stream()
+                .filter(assessment -> Objects.nonNull(assessment.getOverallRating()))
+                .filter(assessment -> Objects.isNull(programId)
+                        || Objects.equals(assessment.getInternshipId(), programId))
+                .filter(assessment -> Objects.isNull(scopedInternIds)
+                        || scopedInternIds.contains(assessment.getInternId()))
+                .map(AssessmentEntity::getOverallRating)
+                .toList();
+    }
+
+    private List<Double> collectInternProgressPercents(List<UserEntity> interns, Long programId) {
+        return interns.stream()
+                .filter(intern -> Objects.isNull(programId) || isInternOnProgram(intern.getId(), programId))
+                .map(intern -> calculateInternProgressPercent(intern.getId()))
+                .toList();
+    }
+
+    private boolean isCompletedInPeriod(TaskEntity task, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        if (Objects.isNull(task.getCompletedAt())) {
+            return false;
+        }
+        return !task.getCompletedAt().isBefore(dateFrom) && !task.getCompletedAt().isAfter(dateTo);
+    }
+
+    private ChartBoxplotItem toBoxplotItem(
+            ChartBoxplotItem.MetricEnum metric,
+            String groupKey,
+            String groupLabel,
+            List<Double> values) {
+        BoxplotStatistics stats = BoxplotStatistics.fromValues(values);
+        ChartBoxplotItem item = new ChartBoxplotItem();
+        item.setMetric(metric);
+        item.setGroupKey(groupKey);
+        item.setGroupLabel(groupLabel);
+        item.setMin(stats.getMin());
+        item.setQ1(stats.getQ1());
+        item.setMedian(stats.getMedian());
+        item.setQ3(stats.getQ3());
+        item.setMax(stats.getMax());
+        item.setOutliers(new ArrayList<>(stats.getOutliers()));
+        item.setSampleSize(stats.getSampleSize());
+        return item;
     }
 
     private Map<String, Integer> buildInternProgressBuckets(List<UserEntity> interns) {

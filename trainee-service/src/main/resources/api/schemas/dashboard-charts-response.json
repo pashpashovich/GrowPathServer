@@ -122,6 +122,13 @@
         "type": "integer"
       },
       "description": "Histogram: intern count by progress bucket (keys 0-25, 26-50, 51-75, 76-100)"
+    },
+    "boxplots": {
+      "type": "array",
+      "description": "Boxplot summaries (min, q1, median, q3, max, outliers). groupKey: all, program:{id}, mentor:{id}.",
+      "items": {
+        "$ref": "./chart-boxplot-item.json"
+      }
     }
   },
   "required": [

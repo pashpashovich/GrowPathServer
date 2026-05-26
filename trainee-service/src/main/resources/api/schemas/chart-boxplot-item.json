@@ -1,0 +1,68 @@
+{
+  "type": "object",
+  "description": "Tukey boxplot summary for a metric within one group (program, mentor, or all)",
+  "properties": {
+    "metric": {
+      "type": "string",
+      "enum": [
+        "task_rating",
+        "task_completion_days",
+        "assessment_overall_rating",
+        "intern_progress_percent"
+      ]
+    },
+    "groupKey": {
+      "type": "string",
+      "description": "Stable id for the series, e.g. all, program:7, mentor:12"
+    },
+    "groupLabel": {
+      "type": "string",
+      "description": "Display label for the X axis category"
+    },
+    "min": {
+      "type": "number",
+      "format": "double"
+    },
+    "q1": {
+      "type": "number",
+      "format": "double",
+      "description": "Lower quartile (25th percentile)"
+    },
+    "median": {
+      "type": "number",
+      "format": "double"
+    },
+    "q3": {
+      "type": "number",
+      "format": "double",
+      "description": "Upper quartile (75th percentile)"
+    },
+    "max": {
+      "type": "number",
+      "format": "double"
+    },
+    "outliers": {
+      "type": "array",
+      "description": "Values outside whiskers (Q1 - 1.5*IQR, Q3 + 1.5*IQR)",
+      "items": {
+        "type": "number",
+        "format": "double"
+      }
+    },
+    "sampleSize": {
+      "type": "integer",
+      "description": "Number of observations used"
+    }
+  },
+  "required": [
+    "metric",
+    "groupKey",
+    "groupLabel",
+    "min",
+    "q1",
+    "median",
+    "q3",
+    "max",
+    "sampleSize"
+  ]
+}

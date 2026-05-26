@@ -5895,6 +5895,8 @@ components:
       $ref: './schemas/program-completion-chart-item.json'
     mentor-workload-chart-item:
       $ref: './schemas/mentor-workload-chart-item.json'
+    chart-boxplot-item:
+      $ref: './schemas/chart-boxplot-item.json'
     interns-stats-response:
       $ref: './schemas/interns-stats-response.json'
     tasks-stats-response:
