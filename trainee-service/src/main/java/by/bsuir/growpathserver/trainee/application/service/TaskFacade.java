@@ -89,6 +89,7 @@ public class TaskFacade {
     private final TaskArtifactStorageService taskArtifactStorageService;
     private final TaskRecommendationService taskRecommendationService;
     private final TaskIprStageBindingService taskIprStageBindingService;
+    private final TaskCompetencyBindingService taskCompetencyBindingService;
     private final IprStageRepository iprStageRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
@@ -128,6 +129,7 @@ public class TaskFacade {
                     .dueDate(date)
                     .build();
             Task created = createTaskHandler.handle(command);
+            bindTaskCompetenciesIfPresent(created.getId(), internshipId, createTaskRequest.getCompetencyIds());
             if (Objects.isNull(firstCreated)) {
                 firstCreated = created;
             }
@@ -193,7 +195,13 @@ public class TaskFacade {
                 .stageId(resolvedStageId)
                 .dueDate(request.getDueDate())
                 .build();
-        return updateTask(command);
+        TaskResponse response = updateTask(command);
+        if (Objects.nonNull(request.getCompetencyIds())) {
+            taskCompetencyBindingService.replaceTaskCompetencies(
+                    taskId, existing.getInternshipId(), request.getCompetencyIds());
+            response = enrich(response, taskId);
+        }
+        return response;
     }
 
     @Transactional
@@ -436,7 +444,15 @@ public class TaskFacade {
         response.setSubmissionLinks(
                 taskArtifactRepository.findAllByTaskId(taskId).stream().map(TaskArtifactEntity::getUrl).toList());
         response.setComments(getTaskComments(taskId.toString()).getData());
+        response.setCompetencyRefs(new ArrayList<>(taskCompetencyBindingService.getCompetencyRefsForTask(taskId)));
         return response;
+    }
+
+    private void bindTaskCompetenciesIfPresent(Long taskId, Long programId, List<Long> competencyIds) {
+        if (CollectionUtils.isEmpty(competencyIds)) {
+            return;
+        }
+        taskCompetencyBindingService.replaceTaskCompetencies(taskId, programId, competencyIds);
     }
 
     @Transactional

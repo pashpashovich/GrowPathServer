@@ -71,6 +71,14 @@
     "feedback": {
       "type": "string",
       "description": "Required when transitioning to needs_rework via PUT."
+    },
+    "competencyIds": {
+      "type": "array",
+      "description": "Replace task competencies; must belong to the task internship program",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      }
     }
   }
 }

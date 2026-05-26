@@ -90,11 +90,11 @@ spring:
             - id: assessments-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
-                - Path=/api/v1/assessments/**
+                - Path=/api/v1/assessments,/api/v1/assessments/**
             - id: ratings-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
-                - Path=/api/v1/ratings/**
+                - Path=/api/v1/ratings,/api/v1/ratings/**
             - id: internship-programs-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
@@ -130,7 +130,7 @@ spring:
             - id: dashboard-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:
-                - Path=/api/v1/dashboard/**
+                - Path=/api/v1/dashboard,/api/v1/dashboard/**
             - id: trainee-service
               uri: ${TRAINEE_SERVICE_URL:http://localhost:8081}
               predicates:

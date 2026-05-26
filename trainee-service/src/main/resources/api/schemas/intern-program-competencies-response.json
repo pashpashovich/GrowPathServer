@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "required": [
+    "internId",
+    "programId",
+    "programTitle",
+    "competencies"
+  ],
+  "properties": {
+    "internId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Internship program id (resolved from intern IPR or programId query)"
+    },
+    "programTitle": {
+      "type": "string"
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "$ref": "./competency-ref.json"
+      }
+    }
+  }
+}

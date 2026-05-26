@@ -64,6 +64,14 @@
     "dueDate": {
       "type": "string",
       "format": "date-time"
+    },
+    "competencyIds": {
+      "type": "array",
+      "description": "Competency ids from the internship program; applied to each created task",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      }
     }
   }
 }

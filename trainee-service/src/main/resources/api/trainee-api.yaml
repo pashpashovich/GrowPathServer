@@ -917,6 +917,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /interns/{id}/program-competencies:
+    get:
+      tags:
+        - Interns
+      summary: List competencies of the intern's internship program
+      description: |
+        Returns competencies linked to the internship program of the intern's active IPR
+        (or the program specified by programId). Use when creating a task to pick competencies.
+      operationId: getInternProgramCompetencies
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: programId
+          in: query
+          description: Optional program id; must match an IPR of this intern
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intern-program-competencies-response'
+        '400':
+          description: Invalid program for intern
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+        '404':
+          description: Intern or program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /interns/{id}/tasks:
     get:
       tags:
@@ -5662,6 +5711,8 @@ components:
       $ref: './schemas/competency-ref.json'
     competency-catalog-list-response:
       $ref: './schemas/competency-catalog-list-response.json'
+    intern-program-competencies-response:
+      $ref: './schemas/intern-program-competencies-response.json'
     create-competency-request:
       $ref: './schemas/create-competency-request.json'
     update-competency-request:

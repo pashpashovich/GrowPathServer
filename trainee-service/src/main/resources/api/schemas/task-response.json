@@ -136,6 +136,12 @@
       "items": {
         "$ref": "./comment-response.json"
       }
+    },
+    "competencyRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "./competency-ref.json"
+      }
     }
   },
   "required": [

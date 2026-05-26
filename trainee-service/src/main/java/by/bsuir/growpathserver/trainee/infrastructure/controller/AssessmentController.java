@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class AssessmentController implements AssessmentsApi {
+public class AssessmentController extends BaseController implements AssessmentsApi {
 
     private final CreateAssessmentHandler createAssessmentHandler;
     private final GetAssessmentsHandler getAssessmentsHandler;

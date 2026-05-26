@@ -16,6 +16,7 @@ import by.bsuir.growpathserver.dto.model.AssessmentListResponse;
 import by.bsuir.growpathserver.dto.model.CreateInternRequest;
 import by.bsuir.growpathserver.dto.model.HiringDecisionResponse;
 import by.bsuir.growpathserver.dto.model.InternListResponse;
+import by.bsuir.growpathserver.dto.model.InternProgramCompetenciesResponse;
 import by.bsuir.growpathserver.dto.model.InternProgressResponse;
 import by.bsuir.growpathserver.dto.model.InternResponse;
 import by.bsuir.growpathserver.dto.model.MessageResponse;
@@ -39,6 +40,7 @@ import by.bsuir.growpathserver.trainee.application.query.GetInternProgressQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternTasksQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsQuery;
 import by.bsuir.growpathserver.trainee.application.service.InternHiringDecisionService;
+import by.bsuir.growpathserver.trainee.application.service.InternProgramCompetencyService;
 import by.bsuir.growpathserver.trainee.application.service.InternshipResultReportService;
 import by.bsuir.growpathserver.trainee.domain.aggregate.User;
 import by.bsuir.growpathserver.trainee.infrastructure.mapper.InternMapper;
@@ -58,6 +60,7 @@ public class InternController extends BaseController implements InternsApi {
     private final GetInternProgressHandler getInternProgressHandler;
     private final InternshipResultReportService internshipResultReportService;
     private final InternHiringDecisionService internHiringDecisionService;
+    private final InternProgramCompetencyService internProgramCompetencyService;
     private final InternMapper internMapper;
 
     @Override
@@ -202,6 +205,20 @@ public class InternController extends BaseController implements InternsApi {
         }
         catch (NoSuchElementException | IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<InternProgramCompetenciesResponse> getInternProgramCompetencies(String id, Long programId) {
+        try {
+            Long internId = Long.parseLong(id);
+            return ResponseEntity.ok(internProgramCompetencyService.getProgramCompetencies(internId, programId));
+        }
+        catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (org.springframework.web.server.ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
         }
     }
 

@@ -18,5 +18,6 @@ public interface TaskMapper {
     @Mapping(target = "submissionLinks", ignore = true)
     @Mapping(target = "statusHistory", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "competencyRefs", ignore = true)
     TaskResponse toTaskResponse(Task task);
 }
