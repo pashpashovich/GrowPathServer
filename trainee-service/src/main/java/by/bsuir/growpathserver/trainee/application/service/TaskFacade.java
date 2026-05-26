@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import by.bsuir.growpathserver.dto.model.ChangeTaskStatusRequest;
 import by.bsuir.growpathserver.dto.model.CommentListResponse;
 import by.bsuir.growpathserver.dto.model.CommentResponse;
@@ -33,10 +35,10 @@ import by.bsuir.growpathserver.dto.model.ReorderTasksRequestItemsInner;
 import by.bsuir.growpathserver.dto.model.ReviewTaskRequest;
 import by.bsuir.growpathserver.dto.model.SubmitTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskListResponse;
-import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
 import by.bsuir.growpathserver.dto.model.TaskRecommendationResponse;
 import by.bsuir.growpathserver.dto.model.TaskResponse;
 import by.bsuir.growpathserver.dto.model.TaskStatusResponse;
+import by.bsuir.growpathserver.dto.model.UpdateTaskRequest;
 import by.bsuir.growpathserver.trainee.application.command.CompleteTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.CreateTaskCommand;
 import by.bsuir.growpathserver.trainee.application.command.DeleteTaskCommand;
@@ -66,9 +68,6 @@ import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskArtifactRep
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskCommentRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -592,7 +591,8 @@ public class TaskFacade {
                 .limit(filters.limit())
                 .status(filters.status())
                 .priority(filters.priority())
-                .internshipId(filters.internshipId());
+                .internshipId(filters.internshipId())
+                .iprId(filters.iprId());
 
         if (isIntern()) {
             builder.assignee(String.valueOf(userId));
@@ -631,6 +631,7 @@ public class TaskFacade {
                 .assignee(assignee)
                 .priority(query.priority())
                 .internshipId(query.internshipId())
+                .iprId(query.iprId())
                 .mentorId(mentorId)
                 .scope(query.scope())
                 .build();
