@@ -48,7 +48,7 @@ public class InternshipProgramController extends BaseController implements Inter
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'DEPARTMENT_HEAD')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
     public ResponseEntity<InternshipProgramResponse> getInternshipProgramById(String id) {
         return ResponseEntity.ok(internshipProgramsApplicationFacade.getInternshipProgramById(id));
     }
