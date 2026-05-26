@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "description": "Either \"to\" (target status) or \"action\" (alias) is required. Use \"links\"/\"comment\" when moving to on_review; \"rating\"/\"comment\" when accepting; \"feedback\" (or \"comment\") when sending to needs_rework.",
+  "description": "Either \"to\" (target status) or \"action\" (alias) is required. Use \"links\"/\"comment\" when moving to on_review; \"rating\"/\"comment\" when accepting; \"feedback\" (or \"comment\") when sending to needs_rework from review. Mentor may drag a completed task to pending, on_review, needs_rework, or rejected without extra fields.",
   "properties": {
     "to": {
       "type": "string",

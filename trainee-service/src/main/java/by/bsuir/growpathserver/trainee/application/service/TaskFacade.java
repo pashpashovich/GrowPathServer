@@ -259,10 +259,12 @@ public class TaskFacade {
     private void applyTransition(TaskEntity task, Long userId, TaskStatus target,
                                  ChangeTaskStatusRequest request) {
         switch (target) {
+            case PENDING -> applyTransitionToPending(task, userId);
             case IN_PROGRESS -> applyTransitionToInProgress(task, userId);
             case ON_REVIEW -> applyTransitionToOnReview(task, userId, request);
             case NEEDS_REWORK -> applyTransitionToNeedsRework(task, userId, request);
             case COMPLETED -> applyTransitionToCompleted(task, userId, request);
+            case REJECTED -> applyTransitionToRejected(task, userId, request);
             default -> throw unsupportedTransition(target);
         }
     }
@@ -688,7 +690,41 @@ public class TaskFacade {
         }
     }
 
+    private void applyTransitionToPending(TaskEntity task, Long userId) {
+        if (!canMentorReopenFromCompleted(task, userId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                              "Cannot move to pending from status " + task.getStatus().getValue());
+        }
+        task.setStatus(TaskStatus.PENDING);
+        task.setTakenAt(null);
+        task.setSubmittedAt(null);
+        task.setCompletedAt(null);
+        task.setReviewedAt(null);
+        task.setRating(null);
+        task.setReviewComment(null);
+    }
+
+    private void applyTransitionToRejected(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {
+        if (!canMentorReopenFromCompleted(task, userId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                              "Cannot move to rejected from status " + task.getStatus().getValue());
+        }
+        task.setStatus(TaskStatus.REJECTED);
+        task.setCompletedAt(null);
+        task.setRating(null);
+        task.setReviewedAt(LocalDateTime.now());
+        String comment = StringUtils.trimToNull(request.getFeedback());
+        if (StringUtils.isBlank(comment)) {
+            comment = StringUtils.trimToNull(request.getComment());
+        }
+        task.setReviewComment(comment);
+    }
+
     private void applyTransitionToOnReview(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {
+        if (canMentorReopenFromCompleted(task, userId)) {
+            applyMentorReopenToOnReview(task, request);
+            return;
+        }
         if (!Objects.equals(task.getAssigneeId(), userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only assignee can submit task for review");
         }
@@ -722,6 +758,10 @@ public class TaskFacade {
     }
 
     private void applyTransitionToNeedsRework(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {
+        if (canMentorReopenFromCompleted(task, userId)) {
+            applyMentorReopenToNeedsRework(task, request);
+            return;
+        }
         if (!Objects.equals(task.getMentorId(), userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only assigned mentor can request rework");
         }
@@ -743,6 +783,37 @@ public class TaskFacade {
         task.setReviewComment(feedback);
         task.setRating(null);
         task.setReviewedAt(LocalDateTime.now());
+    }
+
+    private boolean canMentorReopenFromCompleted(TaskEntity task, Long userId) {
+        return Objects.equals(task.getMentorId(), userId) && TaskStatus.COMPLETED.equals(task.getStatus());
+    }
+
+    private void applyMentorReopenToOnReview(TaskEntity task, ChangeTaskStatusRequest request) {
+        task.setStatus(TaskStatus.ON_REVIEW);
+        task.setCompletedAt(null);
+        task.setRating(null);
+        if (Objects.isNull(task.getSubmittedAt())) {
+            task.setSubmittedAt(LocalDateTime.now());
+        }
+        String comment = StringUtils.trimToNull(request.getComment());
+        if (StringUtils.isNotBlank(comment)) {
+            task.setSubmissionComment(comment);
+        }
+    }
+
+    private void applyMentorReopenToNeedsRework(TaskEntity task, ChangeTaskStatusRequest request) {
+        task.setStatus(TaskStatus.NEEDS_REWORK);
+        task.setCompletedAt(null);
+        task.setRating(null);
+        task.setReviewedAt(LocalDateTime.now());
+        String feedback = StringUtils.trimToNull(request.getFeedback());
+        if (StringUtils.isBlank(feedback)) {
+            feedback = StringUtils.trimToNull(request.getComment());
+        }
+        if (StringUtils.isNotBlank(feedback)) {
+            task.setReviewComment(feedback);
+        }
     }
 
     private void applyTransitionToCompleted(TaskEntity task, Long userId, ChangeTaskStatusRequest request) {

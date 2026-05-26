@@ -1978,8 +1978,10 @@ paths:
       description: |
         Single endpoint for board/DnD column moves. Provide target status in `to` or an `action` alias
         (`take`/`start` → in_progress, `submit` → on_review, `accept`/`approve` → completed, `rework` → needs_rework).
-        Server validates role, current state, and required payload; returns 409 if the transition is not allowed
-        from the current state, 422 if the transition is understood but the request is semantically invalid.
+        Assigned mentor may move a completed task back to `pending`, `on_review`, `needs_rework`, or `rejected`
+        (e.g. kanban column drag). Server validates role, current state, and required payload; returns 409 if the
+        transition is not allowed from the current state, 422 if the transition is understood but the request is
+        semantically invalid.
       operationId: patchTaskStatus
       security:
         - bearerAuth: [ ]
