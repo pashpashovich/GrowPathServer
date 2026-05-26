@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.bsuir.growpathserver.dto.api.DashboardApi;
+import by.bsuir.growpathserver.dto.model.DashboardChartsResponse;
 import by.bsuir.growpathserver.dto.model.DashboardResponse;
 import by.bsuir.growpathserver.dto.model.InternsStatsResponse;
 import by.bsuir.growpathserver.dto.model.MentorsStatsResponse;
@@ -14,12 +15,14 @@ import by.bsuir.growpathserver.dto.model.ProgramsStatsResponse;
 import by.bsuir.growpathserver.dto.model.TasksStatsResponse;
 import by.bsuir.growpathserver.dto.model.TrendsResponse;
 import by.bsuir.growpathserver.dto.model.UpcomingDeadlinesResponse;
+import by.bsuir.growpathserver.trainee.application.handler.GetDashboardChartsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetInternsStatsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetMentorsStatsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetProgramsStatsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetTasksStatsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetTrendsHandler;
 import by.bsuir.growpathserver.trainee.application.handler.GetUpcomingDeadlinesHandler;
+import by.bsuir.growpathserver.trainee.application.query.GetDashboardChartsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorsStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetProgramsStatsQuery;
@@ -36,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class DashboardController extends BaseController implements DashboardApi {
 
     private final ReportFacade reportFacade;
+    private final GetDashboardChartsHandler getDashboardChartsHandler;
     private final GetInternsStatsHandler getInternsStatsHandler;
     private final GetTasksStatsHandler getTasksStatsHandler;
     private final GetMentorsStatsHandler getMentorsStatsHandler;
@@ -54,6 +58,19 @@ public class DashboardController extends BaseController implements DashboardApi 
             Long mentorId,
             String status) {
         return ResponseEntity.ok(reportFacade.getDashboard(role));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'DEPARTMENT_HEAD')")
+    public ResponseEntity<DashboardChartsResponse> getDashboardCharts(
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            Long departmentId,
+            Long programId,
+            String groupBy) {
+        GetDashboardChartsQuery query = new GetDashboardChartsQuery(
+                dateFrom, dateTo, departmentId, programId, groupBy);
+        return ResponseEntity.ok(getDashboardChartsHandler.handle(query));
     }
 
     @Override
@@ -135,7 +152,7 @@ public class DashboardController extends BaseController implements DashboardApi 
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'INTERN')")
+    @PreAuthorize("hasAnyRole('HR_MANAGER', 'ADMIN', 'MENTOR', 'INTERN', 'DEPARTMENT_HEAD')")
     public ResponseEntity<UpcomingDeadlinesResponse> getUpcomingDeadlines(
             Integer days,
             Long mentorId,

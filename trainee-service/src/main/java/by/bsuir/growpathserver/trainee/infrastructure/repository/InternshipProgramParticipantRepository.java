@@ -31,4 +31,7 @@ public interface InternshipProgramParticipantRepository
     long countByProgramIdAndRoleAndMentorId(Long programId, ProgramParticipantRole role, Long mentorId);
 
     boolean existsByProgramIdAndUserIdAndRole(Long programId, Long userId, ProgramParticipantRole role);
+
+    @EntityGraph(attributePaths = { "program", "user" })
+    List<InternshipProgramParticipantEntity> findByUserIdAndRole(Long userId, ProgramParticipantRole role);
 }

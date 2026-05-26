@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "mentorId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mentorName": {
+      "type": "string"
+    },
+    "activeInterns": {
+      "type": "integer"
+    },
+    "activeTasks": {
+      "type": "integer"
+    },
+    "workloadLevel": {
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "overloaded"
+      ]
+    }
+  },
+  "required": [
+    "mentorId",
+    "mentorName",
+    "activeInterns",
+    "activeTasks",
+    "workloadLevel"
+  ]
+}

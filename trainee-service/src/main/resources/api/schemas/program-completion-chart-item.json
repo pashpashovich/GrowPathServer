@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programName": {
+      "type": "string"
+    },
+    "completionRate": {
+      "type": "number",
+      "format": "double",
+      "description": "Average task completion rate for interns on the program (0-100)"
+    },
+    "internCount": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "programId",
+    "programName",
+    "completionRate",
+    "internCount"
+  ]
+}

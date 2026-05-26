@@ -1,0 +1,134 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "departmentId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "programId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "groupBy": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        }
+      }
+    },
+    "groupBy": {
+      "type": "string",
+      "enum": [
+        "day",
+        "week",
+        "month"
+      ],
+      "description": "Resolved time grouping used for trend charts"
+    },
+    "tasksCompletedTrend": {
+      "type": "array",
+      "description": "Line/bar: completed tasks per period",
+      "items": {
+        "$ref": "./chart-data-point.json"
+      }
+    },
+    "tasksCreatedTrend": {
+      "type": "array",
+      "description": "Line/bar: newly created tasks per period",
+      "items": {
+        "$ref": "./chart-data-point.json"
+      }
+    },
+    "averageTaskRatingTrend": {
+      "type": "array",
+      "description": "Line: average task rating per period",
+      "items": {
+        "$ref": "./chart-data-point.json"
+      }
+    },
+    "assessmentsCountTrend": {
+      "type": "array",
+      "description": "Line/bar: mentor assessments recorded per period",
+      "items": {
+        "$ref": "./chart-data-point.json"
+      }
+    },
+    "onTimeCompletionRateTrend": {
+      "type": "array",
+      "description": "Line: % of completed tasks finished on time per period",
+      "items": {
+        "$ref": "./chart-data-point.json"
+      }
+    },
+    "tasksByStatus": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Donut/bar: task counts by status in the selected period"
+    },
+    "tasksByPriority": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Donut/bar: task counts by priority"
+    },
+    "internsByProgram": {
+      "type": "array",
+      "description": "Bar/pie: intern count per program",
+      "items": {
+        "$ref": "./program-intern-count-chart-item.json"
+      }
+    },
+    "mentorsWorkload": {
+      "type": "array",
+      "description": "Horizontal bar: mentor workload",
+      "items": {
+        "$ref": "./mentor-workload-chart-item.json"
+      }
+    },
+    "hiringDecisionsByType": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Pie: hiring decisions recorded in the period (API decision keys)"
+    },
+    "programCompletionRates": {
+      "type": "array",
+      "description": "Bar: average completion rate per program",
+      "items": {
+        "$ref": "./program-completion-chart-item.json"
+      }
+    },
+    "internProgressBuckets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Histogram: intern count by progress bucket (keys 0-25, 26-50, 51-75, 76-100)"
+    }
+  },
+  "required": [
+    "groupBy",
+    "tasksCompletedTrend",
+    "tasksCreatedTrend",
+    "tasksByStatus",
+    "tasksByPriority"
+  ]
+}

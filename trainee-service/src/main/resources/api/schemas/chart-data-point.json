@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable axis label"
+    },
+    "value": {
+      "type": "number",
+      "format": "double"
+    }
+  },
+  "required": [
+    "date",
+    "value"
+  ]
+}

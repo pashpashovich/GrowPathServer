@@ -5367,6 +5367,58 @@ paths:
               schema:
                 $ref: '#/components/schemas/error-response'
 
+  /dashboard/charts:
+    get:
+      tags:
+        - Dashboard
+      summary: Get chart-ready analytics bundle for dashboard UI
+      description: |
+        Returns time series and category breakdowns for line, bar, donut and histogram charts.
+        Intended for department head / HR dashboards with a shared date range filter.
+      operationId: getDashboardCharts
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: departmentId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: programId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: groupBy
+          in: query
+          description: Time bucket for trend charts; auto-selected when omitted
+          schema:
+            type: string
+            enum: [ day, week, month ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dashboard-charts-response'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+
   /dashboard/upcoming-deadlines:
     get:
       tags:
@@ -5833,6 +5885,16 @@ components:
     # Dashboard schemas
     dashboard-response:
       $ref: './schemas/dashboard-response.json'
+    dashboard-charts-response:
+      $ref: './schemas/dashboard-charts-response.json'
+    chart-data-point:
+      $ref: './schemas/chart-data-point.json'
+    program-intern-count-chart-item:
+      $ref: './schemas/program-intern-count-chart-item.json'
+    program-completion-chart-item:
+      $ref: './schemas/program-completion-chart-item.json'
+    mentor-workload-chart-item:
+      $ref: './schemas/mentor-workload-chart-item.json'
     interns-stats-response:
       $ref: './schemas/interns-stats-response.json'
     tasks-stats-response:

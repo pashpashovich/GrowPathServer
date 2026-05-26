@@ -6,23 +6,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import by.bsuir.growpathserver.dto.model.ChartDataPoint;
+import by.bsuir.growpathserver.dto.model.DashboardChartsResponse;
+import by.bsuir.growpathserver.dto.model.DashboardChartsResponseFilters;
 import by.bsuir.growpathserver.dto.model.InternsStatsResponse;
 import by.bsuir.growpathserver.dto.model.InternsStatsResponseDistributionByProgramInner;
 import by.bsuir.growpathserver.dto.model.InternsStatsResponseFilters;
 import by.bsuir.growpathserver.dto.model.InternsStatsResponseTopPerformersInner;
+import by.bsuir.growpathserver.dto.model.MentorWorkloadChartItem;
 import by.bsuir.growpathserver.dto.model.MentorsStatsResponse;
 import by.bsuir.growpathserver.dto.model.MentorsStatsResponseFilters;
 import by.bsuir.growpathserver.dto.model.MentorsStatsResponseTopMentorsInner;
 import by.bsuir.growpathserver.dto.model.MentorsStatsResponseWorkloadDistributionInner;
+import by.bsuir.growpathserver.dto.model.ProgramCompletionChartItem;
+import by.bsuir.growpathserver.dto.model.ProgramInternCountChartItem;
 import by.bsuir.growpathserver.dto.model.ProgramsStatsResponse;
+import by.bsuir.growpathserver.dto.model.ProgramsStatsResponseBestPerformingProgramsInner;
 import by.bsuir.growpathserver.dto.model.ProgramsStatsResponseFilters;
+import by.bsuir.growpathserver.dto.model.ProgramsStatsResponseMostPopularProgramsInner;
 import by.bsuir.growpathserver.dto.model.ProgramsStatsResponseProgramStatsInner;
 import by.bsuir.growpathserver.dto.model.TasksStatsResponse;
 import by.bsuir.growpathserver.dto.model.TasksStatsResponseCompletionTrendInner;
@@ -32,6 +44,7 @@ import by.bsuir.growpathserver.dto.model.TrendsResponseSummary;
 import by.bsuir.growpathserver.dto.model.UpcomingDeadlinesResponse;
 import by.bsuir.growpathserver.dto.model.UpcomingDeadlinesResponseDeadlinesInner;
 import by.bsuir.growpathserver.dto.model.UpcomingDeadlinesResponseFilters;
+import by.bsuir.growpathserver.trainee.application.query.GetDashboardChartsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetInternsStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetMentorsStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetProgramsStatsQuery;
@@ -39,14 +52,22 @@ import by.bsuir.growpathserver.trainee.application.query.GetTasksStatsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetTrendsQuery;
 import by.bsuir.growpathserver.trainee.application.query.GetUpcomingDeadlinesQuery;
 import by.bsuir.growpathserver.trainee.application.service.DashboardStatsService;
+import by.bsuir.growpathserver.trainee.domain.entity.AssessmentEntity;
+import by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.TaskEntity;
 import by.bsuir.growpathserver.trainee.domain.entity.UserEntity;
+import by.bsuir.growpathserver.trainee.domain.valueobject.HiringDecisionType;
+import by.bsuir.growpathserver.trainee.domain.valueobject.InternshipProgramStatus;
+import by.bsuir.growpathserver.trainee.domain.valueobject.ProgramParticipantRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskPriority;
 import by.bsuir.growpathserver.trainee.domain.valueobject.TaskStatus;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserRole;
 import by.bsuir.growpathserver.trainee.domain.valueobject.UserStatus;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.AssessmentRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.InternHiringDecisionRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramParticipantRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.InternshipProgramRepository;
+import by.bsuir.growpathserver.trainee.infrastructure.repository.IprRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.TaskRepository;
 import by.bsuir.growpathserver.trainee.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +80,10 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final InternshipProgramRepository internshipProgramRepository;
+    private final InternshipProgramParticipantRepository internshipProgramParticipantRepository;
+    private final IprRepository iprRepository;
+    private final AssessmentRepository assessmentRepository;
+    private final InternHiringDecisionRepository internHiringDecisionRepository;
 
     @Override
     public InternsStatsResponse getInternsStats(GetInternsStatsQuery query) {
@@ -141,10 +166,13 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
 
         response.setTotalTasks(tasks.size());
         response.setPendingTasks((int) tasks.stream().filter(t -> TaskStatus.PENDING.equals(t.getStatus())).count());
-        response.setInProgressTasks((int) tasks.stream().filter(t -> TaskStatus.IN_PROGRESS.equals(t.getStatus())).count());
-        response.setSubmittedTasks((int) tasks.stream().filter(t -> TaskStatus.SUBMITTED.equals(t.getStatus())).count());
+        response.setInProgressTasks(
+                (int) tasks.stream().filter(t -> TaskStatus.IN_PROGRESS.equals(t.getStatus())).count());
+        response.setSubmittedTasks(
+                (int) tasks.stream().filter(t -> TaskStatus.SUBMITTED.equals(t.getStatus())).count());
         response.setOnReviewTasks((int) tasks.stream().filter(t -> TaskStatus.ON_REVIEW.equals(t.getStatus())).count());
-        response.setCompletedTasks((int) tasks.stream().filter(t -> TaskStatus.COMPLETED.equals(t.getStatus())).count());
+        response.setCompletedTasks(
+                (int) tasks.stream().filter(t -> TaskStatus.COMPLETED.equals(t.getStatus())).count());
         response.setCancelledTasks((int) tasks.stream().filter(t -> TaskStatus.REJECTED.equals(t.getStatus())).count());
 
         int overdueTasks = (int) tasks.stream()
@@ -193,16 +221,20 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
                 });
         response.setDistributionByStatus(distributionByStatus);
 
+        String trendGroupBy = resolveGroupBy(null, dateFrom, dateTo);
+        response.setCompletionTrend(calculateTrendDataPoints("completed_tasks", dateFrom, dateTo, trendGroupBy));
+
         return response;
     }
 
     @Override
     public MentorsStatsResponse getMentorsStats(GetMentorsStatsQuery query) {
-        List<UserEntity> allMentors = userRepository.findByRole(
-                by.bsuir.growpathserver.trainee.domain.valueobject.UserRole.MENTOR
-        );
+        List<UserEntity> allMentors = userRepository.findByRole(UserRole.MENTOR);
 
-        List<UserEntity> filteredMentors = allMentors;
+        List<UserEntity> filteredMentors = allMentors.stream()
+                .filter(mentor -> query.departmentId() == null
+                        || Objects.equals(mentor.getDepartmentId(), query.departmentId()))
+                .toList();
 
         int totalMentors = filteredMentors.size();
         int activeMentors = (int) filteredMentors.stream()
@@ -261,18 +293,24 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
 
     @Override
     public ProgramsStatsResponse getProgramsStats(GetProgramsStatsQuery query) {
-        List<by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity> allPrograms =
-                internshipProgramRepository.findAll();
+        List<InternshipProgramEntity> allPrograms = internshipProgramRepository.findAll();
 
-        List<by.bsuir.growpathserver.trainee.domain.entity.InternshipProgramEntity> filteredPrograms = allPrograms;
-        if (query.status() != null) {
-            // TODO: Filter by status when status field is added to InternshipProgramEntity
-        }
+        List<InternshipProgramEntity> filteredPrograms = allPrograms.stream()
+                .filter(program -> query.status() == null
+                        || program.getStatus() != null
+                        && query.status().equalsIgnoreCase(program.getStatus().getValue()))
+                .toList();
 
         int totalPrograms = filteredPrograms.size();
-        int activePrograms = totalPrograms; // TODO: Filter by active status
-        int completedPrograms = 0; // TODO: Filter by completed status
-        int archivedPrograms = 0; // TODO: Filter by archived status
+        int activePrograms = (int) filteredPrograms.stream()
+                .filter(p -> InternshipProgramStatus.ACTIVE.equals(p.getStatus()))
+                .count();
+        int completedPrograms = (int) filteredPrograms.stream()
+                .filter(p -> InternshipProgramStatus.COMPLETED.equals(p.getStatus()))
+                .count();
+        int archivedPrograms = (int) filteredPrograms.stream()
+                .filter(p -> InternshipProgramStatus.ARCHIVED.equals(p.getStatus()))
+                .count();
 
         ProgramsStatsResponse response = new ProgramsStatsResponse();
 
@@ -288,27 +326,96 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
         response.setActivePrograms(activePrograms);
         response.setCompletedPrograms(completedPrograms);
         response.setArchivedPrograms(archivedPrograms);
-        response.setAverageCompletionRate(0.0); // TODO: Calculate when intern-program relationship is available
+        response.setAverageCompletionRate(calculateAverageProgramCompletionRate(filteredPrograms));
 
-        // Program stats
         List<ProgramsStatsResponseProgramStatsInner> programStats = filteredPrograms.stream()
-                .map(program -> {
-                    ProgramsStatsResponseProgramStatsInner stat = new ProgramsStatsResponseProgramStatsInner();
-                    stat.setProgramId(program.getId());
-                    stat.setProgramName(program.getTitle());
-                    stat.setTotalInterns(0); // TODO: Count interns in this program
-                    stat.setActiveInterns(0);
-                    stat.setCompletedInterns(0);
-                    stat.setAverageRating(0.0);
-                    stat.setCompletionRate(0.0);
-                    stat.setStatus(ProgramsStatsResponseProgramStatsInner.StatusEnum.ACTIVE);
-                    return stat;
-                })
+                .map(this::toProgramStatsInner)
                 .toList();
         response.setProgramStats(programStats);
 
-        response.setMostPopularPrograms(new ArrayList<>());
-        response.setBestPerformingPrograms(new ArrayList<>());
+        response.setMostPopularPrograms(programStats.stream()
+                                                .sorted(Comparator.comparing(
+                                                                ProgramsStatsResponseProgramStatsInner::getTotalInterns)
+                                                                .reversed())
+                                                .limit(5)
+                                                .map(stat -> {
+                                                    ProgramsStatsResponseMostPopularProgramsInner item =
+                                                            new ProgramsStatsResponseMostPopularProgramsInner();
+                                                    item.setProgramId(stat.getProgramId());
+                                                    item.setProgramName(stat.getProgramName());
+                                                    item.setTotalInterns(stat.getTotalInterns());
+                                                    return item;
+                                                })
+                                                .toList());
+
+        response.setBestPerformingPrograms(programStats.stream()
+                                                   .filter(stat -> stat.getTotalInterns() != null
+                                                           && stat.getTotalInterns() > 0)
+                                                   .sorted(Comparator.comparing(
+                                                                   ProgramsStatsResponseProgramStatsInner::getCompletionRate)
+                                                                   .reversed()
+                                                                   .thenComparing(
+                                                                           ProgramsStatsResponseProgramStatsInner::getAverageRating,
+                                                                           Comparator.reverseOrder()))
+                                                   .limit(5)
+                                                   .map(stat -> {
+                                                       ProgramsStatsResponseBestPerformingProgramsInner item =
+                                                               new ProgramsStatsResponseBestPerformingProgramsInner();
+                                                       item.setProgramId(stat.getProgramId());
+                                                       item.setProgramName(stat.getProgramName());
+                                                       item.setCompletionRate(stat.getCompletionRate());
+                                                       item.setAverageRating(stat.getAverageRating());
+                                                       return item;
+                                                   })
+                                                   .toList());
+
+        return response;
+    }
+
+    @Override
+    public DashboardChartsResponse getDashboardCharts(GetDashboardChartsQuery query) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateFrom = query.dateFrom() != null ? query.dateFrom() : now.minusMonths(1);
+        LocalDateTime dateTo = query.dateTo() != null ? query.dateTo() : now;
+        String groupBy = resolveGroupBy(query.groupBy(), dateFrom, dateTo);
+
+        Set<Long> scopedInternIds = resolveScopedInternIds(query.departmentId(), query.programId());
+        List<UserEntity> scopedInterns = filterInternsByScope(scopedInternIds);
+        List<UserEntity> scopedMentors = filterMentorsByScope(query.departmentId());
+        List<TaskEntity> scopedTasks = filterTasksForScope(
+                taskRepository.findAll(), dateFrom, dateTo, scopedInternIds, query.programId());
+
+        DashboardChartsResponse response = new DashboardChartsResponse();
+        DashboardChartsResponseFilters filters = new DashboardChartsResponseFilters();
+        filters.setDateFrom(dateFrom);
+        filters.setDateTo(dateTo);
+        filters.setDepartmentId(query.departmentId());
+        filters.setProgramId(query.programId());
+        filters.setGroupBy(DashboardChartsResponseFilters.GroupByEnum.fromValue(groupBy));
+        response.setFilters(filters);
+        response.setGroupBy(DashboardChartsResponse.GroupByEnum.fromValue(groupBy));
+
+        response.setTasksCompletedTrend(new ArrayList<>(toChartDataPoints(
+                calculateTrendDataPoints("completed_tasks", dateFrom, dateTo, groupBy, scopedTasks, scopedInternIds))));
+        response.setTasksCreatedTrend(new ArrayList<>(toChartDataPoints(
+                calculateTrendDataPoints("tasks_created", dateFrom, dateTo, groupBy, scopedTasks, scopedInternIds))));
+        response.setAverageTaskRatingTrend(new ArrayList<>(toChartDataPoints(
+                calculateTrendDataPoints("average_rating", dateFrom, dateTo, groupBy, scopedTasks, scopedInternIds))));
+        response.setAssessmentsCountTrend(new ArrayList<>(toChartDataPoints(
+                calculateAssessmentsTrend(dateFrom, dateTo, groupBy, scopedInternIds, query.programId()))));
+        response.setOnTimeCompletionRateTrend(new ArrayList<>(toChartDataPoints(
+                calculateTrendDataPoints("task_completion_rate", dateFrom, dateTo, groupBy, scopedTasks,
+                                         scopedInternIds))));
+
+        response.setTasksByStatus(buildTaskStatusDistribution(scopedTasks));
+        response.setTasksByPriority(buildTaskPriorityDistribution(scopedTasks));
+        response.setInternsByProgram(new ArrayList<>(buildInternsByProgram(scopedInterns, query.programId())));
+        response.setMentorsWorkload(new ArrayList<>(buildMentorsWorkloadChart(scopedMentors)));
+        response.setHiringDecisionsByType(
+                buildHiringDecisionsChart(dateFrom, dateTo, scopedInternIds, query.programId()));
+        response.setProgramCompletionRates(
+                new ArrayList<>(buildProgramCompletionChart(query.programId(), query.departmentId())));
+        response.setInternProgressBuckets(buildInternProgressBuckets(scopedInterns));
 
         return response;
     }
@@ -432,8 +539,463 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
     // Helper methods
 
     private boolean applyInternFilters(UserEntity intern, GetInternsStatsQuery query) {
-        // TODO: Add filtering by department and program when these relationships are available
+        if (Objects.nonNull(query.departmentId())
+                && !Objects.equals(intern.getDepartmentId(), query.departmentId())) {
+            return false;
+        }
+        if (Objects.nonNull(query.programId()) && !isInternOnProgram(intern.getId(), query.programId())) {
+            return false;
+        }
         return true;
+    }
+
+    private boolean isInternOnProgram(Long internId, Long programId) {
+        return iprRepository.existsByProgram_IdAndIntern_Id(programId, internId)
+                || internshipProgramParticipantRepository.existsByProgramIdAndUserIdAndRole(
+                programId, internId, ProgramParticipantRole.INTERN);
+    }
+
+    private String resolveGroupBy(String requested, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        if (Objects.nonNull(requested) && !requested.isBlank()) {
+            return requested.toLowerCase();
+        }
+        long days = ChronoUnit.DAYS.between(dateFrom.toLocalDate(), dateTo.toLocalDate());
+        if (days > 90) {
+            return "month";
+        }
+        if (days > 21) {
+            return "week";
+        }
+        return "day";
+    }
+
+    private Set<Long> resolveScopedInternIds(Long departmentId, Long programId) {
+        if (Objects.isNull(departmentId) && Objects.isNull(programId)) {
+            return null;
+        }
+        return userRepository.findByRole(UserRole.INTERN).stream()
+                .filter(intern -> Objects.isNull(departmentId)
+                        || Objects.equals(intern.getDepartmentId(), departmentId))
+                .filter(intern -> Objects.isNull(programId) || isInternOnProgram(intern.getId(), programId))
+                .map(UserEntity::getId)
+                .collect(Collectors.toSet());
+    }
+
+    private List<UserEntity> filterInternsByScope(Set<Long> scopedInternIds) {
+        List<UserEntity> interns = userRepository.findByRole(UserRole.INTERN);
+        if (Objects.isNull(scopedInternIds)) {
+            return interns;
+        }
+        return interns.stream()
+                .filter(intern -> scopedInternIds.contains(intern.getId()))
+                .toList();
+    }
+
+    private List<UserEntity> filterMentorsByScope(Long departmentId) {
+        return userRepository.findByRole(UserRole.MENTOR).stream()
+                .filter(mentor -> Objects.isNull(departmentId)
+                        || Objects.equals(mentor.getDepartmentId(), departmentId))
+                .toList();
+    }
+
+    private List<TaskEntity> filterTasksForScope(
+            List<TaskEntity> tasks,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            Set<Long> scopedInternIds,
+            Long programId) {
+        return tasks.stream()
+                .filter(task -> isTaskInDateRange(task, dateFrom, dateTo))
+                .filter(task -> Objects.isNull(programId) || Objects.equals(task.getInternshipId(), programId))
+                .filter(task -> Objects.isNull(scopedInternIds)
+                        || (Objects.nonNull(task.getAssigneeId()) && scopedInternIds.contains(task.getAssigneeId())))
+                .toList();
+    }
+
+    private List<ChartDataPoint> toChartDataPoints(List<TasksStatsResponseCompletionTrendInner> points) {
+        List<ChartDataPoint> chartPoints = new ArrayList<>(points.size());
+        for (TasksStatsResponseCompletionTrendInner point : points) {
+            ChartDataPoint chartPoint = new ChartDataPoint();
+            chartPoint.setDate(point.getDate());
+            chartPoint.setLabel(point.getLabel());
+            chartPoint.setValue(point.getValue());
+            chartPoints.add(chartPoint);
+        }
+        return chartPoints;
+    }
+
+    private List<TasksStatsResponseCompletionTrendInner> calculateAssessmentsTrend(
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            String groupBy,
+            Set<Long> scopedInternIds,
+            Long programId) {
+        List<AssessmentEntity> assessments = assessmentRepository.findByUpdatedAtBetween(dateFrom, dateTo).stream()
+                .filter(assessment -> Objects.isNull(programId)
+                        || Objects.equals(assessment.getInternshipId(), programId))
+                .filter(assessment -> Objects.isNull(scopedInternIds)
+                        || scopedInternIds.contains(assessment.getInternId()))
+                .toList();
+
+        List<LocalDateTime> periods = generateTimePeriods(dateFrom, dateTo, groupBy);
+        List<TasksStatsResponseCompletionTrendInner> dataPoints = new ArrayList<>();
+        for (int i = 0; i < periods.size() - 1; i++) {
+            LocalDateTime periodStart = periods.get(i);
+            LocalDateTime periodEnd = periods.get(i + 1);
+            TasksStatsResponseCompletionTrendInner point = new TasksStatsResponseCompletionTrendInner();
+            point.setDate(periodStart);
+            point.setLabel(formatPeriodLabel(periodStart, groupBy));
+            long count = assessments.stream()
+                    .filter(assessment -> Objects.nonNull(assessment.getUpdatedAt()))
+                    .filter(assessment -> !assessment.getUpdatedAt().isBefore(periodStart)
+                            && assessment.getUpdatedAt().isBefore(periodEnd))
+                    .count();
+            point.setValue((double) count);
+            dataPoints.add(point);
+        }
+        return dataPoints;
+    }
+
+    private List<TasksStatsResponseCompletionTrendInner> calculateTrendDataPoints(
+            String metric,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            String groupBy,
+            List<TaskEntity> scopedTasks,
+            Set<Long> scopedInternIds) {
+        List<LocalDateTime> periods = generateTimePeriods(dateFrom, dateTo, groupBy);
+        List<TasksStatsResponseCompletionTrendInner> dataPoints = new ArrayList<>();
+        for (int i = 0; i < periods.size() - 1; i++) {
+            LocalDateTime periodStart = periods.get(i);
+            LocalDateTime periodEnd = periods.get(i + 1);
+            TasksStatsResponseCompletionTrendInner point = new TasksStatsResponseCompletionTrendInner();
+            point.setDate(periodStart);
+            point.setLabel(formatPeriodLabel(periodStart, groupBy));
+            point.setValue(calculateScopedMetricValue(
+                    metric, periodStart, periodEnd, scopedTasks, scopedInternIds));
+            dataPoints.add(point);
+        }
+        return dataPoints;
+    }
+
+    private double calculateScopedMetricValue(
+            String metric,
+            LocalDateTime periodStart,
+            LocalDateTime periodEnd,
+            List<TaskEntity> scopedTasks,
+            Set<Long> scopedInternIds) {
+        return switch (metric.toLowerCase()) {
+            case "tasks_created" -> scopedTasks.stream()
+                    .filter(task -> Objects.nonNull(task.getCreatedAt()))
+                    .filter(task -> !task.getCreatedAt().isBefore(periodStart)
+                            && task.getCreatedAt().isBefore(periodEnd))
+                    .count();
+            case "completed_tasks" -> scopedTasks.stream()
+                    .filter(task -> TaskStatus.COMPLETED.equals(task.getStatus()))
+                    .filter(task -> Objects.nonNull(task.getCompletedAt()))
+                    .filter(task -> !task.getCompletedAt().isBefore(periodStart)
+                            && task.getCompletedAt().isBefore(periodEnd))
+                    .count();
+            case "average_rating" -> scopedTasks.stream()
+                    .filter(task -> Objects.nonNull(task.getRating()))
+                    .filter(task -> Objects.nonNull(task.getCompletedAt()))
+                    .filter(task -> !task.getCompletedAt().isBefore(periodStart)
+                            && task.getCompletedAt().isBefore(periodEnd))
+                    .mapToInt(TaskEntity::getRating)
+                    .average()
+                    .orElse(0.0);
+            case "task_completion_rate" -> {
+                List<TaskEntity> completedInPeriod = scopedTasks.stream()
+                        .filter(task -> TaskStatus.COMPLETED.equals(task.getStatus()))
+                        .filter(task -> Objects.nonNull(task.getCompletedAt()))
+                        .filter(task -> !task.getCompletedAt().isBefore(periodStart)
+                                && task.getCompletedAt().isBefore(periodEnd))
+                        .toList();
+                if (completedInPeriod.isEmpty()) {
+                    yield 0.0;
+                }
+                long onTime = completedInPeriod.stream()
+                        .filter(task -> Objects.nonNull(task.getDueDate()))
+                        .filter(task -> !task.getCompletedAt().isAfter(task.getDueDate()))
+                        .count();
+                yield onTime * 100.0 / completedInPeriod.size();
+            }
+            case "new_interns" -> userRepository.findByRole(UserRole.INTERN).stream()
+                    .filter(intern -> Objects.isNull(scopedInternIds) || scopedInternIds.contains(intern.getId()))
+                    .filter(intern -> Objects.nonNull(intern.getCreatedAt()))
+                    .filter(intern -> !intern.getCreatedAt().isBefore(periodStart)
+                            && intern.getCreatedAt().isBefore(periodEnd))
+                    .count();
+            case "active_users" -> scopedTasks.stream()
+                    .filter(task -> Objects.nonNull(task.getCreatedAt()))
+                    .filter(task -> !task.getCreatedAt().isBefore(periodStart)
+                            && task.getCreatedAt().isBefore(periodEnd))
+                    .map(TaskEntity::getAssigneeId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .count();
+            default -> 0.0;
+        };
+    }
+
+    private Map<String, Integer> buildTaskStatusDistribution(List<TaskEntity> tasks) {
+        Map<String, Integer> distribution = new HashMap<>();
+        Arrays.stream(TaskStatus.values()).forEach(status -> distribution.put(
+                status.name().toLowerCase(),
+                (int) tasks.stream().filter(task -> task.getStatus() == status).count()));
+        return distribution;
+    }
+
+    private Map<String, Integer> buildTaskPriorityDistribution(List<TaskEntity> tasks) {
+        Map<String, Integer> distribution = new HashMap<>();
+        Arrays.stream(TaskPriority.values()).forEach(priority -> distribution.put(
+                priority.name().toLowerCase(),
+                (int) tasks.stream().filter(task -> priority.equals(task.getPriority())).count()));
+        return distribution;
+    }
+
+    private List<ProgramInternCountChartItem> buildInternsByProgram(
+            List<UserEntity> scopedInterns,
+            Long programIdFilter) {
+        Map<Long, Long> internCountByProgram = new HashMap<>();
+        Map<Long, String> programNames = new HashMap<>();
+
+        for (UserEntity intern : scopedInterns) {
+            Long programId = resolveInternProgramId(intern.getId());
+            if (Objects.isNull(programId)) {
+                continue;
+            }
+            if (Objects.nonNull(programIdFilter) && !Objects.equals(programId, programIdFilter)) {
+                continue;
+            }
+            internCountByProgram.merge(programId, 1L, Long::sum);
+            programNames.putIfAbsent(programId, resolveProgramTitle(programId));
+        }
+
+        return internCountByProgram.entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                .map(entry -> {
+                    ProgramInternCountChartItem item = new ProgramInternCountChartItem();
+                    item.setProgramId(entry.getKey());
+                    item.setProgramName(programNames.getOrDefault(entry.getKey(), "Program " + entry.getKey()));
+                    item.setCount(entry.getValue().intValue());
+                    return item;
+                })
+                .toList();
+    }
+
+    private Long resolveInternProgramId(Long internId) {
+        return iprRepository.findActiveByInternId(internId)
+                .map(ipr -> ipr.getProgram().getId())
+                .or(() -> iprRepository.findByInternId(internId).stream()
+                        .max(Comparator.comparing(
+                                by.bsuir.growpathserver.trainee.domain.entity.IprEntity::getUpdatedAt,
+                                Comparator.nullsLast(Comparator.naturalOrder())))
+                        .map(ipr -> ipr.getProgram().getId()))
+                .or(() -> internshipProgramParticipantRepository
+                        .findByUserIdAndRole(internId, ProgramParticipantRole.INTERN).stream()
+                        .findFirst()
+                        .map(participant -> participant.getProgram().getId()))
+                .orElse(null);
+    }
+
+    private String resolveProgramTitle(Long programId) {
+        return internshipProgramRepository.findById(programId)
+                .map(InternshipProgramEntity::getTitle)
+                .orElse("Program " + programId);
+    }
+
+    private List<MentorWorkloadChartItem> buildMentorsWorkloadChart(List<UserEntity> mentors) {
+        return mentors.stream()
+                .map(mentor -> {
+                    List<TaskEntity> mentorTasks = taskRepository.findByMentorId(mentor.getId());
+                    MentorWorkloadChartItem item = new MentorWorkloadChartItem();
+                    item.setMentorId(mentor.getId());
+                    item.setMentorName(mentor.getFirstName() + " " + mentor.getLastName());
+                    long activeInterns = mentorTasks.stream()
+                            .map(TaskEntity::getAssigneeId)
+                            .filter(Objects::nonNull)
+                            .distinct()
+                            .count();
+                    item.setActiveInterns((int) activeInterns);
+                    int activeTasks = (int) mentorTasks.stream()
+                            .filter(task -> task.getStatus() != TaskStatus.COMPLETED
+                                    && task.getStatus() != TaskStatus.REJECTED)
+                            .count();
+                    item.setActiveTasks(activeTasks);
+                    item.setWorkloadLevel(resolveWorkloadLevel((int) activeInterns));
+                    return item;
+                })
+                .sorted(Comparator.comparing(MentorWorkloadChartItem::getActiveTasks).reversed())
+                .toList();
+    }
+
+    private MentorWorkloadChartItem.WorkloadLevelEnum resolveWorkloadLevel(int activeInterns) {
+        if (activeInterns == 0) {
+            return MentorWorkloadChartItem.WorkloadLevelEnum.LOW;
+        }
+        if (activeInterns <= 3) {
+            return MentorWorkloadChartItem.WorkloadLevelEnum.NORMAL;
+        }
+        if (activeInterns <= 5) {
+            return MentorWorkloadChartItem.WorkloadLevelEnum.HIGH;
+        }
+        return MentorWorkloadChartItem.WorkloadLevelEnum.OVERLOADED;
+    }
+
+    private Map<String, Integer> buildHiringDecisionsChart(
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            Set<Long> scopedInternIds,
+            Long programId) {
+        Map<String, Integer> distribution = new HashMap<>();
+        for (HiringDecisionType type : HiringDecisionType.values()) {
+            distribution.put(type.toApiValue(), 0);
+        }
+        internHiringDecisionRepository.findByDecidedAtBetween(dateFrom, dateTo).stream()
+                .filter(decision -> Objects.isNull(programId)
+                        || Objects.equals(decision.getProgram().getId(), programId))
+                .filter(decision -> Objects.isNull(scopedInternIds)
+                        || scopedInternIds.contains(decision.getIntern().getId()))
+                .forEach(decision -> distribution.merge(decision.getDecision().toApiValue(), 1, Integer::sum));
+        return distribution;
+    }
+
+    private List<ProgramCompletionChartItem> buildProgramCompletionChart(Long programId, Long departmentId) {
+        List<InternshipProgramEntity> programs = internshipProgramRepository.findAll().stream()
+                .filter(program -> Objects.isNull(programId) || Objects.equals(program.getId(), programId))
+                .toList();
+
+        return programs.stream()
+                .map(program -> {
+                    Set<Long> internIds = resolveProgramInternIds(program.getId(), departmentId);
+                    ProgramCompletionChartItem item = new ProgramCompletionChartItem();
+                    item.setProgramId(program.getId());
+                    item.setProgramName(program.getTitle());
+                    item.setInternCount(internIds.size());
+                    item.setCompletionRate(calculateInternSetCompletionRate(internIds));
+                    return item;
+                })
+                .filter(item -> item.getInternCount() > 0)
+                .sorted(Comparator.comparing(ProgramCompletionChartItem::getCompletionRate).reversed())
+                .toList();
+    }
+
+    private Set<Long> resolveProgramInternIds(Long programId, Long departmentId) {
+        Set<Long> internIds = new HashSet<>();
+        internshipProgramParticipantRepository
+                .findByProgramIdAndRole(programId, ProgramParticipantRole.INTERN)
+                .stream()
+                .map(participant -> participant.getUser().getId())
+                .forEach(internIds::add);
+        userRepository.findByRole(UserRole.INTERN).stream()
+                .filter(intern -> iprRepository.existsByProgram_IdAndIntern_Id(programId, intern.getId()))
+                .map(UserEntity::getId)
+                .forEach(internIds::add);
+        if (Objects.nonNull(departmentId)) {
+            return internIds.stream()
+                    .map(userRepository::findById)
+                    .flatMap(java.util.Optional::stream)
+                    .filter(intern -> Objects.equals(intern.getDepartmentId(), departmentId))
+                    .map(UserEntity::getId)
+                    .collect(Collectors.toSet());
+        }
+        return internIds;
+    }
+
+    private Map<String, Integer> buildInternProgressBuckets(List<UserEntity> interns) {
+        Map<String, Integer> buckets = new LinkedHashMap<>();
+        buckets.put("0-25", 0);
+        buckets.put("26-50", 0);
+        buckets.put("51-75", 0);
+        buckets.put("76-100", 0);
+        for (UserEntity intern : interns) {
+            String bucket = resolveProgressBucket(calculateInternProgressPercent(intern.getId()));
+            buckets.merge(bucket, 1, Integer::sum);
+        }
+        return buckets;
+    }
+
+    private double calculateInternProgressPercent(Long internId) {
+        List<TaskEntity> tasks = taskRepository.findByAssigneeId(internId);
+        if (tasks.isEmpty()) {
+            return 0.0;
+        }
+        long completed = tasks.stream().filter(task -> TaskStatus.COMPLETED.equals(task.getStatus())).count();
+        return completed * 100.0 / tasks.size();
+    }
+
+    private String resolveProgressBucket(double progress) {
+        if (progress <= 25.0) {
+            return "0-25";
+        }
+        if (progress <= 50.0) {
+            return "26-50";
+        }
+        if (progress <= 75.0) {
+            return "51-75";
+        }
+        return "76-100";
+    }
+
+    private double calculateInternSetCompletionRate(Set<Long> internIds) {
+        if (internIds.isEmpty()) {
+            return 0.0;
+        }
+        return internIds.stream()
+                .mapToDouble(this::calculateInternProgressPercent)
+                .average()
+                .orElse(0.0);
+    }
+
+    private double calculateAverageProgramCompletionRate(List<InternshipProgramEntity> programs) {
+        if (programs.isEmpty()) {
+            return 0.0;
+        }
+        return programs.stream()
+                .mapToDouble(
+                        program -> calculateInternSetCompletionRate(resolveProgramInternIds(program.getId(), null)))
+                .average()
+                .orElse(0.0);
+    }
+
+    private ProgramsStatsResponseProgramStatsInner toProgramStatsInner(InternshipProgramEntity program) {
+        Set<Long> internIds = resolveProgramInternIds(program.getId(), null);
+        ProgramsStatsResponseProgramStatsInner stat = new ProgramsStatsResponseProgramStatsInner();
+        stat.setProgramId(program.getId());
+        stat.setProgramName(program.getTitle());
+        stat.setTotalInterns(internIds.size());
+        stat.setActiveInterns((int) internIds.stream()
+                .map(userRepository::findById)
+                .flatMap(java.util.Optional::stream)
+                .filter(user -> UserStatus.ACTIVE.equals(user.getStatus()))
+                .count());
+        stat.setCompletedInterns(stat.getTotalInterns() - stat.getActiveInterns());
+        stat.setCompletionRate(calculateInternSetCompletionRate(internIds));
+        stat.setAverageRating(calculateInternSetAverageRating(internIds));
+        stat.setStatus(mapProgramStatus(program.getStatus()));
+        return stat;
+    }
+
+    private double calculateInternSetAverageRating(Set<Long> internIds) {
+        return internIds.stream()
+                .map(taskRepository::getAverageRatingByAssigneeId)
+                .filter(Objects::nonNull)
+                .filter(rating -> rating > 0)
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0);
+    }
+
+    private ProgramsStatsResponseProgramStatsInner.StatusEnum mapProgramStatus(InternshipProgramStatus status) {
+        if (Objects.isNull(status)) {
+            return ProgramsStatsResponseProgramStatsInner.StatusEnum.ACTIVE;
+        }
+        return switch (status) {
+            case COMPLETED -> ProgramsStatsResponseProgramStatsInner.StatusEnum.COMPLETED;
+            case ARCHIVED -> ProgramsStatsResponseProgramStatsInner.StatusEnum.ARCHIVED;
+            default -> ProgramsStatsResponseProgramStatsInner.StatusEnum.ACTIVE;
+        };
     }
 
     private boolean isTaskInDateRange(TaskEntity task, LocalDateTime from, LocalDateTime to) {
@@ -486,8 +1048,27 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
     }
 
     private List<InternsStatsResponseDistributionByProgramInner> calculateDistributionByProgram(List<UserEntity> interns) {
-        // TODO: Implement when intern-program relationship is available
-        return new ArrayList<>();
+        Map<Long, Long> counts = new HashMap<>();
+        Map<Long, String> names = new HashMap<>();
+        for (UserEntity intern : interns) {
+            Long programId = resolveInternProgramId(intern.getId());
+            if (Objects.isNull(programId)) {
+                continue;
+            }
+            counts.merge(programId, 1L, Long::sum);
+            names.putIfAbsent(programId, resolveProgramTitle(programId));
+        }
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                .map(entry -> {
+                    InternsStatsResponseDistributionByProgramInner item =
+                            new InternsStatsResponseDistributionByProgramInner();
+                    item.setProgramId(entry.getKey());
+                    item.setProgramName(names.getOrDefault(entry.getKey(), "Program " + entry.getKey()));
+                    item.setCount(entry.getValue().intValue());
+                    return item;
+                })
+                .toList();
     }
 
     private List<InternsStatsResponseTopPerformersInner> getTopPerformers(List<UserEntity> interns, int limit) {

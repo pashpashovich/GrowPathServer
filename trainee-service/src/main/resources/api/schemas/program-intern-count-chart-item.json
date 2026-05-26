@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programName": {
+      "type": "string"
+    },
+    "count": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "programId",
+    "programName",
+    "count"
+  ]
+}
